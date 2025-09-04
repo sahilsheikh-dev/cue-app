@@ -1,0 +1,92 @@
+{
+  "expo": {
+    "name": "cue_wellness",
+    "slug": "cuewellness",
+    "owner": "sahilasheikh123",
+    "version": "2.2.0",
+    "orientation": "portrait",
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Cue Wellness to access your microphone."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Cue Wellness to access your camera",
+          "microphonePermission": "Allow Cue Wellness to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "react-native-iap",
+        {
+          "paymentProvider": "both"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff",
+      "imageWidth": "500"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "net.cuewellness",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "This app needs access to the microphone to record audio.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to let you upload certificates.",
+        "NSCameraUsageDescription": "This app needs camera access to capture certificates.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "20.203.47.117": {
+              "NSIncludesSubdomains": true,
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
+              "NSTemporaryExceptionMinimumTLSVersion": "TLSv1.0"
+            }
+          }
+        }
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/splash-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
+      ],
+      "package": "net.cuewellness"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5dbae576-50ab-4239-9285-fd932c8efb2f"
+      }
+    }
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      }
+    }
+  }
+}

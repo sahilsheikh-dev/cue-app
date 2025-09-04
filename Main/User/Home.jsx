@@ -1,0 +1,746 @@
+import {
+  Text,
+  View,
+  SafeAreaView,
+  Image,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Share,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
+import img1 from "../../Images/img1.png";
+import img2 from "../../Images/img2.png";
+import img3 from "../../Images/img3.png";
+import styles from "./HomeCss";
+// import { Svg, Path, Mask, G, Rect } from "react-native-svg";
+import { StatusBar } from "expo-status-bar";
+const background = require("../../Images/background.png");
+import axios from "axios";
+import { DataContext } from "../../Context/DataContext";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRef, useState, useContext, useEffect } from "react";
+import {
+  initPaymentSheet,
+  presentPaymentSheet,
+} from "@stripe/stripe-react-native";
+import {
+  Svg,
+  Path,
+  G,
+  Circle,
+  Ellipse,
+  Defs,
+  Filter,
+  FeFlood,
+  FeColorMatrix,
+  FeOffset,
+  FeGaussianBlur,
+  FeBlend,
+  Stop,
+  LinearGradient as Lg,
+  Rect,
+} from "react-native-svg";
+
+// in app purchase
+
+import {
+  PurchaseError,
+  requestSubscription,
+  useIAP,
+  validateReceiptIos,
+  initConnection,
+  endConnection,
+} from "react-native-iap";
+
+const errorLog = ({ message, error }) => {
+  console.error("An error happened", message, error);
+};
+
+const isIos = Platform.OS === "ios";
+
+//product id from appstoreconnect app->subscriptions
+const subscriptionSkus = Platform.select({
+  ios: ["net.cuewellness.reflection"],
+});
+
+export default function Home({ navigation }) {
+  const { data, logout } = useContext(DataContext);
+  const [name, setName] = useState("");
+  const [greeting, setGreeting] = useState("Loading...");
+  const [awareness_guideline, setAwareness_guideline] = useState(false); // true means user has read
+  const [connection_guideline, setConnection_guideline] = useState(false); // true means user has read
+  const [reflection_guideline, setReflection_guideline] = useState(false); // true means user has read
+
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+
+    if (hour >= 5 && hour < 12) {
+      setGreeting("Good morning");
+    } else if (hour >= 12 && hour < 17) {
+      setGreeting("Good afternoon");
+    } else if (hour >= 17 && hour < 21) {
+      setGreeting("Good evening");
+    } else {
+      setGreeting("Good evening");
+    }
+  }, []);
+
+  // const fetchPaymentSheetParams = async () => {
+  //   console.log("going");
+  //   let data_ = undefined;
+  //   // const response = await fetch(data.url + "/user/auth/subscribe", {
+  //   //   method: "POST",
+  //   //   headers: { "Content-Type": "application/json" },
+  //   //   body: JSON.stringify({
+  //   //     amount: 5000, // $50.00
+  //   //     currency: "usd",
+  //   //   }),
+  //   // });
+
+  //   let res = await axios.post(data.url + "/user/sub-reflection-start", {
+  //     token: data.authToken,
+  //   });
+  //   data_ = res.data;
+  //   console.log(data_);
+  //   return data_;
+  // };
+
+  // const initializePaymentSheet = async () => {
+  //   const { paymentIntent, ephemeralKey, customer, publishableKey } =
+  //     await fetchPaymentSheetParams();
+  //   const { error } = await initPaymentSheet({
+  //     merchantDisplayName: "Cue Wellness",
+  //     customerId: customer,
+  //     customerEphemeralKeySecret: ephemeralKey,
+  //     paymentIntentClientSecret: paymentIntent,
+  //     paymentIntentClientSecret: paymentIntent, // ✅ REQUIRED
+  //     allowsDelayedPaymentMethods: true, // Optional: if you support Klarna, etc.
+  //     returnURL: "weebookie://stripe-redirect", // 👈 REQUIRED for redirect-based methods
+  //   });
+
+  //   console.log(error);
+
+  //   if (!error) {
+  //     setLoading(true);
+  //   }
+  // };
+
+  // const openPaymentSheet = async () => {
+  //   console.log();
+  //   const { error } = await presentPaymentSheet();
+  //   if (error) {
+  //     Alert.alert(`Error code: ${error.code}`, error.message);
+  //   } else {
+  //     axios
+  //       .post(data.url + "/user/sub-reflection", {
+  //         token: data.authToken,
+  //       })
+  //       .then((res) => {
+  //         // checked_today();
+  //         // login("user");
+  //       });
+  //     Alert.alert("Success", "Your payment is confirmed!");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   initializePaymentSheet();
+  // }, []);
+
+  // useEffect(async () => {
+  //   let res = await axios.post(data.url + "/user/sub-reflection-start", {
+  //     token: data.authToken,
+  //   });
+  //   data_ = res.data;
+  //   console.log(data_);
+  //   return data_;
+  // }, []);
+
+  useEffect(() => {
+    axios
+      .post(data.url + "/user/has-read-awareness-guideline", {
+        token: data.authToken,
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.alert != undefined) {
+          Alert.alert(res.data.alert);
+        } else if (res.data.logout == true) {
+          logout();
+        } else {
+          if (res.data.supply == true) {
+            setAwareness_guideline(true);
+          } else {
+            setAwareness_guideline(false);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .post(data.url + "/user/has-read-connection-guideline", {
+        token: data.authToken,
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.alert != undefined) {
+          Alert.alert(res.data.alert);
+        } else if (res.data.logout == true) {
+          logout();
+        } else {
+          if (res.data.supply == true) {
+            setConnection_guideline(true);
+          } else {
+            setConnection_guideline(false);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .post(data.url + "/user/has-read-reflection-guideline", {
+        token: data.authToken,
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.alert != undefined) {
+          Alert.alert(res.data.alert);
+        } else if (res.data.logout == true) {
+          logout();
+        } else {
+          if (res.data.supply == true) {
+            setReflection_guideline(true);
+          } else {
+            setReflection_guideline(false);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .post(data.url + "/user/get-user-name", {
+        token: data.authToken,
+      })
+      .then((res) => {
+        if (res.data.res == true) {
+          console.log(res.data);
+          setName(res.data.supply);
+        } else if (res.data.alert != undefined) {
+          Alert.alert("Warning", res.data.alert);
+        } else if (res.data.logout == true) {
+          logout();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const [reflection_already, setReflection_already] = useState(false);
+
+  useEffect(() => {
+    axios
+      .post(data.url + "/user/reflection-already-sub", {
+        token: data.authToken,
+      })
+      .then((res) => {
+        if (res.data.res == true) {
+          setReflection_already(true);
+        }
+      });
+  }, []);
+
+  // in app purchase here
+  const [loading, setLoading] = useState(true);
+  const [buy_loading, setBuy_loading] = useState(false);
+
+  const {
+    connected,
+    subscriptions, //returns subscriptions for this app.
+    getSubscriptions, //Gets available subsctiptions for this app.
+    currentPurchase, //current purchase for the tranasction
+    finishTransaction,
+    purchaseHistory, //return the purchase history of the user on the device (sandbox user in dev)
+    getPurchaseHistory, //gets users purchase history
+  } = useIAP();
+
+  useEffect(() => {
+    if (subscriptions[0] != undefined) {
+      console.log(subscriptions);
+      setLoading(false);
+    }
+  }, [subscriptions]);
+
+  // const [loading, setLoading] = useState(false);
+
+  const handleGetPurchaseHistory = async () => {
+    try {
+      await getPurchaseHistory();
+      console.log("purchaseHistory");
+      console.log(purchaseHistory);
+    } catch (error) {
+      errorLog({ message: "handleGetPurchaseHistory", error });
+    }
+  };
+
+  useEffect(() => {
+    handleGetPurchaseHistory();
+  }, [connected]);
+
+  const handleGetSubscriptions = async () => {
+    try {
+      await getSubscriptions({ skus: subscriptionSkus });
+    } catch (error) {
+      errorLog({ message: "handleGetSubscriptions", error });
+    }
+  };
+
+  useEffect(() => {
+    handleGetSubscriptions();
+  }, [connected]);
+
+  useEffect(() => {
+    // ... listen if connected, purchaseHistory and subscriptions exist
+    if (purchaseHistory?.length && subscriptionSkus?.length) {
+      const isSubscribed = purchaseHistory.some(
+        (x) => x.productId === subscriptionSkus[0]
+      );
+      console.log(isSubscribed ? "already a sub" : "not a sub");
+    }
+  }, [connected, purchaseHistory, subscriptions]);
+
+  const handleBuySubscription = async (productId) => {
+    try {
+      setBuy_loading(true);
+      await requestSubscription({
+        sku: productId,
+      });
+      setBuy_loading(false);
+    } catch (error) {
+      setBuy_loading(false);
+      if (error instanceof PurchaseError) {
+        errorLog({ message: `[${error.code}]: ${error.message}`, error });
+      } else {
+        errorLog({ message: "handleBuySubscription", error });
+      }
+    }
+  };
+
+  useEffect(() => {
+    const checkCurrentPurchase = async (purchase) => {
+      if (!purchase?.transactionReceipt) return;
+
+      try {
+        const receipt = purchase.transactionReceipt;
+        console.log("receipt");
+        console.log(receipt);
+
+        if (Platform.OS === "ios") {
+          const isTestEnvironment = __DEV__;
+
+          const appleReceiptResponse = await validateReceiptIos(
+            {
+              "receipt-data": receipt,
+              password: "63c03e8df68c46e29c6ee354df634a1f",
+            },
+            isTestEnvironment
+          );
+
+          console.log("sub1");
+          console.log(subscriptions[0].productId);
+          if (
+            appleReceiptResponse.status &&
+            subscriptions[0].productId == "net.cuewellness.reflection"
+          ) {
+            // 21002
+            console.log("sub2");
+            console.log("Subscription purchase verified");
+
+            // Call backend API to update subscription
+            const res = await axios.post(data.url + "/user/sub-reflection", {
+              token: data.authToken,
+            });
+
+            if (res.data.res === true) {
+              setReflection_already(true);
+            }
+
+            // ✅ Acknowledge the transaction
+            await finishTransaction(purchase);
+          }
+        }
+      } catch (error) {
+        console.log("Purchase validation error", error);
+      }
+    };
+
+    if (currentPurchase) {
+      checkCurrentPurchase(currentPurchase);
+    }
+  }, [currentPurchase]);
+
+  return (
+    <SafeAreaView style={styles.sav}>
+      <StatusBar style="light" />
+      <Image source={background} style={styles.backgroundImage} />
+      <LinearGradient
+        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
+        style={styles.backgroundView}
+      ></LinearGradient>
+      <View style={styles.sv_oter}>
+        <ScrollView style={styles.main_scroll_view}>
+          <View style={styles.top_portion}></View>
+          <View style={styles.help_portion}>
+            <TouchableOpacity
+              style={styles.hp1}
+              onPress={() => {
+                navigation.navigate("ManagemenetChat");
+              }}
+            >
+              <LinearGradient
+                style={styles.circle}
+                colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
+              >
+                <View style={styles.inner_circle}>
+                  <Svg
+                    width="23"
+                    height="23"
+                    viewBox="0 0 21 21"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M16.8199 16.51C14.2731 19.0571 10.5019 19.6074 7.41576 18.1802C6.96017 17.9967 6.58665 17.8485 6.23156 17.8485C5.24249 17.8544 4.01139 18.8134 3.37155 18.1743C2.73171 17.5344 3.69147 16.3023 3.69147 15.3073C3.69147 14.9521 3.5491 14.5853 3.36569 14.1288C1.93778 11.0432 2.48884 7.27073 5.03563 4.72449C8.28675 1.47218 13.5688 1.47218 16.8199 4.72366C20.0769 7.98099 20.071 13.2586 16.8199 16.51Z"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <Path
+                      d="M14.2098 10.9626H14.2173"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <Path
+                      d="M10.8699 10.9626H10.8774"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <Path
+                      d="M7.5301 10.9626H7.5376"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </Svg>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+            <View style={styles.hp2}>
+              <Text style={styles.h2_text}>cue</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.hp3}
+              onPress={() => {
+                Share.share({
+                  message:
+                    "Check out the Cue Wellness app for personalized mental health support! Download it now: https://cuewellness.app",
+                  url: "https://cuewellness.app",
+                  title: "Cue Wellness App",
+                });
+              }}
+            >
+              <LinearGradient
+                style={styles.circle}
+                colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
+              >
+                <View style={styles.inner_circle}>
+                  <Svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    height={21}
+                    width={21}
+                  >
+                    <G id="SVGRepo_bgCarrier" strokeWidth="0"></G>
+                    <G
+                      id="SVGRepo_tracerCarrier"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    ></G>
+                    <G id="SVGRepo_iconCarrier">
+                      <Path
+                        d="M12.0004 18.5816V12.5M12.7976 18.754L15.8103 19.7625C17.4511 20.3118 18.2714 20.5864 18.7773 20.3893C19.2166 20.2182 19.5499 19.8505 19.6771 19.3965C19.8236 18.8737 19.4699 18.0843 18.7624 16.5053L14.2198 6.36709C13.5279 4.82299 13.182 4.05094 12.7001 3.81172C12.2814 3.60388 11.7898 3.60309 11.3705 3.80958C10.8878 4.04726 10.5394 4.8182 9.84259 6.36006L5.25633 16.5082C4.54325 18.086 4.18671 18.875 4.33169 19.3983C4.4576 19.8528 4.78992 20.2216 5.22888 20.394C5.73435 20.5926 6.55603 20.3198 8.19939 19.7744L11.2797 18.752C11.5614 18.6585 11.7023 18.6117 11.8464 18.5933C11.9742 18.5769 12.1036 18.5771 12.2314 18.5938C12.3754 18.6126 12.5162 18.6597 12.7976 18.754Z"
+                        stroke="#FFFFFF"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></Path>
+                    </G>
+                  </Svg>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.greeting_whole}>
+            <Text style={styles.greeting_text} numberOfLines={1}>
+              {greeting}
+            </Text>
+            <View style={styles.gt_svg}>
+              <Text style={styles.greeting_text1}>
+                {name}
+
+                {"  "}
+              </Text>
+              <Svg
+                fill="#ffffff"
+                version="1.1"
+                id="Capa_1"
+                viewBox="0 0 532.523 532.523"
+                height={28}
+                width={28}
+                style={{
+                  position: "relative",
+                  bottom: 3,
+                }}
+              >
+                <G id="SVGRepo_bgCarrier" strokeWidth="0"></G>
+                <G
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></G>
+                <G id="SVGRepo_iconCarrier">
+                  <G>
+                    <Path d="M271.396,337.635v14.543c0,2.632-2.135,4.779-4.779,4.779c-0.66,0-1.29-0.141-1.859-0.383 c-0.889-0.373-1.566-1.06-2.084-1.854c-0.152-0.232-0.353-0.429-0.467-0.686c-0.063-0.154-0.049-0.336-0.101-0.499 c-0.135-0.439-0.277-0.878-0.277-1.358l-0.005-14.543c0-2.642,2.135-4.779,4.779-4.779c0.658,0,1.291,0.131,1.864,0.374 C270.191,333.957,271.396,335.656,271.396,337.635z M181.263,295.239c0.658,2.025,2.527,3.305,4.543,3.305 c0.492,0,0.985-0.075,1.482-0.233l13.831-4.499h0.005l0,0c2.508-0.817,3.885-3.51,3.073-6.021 c-0.822-2.512-3.512-3.884-6.021-3.071h-0.005c0,0-0.004,0-0.012,0l-5.706,1.857l-8.113,2.637 c-1.888,0.611-3.132,2.282-3.288,4.145C180.99,293.975,181.057,294.614,181.263,295.239z M184.21,245.887l13.831,4.487 c0.492,0.159,0.984,0.236,1.477,0.236c0.501,0,0.999-0.082,1.472-0.236c1.405-0.453,2.581-1.556,3.078-3.073 c0.205-0.625,0.273-1.265,0.219-1.888c-0.164-1.853-1.405-3.526-3.288-4.137l-13.831-4.492c-2.509-0.817-5.204,0.562-6.021,3.066 c-0.206,0.627-0.273,1.267-0.222,1.89C181.081,243.603,182.322,245.276,184.21,245.887z M221.082,213.428 c0.467,0.646,1.069,1.136,1.729,1.468c0.669,0.333,1.4,0.502,2.142,0.502c0.973,0,1.953-0.297,2.805-0.913 c2.13-1.554,2.609-4.541,1.055-6.676l-8.55-11.768c-1.542-2.13-4.534-2.609-6.672-1.055l0,0h-0.004 c-2.135,1.554-2.609,4.541-1.055,6.676L221.082,213.428z M312.242,195.807l-8.551,11.766c-1.554,2.138-1.078,5.125,1.06,6.676 c0.85,0.618,1.83,0.913,2.801,0.913c1.483,0,2.94-0.682,3.873-1.967l8.551-11.766c1.554-2.138,1.082-5.125-1.056-6.676 C316.778,193.198,313.787,193.672,312.242,195.807z M351.562,239.475c-0.822-2.509-3.524-3.89-6.03-3.064l-13.824,4.497 c-2.511,0.817-3.883,3.512-3.07,6.023c0.662,2.016,2.529,3.302,4.546,3.302c0.494,0,0.989-0.077,1.483-0.24l13.824-4.497 C351.007,244.679,352.374,241.983,351.562,239.475z M345.672,297.918c0.495,0.159,0.985,0.233,1.475,0.233 c2.017,0,3.893-1.288,4.546-3.304c0.821-2.512-0.56-5.209-3.07-6.025l-13.833-4.485c-2.497-0.821-5.209,0.56-6.021,3.071 c-0.816,2.511,0.561,5.203,3.071,6.021L345.672,297.918z M311.742,321.281c-1.545-2.128-4.526-2.604-6.669-1.05 c-2.133,1.554-2.608,4.541-1.055,6.679l8.555,11.761c0.934,1.284,2.39,1.97,3.869,1.97c0.976,0,1.955-0.299,2.805-0.915 c2.138-1.554,2.613-4.541,1.055-6.674L311.742,321.281z M221.397,321.524l-8.546,11.761c-1.549,2.138-1.076,5.125,1.062,6.679 c0.849,0.616,1.83,0.91,2.805,0.91c1.482,0,2.934-0.682,3.876-1.97l8.545-11.761c0.311-0.43,0.481-0.905,0.63-1.382 c0.037-0.121,0.128-0.224,0.159-0.341c0.42-1.815-0.25-3.789-1.851-4.956C225.922,318.901,222.944,319.387,221.397,321.524z M266.21,201.867c2.642,0,4.779-2.14,4.779-4.779v-0.005v-14.542c0-2.639-2.137-4.779-4.779-4.779c-2.644,0-4.779,2.14-4.779,4.779 v14.542v0.005C261.432,199.728,263.566,201.867,266.21,201.867z M189.029,216.482c0.424,0.306,0.912,0.457,1.405,0.457 c0.735,0,1.468-0.338,1.93-0.984c0.775-1.069,0.542-2.56-0.525-3.335L53.919,112.406c-1.066-0.768-2.562-0.539-3.337,0.527 c-0.774,1.064-0.539,2.562,0.525,3.335L189.029,216.482z M234.687,181.127c0.327,1.008,1.267,1.652,2.275,1.652 c0.245,0,0.497-0.037,0.737-0.114c1.255-0.406,1.939-1.759,1.533-3.01L186.558,17.513c-0.401-1.255-1.76-1.939-3.011-1.533 c-1.257,0.406-1.941,1.759-1.535,3.01L234.687,181.127z M293.942,182.377c0.242,0.082,0.495,0.115,0.737,0.115 c1.008,0,1.941-0.64,2.277-1.652l52.682-162.137c0.406-1.251-0.279-2.6-1.535-3.01c-1.246-0.401-2.604,0.282-3.01,1.533 l-52.691,162.141C292.001,180.625,292.687,181.972,293.942,182.377z M339.614,215.201c0.467,0.644,1.194,0.985,1.933,0.985 c0.485,0,0.975-0.149,1.399-0.46l137.922-100.193c1.073-0.774,1.298-2.271,0.522-3.337c-0.774-1.064-2.272-1.3-3.332-0.525 L340.142,211.859C339.073,212.634,338.84,214.13,339.614,215.201z M530.134,266.222H359.65c-1.321,0-2.39,1.071-2.39,2.387 c0,1.326,1.068,2.389,2.39,2.389h170.483c1.321,0,2.39-1.063,2.39-2.389C532.523,267.293,531.455,266.222,530.134,266.222z M343.488,321.659c-1.064-0.774-2.558-0.546-3.333,0.528c-0.774,1.068-0.541,2.557,0.523,3.332L478.6,425.735 c0.42,0.304,0.91,0.458,1.4,0.458c0.737,0,1.47-0.341,1.933-0.985c0.774-1.068,0.541-2.562-0.523-3.332L343.488,321.659z M297.825,357.013c-0.401-1.251-1.745-1.937-3.006-1.53c-1.26,0.405-1.941,1.759-1.535,3.01l52.678,162.135 c0.326,1.013,1.269,1.656,2.277,1.656c0.242,0,0.494-0.037,0.737-0.116c1.256-0.406,1.941-1.76,1.53-3.011L297.825,357.013z M238.577,355.762c-1.246-0.41-2.604,0.285-3.01,1.535l-52.68,162.135c-0.406,1.256,0.282,2.6,1.533,3.011 c0.245,0.084,0.497,0.116,0.737,0.116c1.008,0,1.944-0.64,2.275-1.656l52.68-162.125 C240.518,357.517,239.834,356.173,238.577,355.762z M192.905,322.934c-0.775-1.068-2.275-1.293-3.337-0.522L51.653,422.608 c-1.071,0.774-1.3,2.272-0.525,3.337c0.467,0.645,1.195,0.984,1.93,0.984c0.492,0,0.98-0.148,1.405-0.462l137.915-100.202 C193.444,325.501,193.677,324.002,192.905,322.934z M175.254,269.533c0-1.326-1.069-2.392-2.39-2.392H2.39 c-1.318,0-2.39,1.066-2.39,2.392c0,1.316,1.071,2.39,2.39,2.39h170.475C174.185,271.923,175.254,270.85,175.254,269.533z M192.487,377.091L192.487,377.091c1.578-2.129,1.134-5.12-0.982-6.693c-2.114-1.577-5.106-1.129-6.683,0.99l-16.118,21.716 c-0.784,1.059-1.071,2.338-0.894,3.542c0.075,0.49,0.275,0.942,0.493,1.391l-15.017,20.274l-3.222,4.35 c-0.397,0.531-0.535,1.171-0.443,1.777c0.042,0.304,0.142,0.598,0.301,0.864c0.159,0.271,0.369,0.509,0.635,0.704 c0.432,0.312,0.929,0.472,1.426,0.472c0.726,0,1.451-0.336,1.916-0.971l18.386-24.811c0.084,0.005,0.161,0.038,0.247,0.038 c1.463,0,2.901-0.668,3.844-1.933L192.487,377.091L192.487,377.091z M267.177,143.151c0.019,0,0.037,0,0.051,0 c2.618,0,4.75-2.107,4.779-4.73l0.282-27.037c0.019-1.853-1.052-3.421-2.581-4.233l0.296-30.644 c0.014-1.318-1.045-2.399-2.366-2.413c-1.295-0.154-2.399,1.045-2.413,2.366l-0.301,30.957c-1.276,0.847-2.175,2.219-2.193,3.867 l-0.283,27.036C262.421,140.962,264.537,143.123,267.177,143.151z M356.145,139.347l-16.119,21.707 c-1.578,2.117-1.135,5.113,0.979,6.686c0.863,0.637,1.862,0.943,2.852,0.943c1.461,0,2.898-0.67,3.841-1.932l16.125-21.707 c1.097-1.487,1.162-3.384,0.401-4.936l18.244-24.624c0.788-1.06,0.56-2.555-0.495-3.344c-1.064-0.78-2.558-0.565-3.342,0.497 l-18.426,24.871C358.675,137.44,357.135,138.024,356.145,139.347z M265.335,394.984c-0.014,0-0.033,0-0.047,0 c-1.965,0-3.661,1.186-4.392,2.884c-0.25,0.569-0.387,1.195-0.392,1.849l-0.273,27.036c-0.019,1.849,1.045,3.416,2.572,4.224 l-0.297,30.653c-0.014,1.316,1.046,2.399,2.364,2.413c0.012,0,0.016,0,0.025,0c1.31,0,2.376-1.055,2.39-2.366l0.306-30.957 c1.276-0.845,2.175-2.217,2.193-3.869l0.278-27.041C270.101,397.168,267.979,395.012,265.335,394.984z M82.764,210.536 l29.345,9.846c0.411,1.481,1.439,2.763,3.001,3.288l25.627,8.623c0,0,0.004,0,0.009,0h0.01c0.501,0.17,1.017,0.252,1.519,0.252 c1.998,0,3.862-1.262,4.532-3.26c0.84-2.499-0.506-5.213-3.013-6.053l-25.644-8.627c-1.745-0.588-3.561-0.058-4.807,1.137 l-29.058-9.745c-1.248-0.41-2.611,0.255-3.026,1.508c-0.105,0.311-0.138,0.63-0.114,0.94 C81.217,209.384,81.828,210.226,82.764,210.536z M170.169,139.069c-0.539,1.44-0.462,3.078,0.492,4.427l15.658,22.031 c0.931,1.309,2.408,2.011,3.899,2.011c0.955,0,1.92-0.287,2.761-0.884c2.151-1.528,2.658-4.511,1.129-6.662l-15.658-22.031 c-1.069-1.505-2.852-2.149-4.562-1.906l-17.784-24.972c-0.765-1.08-2.261-1.318-3.33-0.558c-1.076,0.763-1.326,2.254-0.56,3.33 L170.169,139.069z M449.123,208.562l-29.543,9.283c-1.195-0.952-2.777-1.381-4.35-0.892l-25.809,8.088 c-2.516,0.789-3.916,3.47-3.127,5.987c0.639,2.044,2.52,3.356,4.56,3.356c0.471,0,0.947-0.072,1.428-0.222l25.805-8.086 c1.773-0.553,2.94-2.058,3.233-3.771l29.23-9.185c1.26-0.396,1.96-1.734,1.559-2.996 C451.727,208.868,450.388,208.17,449.123,208.562z M449.758,327.605l-29.347-9.853c-0.411-1.475-1.442-2.753-2.997-3.276 l-25.641-8.62c-2.487-0.835-5.208,0.505-6.053,3.006c-0.841,2.497,0.509,5.213,3.01,6.054l25.637,8.624 c0.499,0.168,1.018,0.253,1.517,0.253c1.26,0,2.417-0.542,3.3-1.4l29.048,9.749c0.257,0.084,0.509,0.126,0.761,0.126 c0.998,0,1.932-0.635,2.264-1.633C451.689,329.379,451.013,328.021,449.758,327.605z M380.312,424.284l-17.959-25.207 c0.103-0.285,0.271-0.556,0.317-0.854c0.205-1.204-0.057-2.487-0.812-3.565l-15.662-22.042c-1.531-2.152-4.509-2.656-6.67-1.125 l0,0h-0.004c-2.147,1.525-2.656,4.508-1.13,6.66l15.667,22.042c0.934,1.312,2.404,2.017,3.897,2.017 c0.233,0,0.452-0.075,0.682-0.103l17.781,24.959c0.467,0.653,1.194,0.999,1.941,0.999c0.485,0,0.966-0.141,1.386-0.443 C380.824,426.851,381.076,425.357,380.312,424.284z M82.689,329.691c0.238,0,0.476-0.037,0.716-0.111l29.468-9.27 c0.453,0.369,0.95,0.682,1.505,0.859c0.474,0.158,0.971,0.237,1.481,0.237c0.474,0,0.95-0.069,1.428-0.219l25.807-8.089 c2.52-0.788,3.92-3.467,3.131-5.987c-0.592-1.895-2.256-3.159-4.114-3.332c-0.354-0.033-0.719,0.065-1.085,0.116 c-0.269,0.037-0.527,0-0.789,0.089l0,0c-0.01,0-0.014,0-0.021,0l-25.788,8.083c-0.63,0.196-1.188,0.514-1.662,0.915 c-0.861,0.719-1.372,1.741-1.568,2.843l-29.234,9.193c-1.255,0.397-1.953,1.741-1.557,2.996 C80.729,329.033,81.669,329.691,82.689,329.691z M286.125,288.785c-3.809,11.644-11.191,19.392-19.863,19.392 c-8.669,0-16.052-7.748-19.861-19.392c-10.762-3.738-17.831-10.459-17.831-18.31c0-7.852,7.068-14.566,17.831-18.309 c3.809-11.647,11.192-19.387,19.861-19.387c8.672,0,16.055,7.74,19.863,19.387c10.762,3.738,17.833,10.457,17.833,18.309 C303.958,278.326,296.887,285.042,286.125,288.785z M282.19,255.961c-4.751-1.372-10.192-2.17-15.929-2.17 c-5.733,0-11.173,0.798-15.929,2.17c-1.213,4.413-1.916,9.339-1.916,14.515s0.703,10.104,1.916,14.515 c4.756,1.372,10.195,2.17,15.929,2.17c5.736,0,11.178-0.798,15.929-2.17c1.214-4.41,1.918-9.339,1.918-14.515 S283.404,260.374,282.19,255.961z M252.202,250.524c4.331-0.966,9.061-1.505,14.055-1.505c4.996,0,9.727,0.544,14.058,1.505 c-3.295-7.815-8.417-12.96-14.058-12.96C260.619,237.563,255.5,242.704,252.202,250.524z M244.9,283.035 c-0.807-3.916-1.267-8.126-1.267-12.56c0-4.429,0.46-8.641,1.267-12.559c-7.021,3.087-11.556,7.607-11.556,12.559 C233.345,275.428,237.879,279.95,244.9,283.035z M280.319,290.428c-4.331,0.966-9.062,1.507-14.058,1.507 c-4.994,0-9.724-0.546-14.055-1.507c3.292,7.817,8.417,12.96,14.055,12.96C271.902,303.388,277.029,298.245,280.319,290.428z M287.623,283.035c7.023-3.085,11.556-7.607,11.556-12.56c0-4.952-4.532-9.472-11.556-12.559c0.812,3.918,1.27,8.13,1.27,12.559 C288.893,274.909,288.426,279.119,287.623,283.035z M319.942,269.071c0,29.733-24.189,53.923-53.923,53.923 c-29.731,0-53.923-24.189-53.923-53.923c0-29.737,24.187-53.924,53.923-53.924C295.753,215.147,319.942,239.334,319.942,269.071z M315.163,269.071c0-27.098-22.047-49.145-49.144-49.145s-49.144,22.047-49.144,49.145c0,27.097,22.047,49.144,49.144,49.144 S315.163,296.168,315.163,269.071z M359.048,63.146c0.312,0.142,0.645,0.205,0.971,0.205c0.915,0,1.788-0.527,2.185-1.414 l11.994-26.917c0.537-1.204-0.005-2.618-1.213-3.152c-1.19-0.542-2.614,0-3.155,1.208L357.835,59.99 C357.303,61.194,357.839,62.604,359.048,63.146z M434.879,118.233c0.476,0.525,1.12,0.793,1.778,0.793 c0.569,0,1.144-0.201,1.601-0.612l21.902-19.713c0.98-0.885,1.06-2.395,0.178-3.375c-0.901-0.985-2.404-1.062-3.375-0.177 l-21.907,19.714C434.076,115.743,433.992,117.253,434.879,118.233z M481.755,199.41c0.322,1.008,1.26,1.654,2.272,1.654 c0.243,0,0.5-0.037,0.733-0.114l28.025-9.101c1.256-0.406,1.941-1.753,1.536-3.01c-0.406-1.251-1.76-1.939-3.011-1.533 l-28.026,9.098C482.03,196.806,481.344,198.155,481.755,199.41z M523.483,293.587l-29.305-3.09c-1.34-0.14-2.492,0.812-2.632,2.129 c-0.136,1.312,0.812,2.492,2.123,2.622l29.305,3.09c0.094,0.01,0.178,0.015,0.262,0.015c1.203,0,2.244-0.91,2.37-2.143 C525.747,294.903,524.795,293.728,523.483,293.587z M491.369,395.638l-25.52-14.739c-1.139-0.653-2.604-0.271-3.268,0.878 c-0.662,1.144-0.271,2.604,0.878,3.267l25.52,14.739c0.373,0.214,0.784,0.317,1.194,0.317c0.822,0,1.629-0.425,2.068-1.195 C492.909,397.761,492.518,396.3,491.369,395.638z M403.203,451.96c-0.774-1.073-2.272-1.298-3.337-0.527 c-1.068,0.779-1.298,2.268-0.522,3.337l17.314,23.849c0.472,0.644,1.195,0.979,1.933,0.979c0.494,0,0.979-0.148,1.409-0.452 c1.064-0.779,1.298-2.272,0.522-3.342L403.203,451.96z M317.072,491.396c-0.275-1.293-1.596-2.091-2.833-1.839 c-1.293,0.28-2.114,1.545-1.844,2.838l6.124,28.823c0.237,1.125,1.231,1.896,2.333,1.896c0.163,0,0.331-0.019,0.495-0.057 c1.297-0.274,2.118-1.54,1.843-2.833L317.072,491.396z M220.503,489.558c-1.228-0.252-2.558,0.551-2.835,1.839l-6.125,28.828 c-0.278,1.293,0.548,2.562,1.844,2.833c0.163,0.038,0.332,0.057,0.497,0.057c1.099,0,2.093-0.771,2.333-1.896l6.125-28.823 C222.62,491.103,221.794,489.828,220.503,489.558z M134.876,451.438c-1.066-0.775-2.562-0.551-3.337,0.522l-17.324,23.844 c-0.772,1.069-0.539,2.562,0.527,3.337c0.425,0.309,0.913,0.457,1.405,0.457c0.735,0,1.466-0.336,1.93-0.979l17.324-23.849 C136.176,453.7,135.943,452.212,134.876,451.438z M72.156,381.776c-0.661-1.153-2.122-1.531-3.265-0.878l-25.524,14.739 c-1.143,0.658-1.536,2.118-0.875,3.262c0.439,0.771,1.246,1.195,2.07,1.195c0.406,0,0.817-0.099,1.195-0.322l25.524-14.729 C72.424,384.381,72.816,382.92,72.156,381.776z M43.189,292.635c-0.133-1.316-1.263-2.272-2.627-2.128l-29.312,3.08 c-1.309,0.141-2.266,1.316-2.121,2.623c0.124,1.232,1.167,2.143,2.371,2.143c0.086,0,0.166-0.005,0.257-0.015l29.312-3.08 C42.377,295.123,43.327,293.946,43.189,292.635z M21.952,191.84l28.028,9.11c0.245,0.082,0.497,0.114,0.737,0.114 c1.008,0,1.944-0.642,2.273-1.654c0.406-1.251-0.28-2.6-1.533-3.01l-28.03-9.108c-1.251-0.401-2.604,0.282-3.01,1.533 C20.01,190.078,20.694,191.434,21.952,191.84z M96.476,118.42c0.46,0.411,1.034,0.611,1.601,0.611c0.656,0,1.3-0.269,1.773-0.793 c0.889-0.98,0.807-2.49-0.173-3.374L77.775,95.145c-0.98-0.879-2.49-0.803-3.375,0.178c-0.887,0.98-0.807,2.49,0.173,3.374 L96.476,118.42z M172.53,61.937c0.397,0.892,1.272,1.419,2.185,1.419c0.324,0,0.66-0.068,0.971-0.206 c1.209-0.537,1.748-1.951,1.213-3.155l-11.985-26.924c-0.542-1.209-1.965-1.75-3.155-1.209c-1.208,0.535-1.75,1.949-1.213,3.153 L172.53,61.937z M267.368,43.656c1.318,0,2.389-1.071,2.389-2.39V11.798c0-1.318-1.071-2.39-2.389-2.39 c-1.321,0-2.39,1.071-2.39,2.39v29.473C264.979,42.589,266.047,43.656,267.368,43.656z"></Path>
+                  </G>
+                </G>
+              </Svg>
+
+              {/* <Svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                height={21}
+                width={21}
+              >
+                <G id="SVGRepo_bgCarrier" strokeWidth="0"></G>
+                <G
+                  id="SVGRepo_tracerCarrier"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></G>
+                <G id="SVGRepo_iconCarrier">
+                  <Path
+                    d="M4.5 22V17M4.5 7V2M2 4.5H7M2 19.5H7M13 3L11.2658 7.50886C10.9838 8.24209 10.8428 8.60871 10.6235 8.91709C10.4292 9.1904 10.1904 9.42919 9.91709 9.62353C9.60871 9.84281 9.24209 9.98381 8.50886 10.2658L4 12L8.50886 13.7342C9.24209 14.0162 9.60871 14.1572 9.91709 14.3765C10.1904 14.5708 10.4292 14.8096 10.6235 15.0829C10.8428 15.3913 10.9838 15.7579 11.2658 16.4911L13 21L14.7342 16.4911C15.0162 15.7579 15.1572 15.3913 15.3765 15.0829C15.5708 14.8096 15.8096 14.5708 16.0829 14.3765C16.3913 14.1572 16.7579 14.0162 17.4911 13.7342L22 12L17.4911 10.2658C16.7579 9.98381 16.3913 9.8428 16.0829 9.62353C15.8096 9.42919 15.5708 9.1904 15.3765 8.91709C15.1572 8.60871 15.0162 8.24209 14.7342 7.50886L13 3Z"
+                    stroke="#FFFFFF"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  ></Path>
+                </G>
+              </Svg> */}
+              {/* <Svg width="31" height="30" viewBox="0 0 31 30" fill="none">
+                <G>
+                  <Path
+                    d="M11.8784 7.95442C12.2136 7.10048 13.4002 7.10048 13.7354 7.95442L15.6473 12.8247C15.7489 13.0836 15.9503 13.2887 16.2045 13.3923L20.9852 15.34C21.8234 15.6815 21.8234 16.8903 20.9852 17.2318L16.2045 19.1795C15.9503 19.283 15.7489 19.4882 15.6473 19.7471L13.7354 24.6173C13.4002 25.4713 12.2136 25.4713 11.8784 24.6173L9.96655 19.7471C9.86491 19.4881 9.66353 19.283 9.40937 19.1794L4.62868 17.2318C3.79044 16.8903 3.79044 15.6815 4.62868 15.34L9.40937 13.3923C9.66353 13.2887 9.86491 13.0836 9.96655 12.8247L11.8784 7.95442Z"
+                    fill="url(#paint0_linear_43_682)"
+                  />
+                  <Path
+                    d="M22.5783 4.5487C22.7305 4.16085 23.2695 4.16085 23.4217 4.5487L24.2901 6.76071C24.3362 6.8783 24.4277 6.97148 24.5431 7.01851L26.7145 7.90313C27.0952 8.05823 27.0952 8.60725 26.7145 8.76236L24.5431 9.64697C24.4277 9.694 24.3362 9.78718 24.2901 9.90478L23.4217 12.1168C23.2695 12.5046 22.7305 12.5046 22.5783 12.1168L21.7099 9.90478C21.6638 9.78718 21.5723 9.694 21.4569 9.64697L19.2855 8.76236C18.9048 8.60725 18.9048 8.05823 19.2855 7.90313L21.4569 7.01851C21.5723 6.97148 21.6638 6.8783 21.7099 6.76071L22.5783 4.5487Z"
+                    fill="url(#paint1_linear_43_682)"
+                  />
+                </G>
+                <Defs>
+                  <Filter
+                    id="filter0_d_43_682"
+                    x="0"
+                    y="0.257812"
+                    width="31"
+                    height="29"
+                    filterUnits="userSpaceOnUse"
+                    color-interpolation-filters="sRGB"
+                  >
+                    <FeFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <FeColorMatrix
+                      in="SourceAlpha"
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                      result="hardAlpha"
+                    />
+                    <FeOffset />
+                    <FeGaussianBlur stdDeviation="2" />
+                    <FeColorMatrix
+                      type="matrix"
+                      values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                    />
+                    <FeBlend
+                      mode="normal"
+                      in2="BackgroundImageFix"
+                      result="effect1_dropShadow_43_682"
+                    />
+                    <FeBlend
+                      mode="normal"
+                      in="SourceGraphic"
+                      in2="effect1_dropShadow_43_682"
+                      result="shape"
+                    />
+                  </Filter>
+                  <Lg
+                    id="paint0_linear_43_682"
+                    x1="12.424"
+                    y1="26.0291"
+                    x2="14.8794"
+                    y2="12.636"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <Stop stopColor="#FFDB0E" />
+                    <Stop offset="1" stopColor="white" />
+                  </Lg>
+                  <Lg
+                    id="paint1_linear_43_682"
+                    x1="22.8261"
+                    y1="12.758"
+                    x2="23.9413"
+                    y2="6.675"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <Stop stopColor="#FFDB0E" />
+                    <Stop offset="1" stopColor="white" />
+                  </Lg>
+                </Defs>
+              </Svg> */}
+            </View>
+          </View>
+          <View style={[styles.indi_acr_section, { marginTop: 2 }]}>
+            <Image source={img1} style={styles.acr__img} blurRadius={10} />
+            <View style={styles.acr_main_view}>
+              <View>
+                <Text style={styles.acr_title}>Awareness</Text>
+              </View>
+              <View>
+                <Text style={styles.acr_des}>Self-Discovery Journey</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.acr_btn}
+                onPress={() => {
+                  if (awareness_guideline == true) {
+                    navigation.navigate("AwarenessMainOptions");
+                  } else {
+                    navigation.navigate("AwarenessGuideline");
+                  }
+                }}
+              >
+                <Text style={styles.acr_btn_text}>Enter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.indi_acr_section}>
+            <Image source={img2} style={styles.acr__img} blurRadius={10} />
+            <View style={styles.acr_main_view}>
+              <View>
+                <Text style={styles.acr_title}>Connection</Text>
+              </View>
+              <View>
+                <Text style={styles.acr_des}>Coaches</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.acr_btn}
+                onPress={() => {
+                  if (connection_guideline == true) {
+                    navigation.navigate("ConnectionMainOptions");
+                  } else {
+                    navigation.navigate("ConnectionGuideline");
+                  }
+                  // navigation.navigate("ConnectionMainOptions");
+                }}
+              >
+                <Text style={styles.acr_btn_text}>Enter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.indi_acr_section}>
+            <Image source={img3} style={styles.acr__img} blurRadius={10} />
+            <View style={styles.acr_main_view}>
+              <View>
+                <Text style={styles.acr_title}>Reflection</Text>
+              </View>
+              <View>
+                <Text style={styles.acr_des}>
+                  Analyzing Thoughts , Feelings, Experiences
+                </Text>
+              </View>
+
+              <View style={styles.btn_and_text}>
+                <TouchableOpacity
+                  style={styles.acr_btn_}
+                  onPress={() => {
+                    if (reflection_already) {
+                      if (reflection_guideline == true) {
+                        navigation.navigate("ReflectionMainOptions");
+                      } else {
+                        navigation.navigate("ReflectionGuideline");
+                      }
+                    } else {
+                      // openPaymentSheet();
+                      handleBuySubscription("net.cuewellness.reflection");
+                    }
+                  }}
+                  // onPress={openPaymentSheet}
+                >
+                  {buy_loading ? (
+                    <ActivityIndicator
+                      size={20}
+                      color={"rgba(30, 63, 142, 1)"}
+                    />
+                  ) : (
+                    <Text style={styles.acr_btn_text}>
+                      {reflection_already ? "Enter" : "Buy Now"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+
+                <View style={styles.raft_section}>
+                  <View style={styles.raft_s_1}>
+                    <Text style={styles.raft_t_1}>
+                      {loading ? (
+                        <ActivityIndicator size={10} color={"white"} />
+                      ) : (
+                        subscriptions[0].localizedPrice
+                      )}
+                    </Text>
+                    <Text style={styles.raft_t_2}>ANNUALLY</Text>
+                  </View>
+                  <Text style={styles.raft_t_3}>Introductory Offer!</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={styles.empty}></View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+}

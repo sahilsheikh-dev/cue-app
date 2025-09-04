@@ -1,0 +1,14 @@
+node_modules
+.git
+.gitignore
+*.log
+android
+ios
+dist
+build
+.expo
+.expo-shared
+*.tar.gz
+*.apk
+*.aab
+*.ipa
