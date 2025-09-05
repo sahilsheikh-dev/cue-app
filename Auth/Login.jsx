@@ -91,7 +91,7 @@ export default function Login({ navigation }) {
     } else if (role == "coach") {
       console.log("hey coach here");
       axios
-        .post(data.url + "/user/auth/login", {
+        .post(data.url + "/user/auth/login-coach", {
           contact: selected_country.code + mobileNumber,
           password: password,
         })
@@ -101,7 +101,7 @@ export default function Login({ navigation }) {
             setLoading(false);
             Alert.alert("Warning", res.data.alert);
           } else {
-            partial_login_together(res.data.supply, "coach");
+            partial_login_together(res.data.token, "coach");
           }
         })
         .catch((err) => {

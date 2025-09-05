@@ -43,6 +43,7 @@ export default function CreateService({ navigation }) {
         setLoading(false);
       });
   }, []);
+
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />

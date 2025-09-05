@@ -2,7 +2,7 @@
   "expo": {
     "name": "cue_wellness",
     "slug": "cuewellness",
-    "owner": "dhanashrimaheshram",
+    "owner": "rajeshkhanna",
     "version": "2.2.0",
     "orientation": "portrait",
     "assetBundlePatterns": [
@@ -77,7 +77,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "87318a29-56ce-4305-8676-df2dfa5817d3"
+        "projectId": "6f62f202-12f5-49af-b568-0197dc76889c"
       }
     }
   },

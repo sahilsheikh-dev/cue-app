@@ -34,8 +34,19 @@ export default function Verification({ navigation }) {
         if (res.data.alert) {
           Alert.alert("Warning", res.data.alert);
         } else if (res.data.redirect) {
-          // logout user if backend says so
-          // logout();
+          Alert.alert(
+            "User Not Found - Please log in again."[
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                  });
+                },
+              }
+            ]
+          );
         } else if (res.data.res === true) {
           // ✅ Verified → move to next page
           navigation.navigate("Coach-create-service");
@@ -45,6 +56,19 @@ export default function Verification({ navigation }) {
         } else {
           // Fallback (just in case)
           // logout();
+          Alert.alert(
+            "Error - Please log in again."[
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                  });
+                },
+              }
+            ]
+          );
         }
       })
       .catch((err) => {
