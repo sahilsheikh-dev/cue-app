@@ -7,6 +7,8 @@ import Signup from "./Signup";
 import ContactNumber from "./ContactNumber";
 import Otp from "./Otp";
 import FinishYourProfile from "./FinishYourProfile";
+// import FinishYourShopProfile from "./Auth/Shop/FinishYourProfile";
+
 import Login from "./Login";
 import Subscription from "./Subscription";
 import Splash from "./Splash";
@@ -94,6 +96,14 @@ export default function Auth() {
             headerShown: false,
           }}
         />
+
+        {/* <Stack.Screen
+          name="FinishYourShopProfile"
+          component={FinishYourShopProfile}
+          options={{
+            headerShown: false,
+          }}
+        /> */}
 
         <Stack.Screen
           name="Subscription"

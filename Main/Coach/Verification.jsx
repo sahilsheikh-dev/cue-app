@@ -22,27 +22,35 @@ export default function Verification({ navigation }) {
   const { data, logout } = useContext(DataContext);
 
   useEffect(() => {
-    console.log(data.authToken);
+    console.log("Auth token:", data.authToken);
+
     axios
-      .post(data.url + "/coach/is-verified", {
+      .post(`${data.url}/coach/is-verified`, {
         token: data.authToken,
       })
       .then((res) => {
-        console.log(res.data);
-        if (res.data.alert != undefined) {
+        console.log("Verification response:", res.data);
+
+        if (res.data.alert) {
           Alert.alert("Warning", res.data.alert);
-        } else if (res.data.redirect != undefined) {
+        } else if (res.data.redirect) {
+          // logout user if backend says so
           // logout();
-        } else if (res.data.res == true || res.data.supply == "2") {
-          // logout();
-        } else {
+        } else if (res.data.res === true) {
+          // ✅ Verified → move to next page
           navigation.navigate("Coach-create-service");
+        } else if (res.data.supply === "1" || res.data.supply === "2") {
+          // ❌ Half-verified/unverified → stay on same page
+          Alert.alert("Info", "Your account is not fully verified yet.");
+        } else {
+          // Fallback (just in case)
+          // logout();
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Verification error:", err);
       });
-  });
+  }, []); // 👈 add [] so it doesn't loop infinitely
 
   return (
     <SafeAreaView style={styles.sav}>

@@ -56,8 +56,18 @@ export default function ShopOtp({ navigation }) {
             setLoading(false);
           } else {
             partial_login(res.data.token);
+            Alert.alert("Success", "OTP verified successfully", [
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.navigate("Login");
+                },
+              },
+            ]);
+            // navigation.navigate("Login");
+            // navigation.navigate("FinishYourShopProfile");
             // login("product");
-            navigation.navigate("FinishYourProfile");
+            // logout();
           }
         })
         .catch((err) => {
@@ -107,9 +117,7 @@ export default function ShopOtp({ navigation }) {
         <ScrollView style={styles.main_scroll_view}>
           <View style={styles.top_portion}></View>
           <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>
-              OTP Verification
-            </Text>
+            <Text style={styles.welcome_text}>OTP Verification</Text>
             <Text style={styles.welcome_des}>
               Enter the code from the SMS we sent you
             </Text>

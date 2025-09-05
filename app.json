@@ -2,10 +2,12 @@
   "expo": {
     "name": "cue_wellness",
     "slug": "cuewellness",
-    "owner": "sahilasheikh123",
+    "owner": "dhanashrimaheshram",
     "version": "2.2.0",
     "orientation": "portrait",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
       [
         "expo-av",
@@ -75,7 +77,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "5dbae576-50ab-4239-9285-fd932c8efb2f"
+        "projectId": "87318a29-56ce-4305-8676-df2dfa5817d3"
       }
     }
   },
