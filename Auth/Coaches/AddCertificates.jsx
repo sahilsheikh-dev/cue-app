@@ -73,15 +73,20 @@ export default function AddCertificates({ navigation, route }) {
   const save = () => {
     setLoading(true);
     const formData = new FormData();
+
     all_certificates.forEach((image, index) => {
-      const mimeType = image.endsWith(".png") ? "image/png" : "image/jpeg";
+      // Detect correct MIME type & extension
+      const isPng = image.toLowerCase().endsWith(".png");
+      const mimeType = isPng ? "image/png" : "image/jpeg";
+      const ext = isPng ? ".png" : ".jpg";
+
       formData.append("images", {
-        uri: image, // e.g., file://path/to/image.jpg
-        // type: "image", // e.g., image/jpeg
+        uri: image, // ensure correct file:// prefix
         type: mimeType,
-        name: `photo${index}.jpg`,
+        name: `photo${index}${ext}`, // correct extension
       });
     });
+
     axios
       .post(data.url + "/coach/auth/save-certificates", formData, {
         headers: {
@@ -90,25 +95,29 @@ export default function AddCertificates({ navigation, route }) {
         },
       })
       .then((res) => {
-        if (res.data.logout == true) {
+        if (res.data.logout) {
           logout();
-        } else if (res.data.res == true) {
+        } else if (res.data.res) {
           navigation.navigate("Coach-review-confirm", {
-            email: email,
-            dob: dob,
-            gender: gender,
-            pin_code: pin_code,
-            country: country,
-            city: city,
-            address: address,
-            experience: experience,
-            level: level,
-            category: category,
-            client_gender: client_gender,
-            languages: languages,
+            email,
+            dob,
+            gender,
+            pin_code,
+            country,
+            city,
+            address,
+            experience,
+            level,
+            category,
+            client_gender,
+            languages,
           });
         }
-      });
+      })
+      .catch((err) => {
+        console.error("Upload error:", err.response?.data || err.message);
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
