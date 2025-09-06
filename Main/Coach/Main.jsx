@@ -981,6 +981,20 @@ function CoachMain() {
     return (
       <Stack.Navigator>
         <Stack.Screen
+          name="Coach-dashboard"
+          component={Dashboard}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="MainProfileCoach"
+          component={MainProfileCoach}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="Verification"
           component={Verification}
           options={{

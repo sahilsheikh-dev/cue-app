@@ -33,12 +33,12 @@ export default function ReviewConfirm({ navigation, route }) {
     experience,
     level,
     category,
-    // cvv,
-    // expiry_date,
-    // card_number,
-    // card_holder_name,
-    // cue_share,
-    // coach_share,
+    cvv,
+    expiry_date,
+    card_number,
+    card_holder_name,
+    cue_share,
+    coach_share,
     client_gender,
     languages,
   } = route.params;
@@ -57,12 +57,12 @@ export default function ReviewConfirm({ navigation, route }) {
         email: email,
         dob: dob,
         gender: gender,
-        // coach_share: coach_share,
-        // cue_share: cue_share,
-        // card_holder_name: card_holder_name,
-        // card_number: card_number,
-        // expiry_date: expiry_date,
-        // cvv: cvv,
+        coach_share: coach_share,
+        cue_share: cue_share,
+        card_holder_name: card_holder_name,
+        card_number: card_number,
+        expiry_date: expiry_date,
+        cvv: cvv,
         languages: languages,
         client_gender: client_gender,
         token: data.authToken,
@@ -75,7 +75,7 @@ export default function ReviewConfirm({ navigation, route }) {
           console.log("all good");
           setData({ ...data, role: "coach" });
           login("coach");
-          // navigation.navigate("Coach-verification");
+          navigation.navigate("Coach-verification");
         }
       });
   };

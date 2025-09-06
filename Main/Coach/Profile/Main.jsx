@@ -31,6 +31,19 @@ export default function MainProfile({ navigation }) {
           Alert.alert("Warning", res.data.alert);
         } else if (res.data.redirect != undefined) {
           // logout();
+          Alert.alert(
+            "User Not Found - Please log in again."[
+              {
+                text: "OK",
+                onPress: () => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "Login" }],
+                  });
+                },
+              }
+            ]
+          );
         } else {
           // do something
           console.log(res.data);

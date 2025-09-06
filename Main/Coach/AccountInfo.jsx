@@ -21,21 +21,21 @@ import { DataContext } from "../../Context/DataContext";
 import enu from "../../essentails/enu";
 import axios from "axios";
 export default function AccountInfo({ navigation, route }) {
-  // const {
-  //   email,
-  //   dob,
-  //   gender,
-  //   pin_code,
-  //   country,
-  //   city,
-  //   address,
-  //   experience,
-  //   level,
-  //   category,
-  //   client_gender,
-  //   languages,
-  // } = route.params;
-  // console.log(route.params);
+  const {
+    email,
+    dob,
+    gender,
+    pin_code,
+    country,
+    city,
+    address,
+    experience,
+    level,
+    category,
+    client_gender,
+    languages,
+  } = route.params;
+  console.log(route.params);
   const { data } = useContext(DataContext);
   const [coach_share, setCoachShare] = useState(80);
   const [cue_share, setCue_share] = useState(20);
@@ -62,6 +62,7 @@ export default function AccountInfo({ navigation, route }) {
   const [chnumber, setChnumber] = useState("");
   const [ed, setEd] = useState("");
   const [cvv, setCvv] = useState("");
+
   useEffect(() => {
     console.log("hey");
     if (ed.length == 2) {
@@ -74,29 +75,30 @@ export default function AccountInfo({ navigation, route }) {
   const send_data = () => {
     if (enu(chn, chnumber, ed, cvv)) {
       navigation.navigate("Coach-Add-Agreement", {
-        // category: category,
-        // level: level,
-        // experience: experience,
-        // address: address,
-        // city: city,
-        // country: country,
-        // pin_code: pin_code,
-        // email: email,
-        // dob: dob,
-        // gender: gender,
-        // coach_share: coach_share,
-        // cue_share: cue_share,
-        // card_holder_name: chn,
-        // card_number: chnumber,
-        // expiry_date: ed,
-        // cvv: cvv,
-        // client_gender: client_gender,
-        // languages: languages,
+        category: category,
+        level: level,
+        experience: experience,
+        address: address,
+        city: city,
+        country: country,
+        pin_code: pin_code,
+        email: email,
+        dob: dob,
+        gender: gender,
+        coach_share: coach_share,
+        cue_share: cue_share,
+        card_holder_name: chn,
+        card_number: chnumber,
+        expiry_date: ed,
+        cvv: cvv,
+        client_gender: client_gender,
+        languages: languages,
       });
     } else {
       Alert.alert("Warning", "Please fill all the details");
     }
   };
+  
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />

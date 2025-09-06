@@ -20,7 +20,7 @@ import BuildProfile2 from "./Coaches/BuildProfile2";
 import ReviewConfirm from "./Coaches/ReviewConfirm";
 import AddCertificates from "./Coaches/AddCertificates";
 import ChooseCategory from "./Coaches/ChooseCategory";
-// import Verification from "./Coaches/Verification";
+import Verification from "./Coaches/Verification";
 import Create from "./Events/Create";
 import Create2 from "./Events/Create2";
 // import BookSession fro../Main/Coach/BookSessionion";
@@ -207,13 +207,13 @@ export default function Auth() {
           }}
         />
 
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Coach-verification"
           component={Verification}
           options={{
             headerShown: false,
           }}
-        /> */}
+        />
 
         {/* Ad's everything is here */}
 
