@@ -49,10 +49,13 @@ export default function Verification({ navigation }) {
           );
         } else if (res.data.res === true) {
           // ✅ Verified → move to next page
-          navigation.navigate("Coach-create-service");
-        } else if (res.data.supply === "1" || res.data.supply === "2") {
-          // ❌ Half-verified/unverified → stay on same page
+          navigation.navigate("Coach-build-profile"); // dont know where to navigate if coach is full verified
+        } else if (res.data.supply === "1") {
+          // Unverified → stay on same page
           Alert.alert("Info", "Your account is not fully verified yet.");
+        } else if (res.data.supply === "2") {
+          // ❌ Half-verified
+          navigation.navigate("Coach-create-service");
         } else {
           // Fallback (just in case)
           // logout();
