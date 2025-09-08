@@ -16,91 +16,76 @@ import { Svg, Path, Mask, G } from "react-native-svg";
 import { DataContext } from "../Context/DataContext";
 import axios from "axios";
 import { useEffect, useContext, useState } from "react";
+
 export default function TermsAndCondition({ navigation, route }) {
   const { data } = useContext(DataContext);
   const { role, client, coach, ad, shop } = route.params;
   let role_ = role;
-  if (role_ == "") {
+
+  if (role == "" || role == "Client") {
     role_ = "user";
   }
-  if (role == "Product Company") {
+
+  if (role == "Coach") {
+    role_ = "coach";
+  }
+
+  if (role == "Event Organizer") {
     role_ = "ad";
   }
-  if (role == "advertise") {
+
+  if (role == "Product Company") {
     role_ = "shop";
   }
+
   console.log(role);
   const [all_termsandconditions, setAlltermsandconditions] = useState([]);
   const [loading, setLoading] = useState(true);
   let title_count = 0;
 
   useEffect(() => {
-    if (role_ == "user" && client.length == 0) {
-      axios
-        .post(data.url + "/user/auth/get-terms-and-condition", {
-          role: role_,
-        })
-        .then((res) => {
-          console.log(res.data.supply);
-          setAlltermsandconditions(res.data.supply);
+    const fetchTerms = async () => {
+      setLoading(true);
+      try {
+        let cache = null;
+
+        if (role_ === "user") cache = client;
+        else if (role_ === "coach") cache = coach;
+        else if (role_ === "ad") cache = ad;
+        else if (role_ === "shop") cache = shop;
+
+        if (cache && cache.length > 0) {
+          // Use cached terms
+          setAlltermsandconditions(cache);
           setLoading(false);
-        })
-        .catch((err) => {
-          Alert.alert("Warning", "Something went wrong");
-        });
-    } else if (role_ == "coach" && coach.length == 0) {
-      axios
-        .post(data.url + "/user/auth/get-terms-and-condition", {
-          role: role_,
-        })
-        .then((res) => {
+        } else {
+          // Fetch from API
+          const res = await axios.post(
+            `${data.url}/user/auth/get-terms-and-condition`,
+            { role: role_ }
+          );
           console.log(res.data.supply);
+
           setAlltermsandconditions(res.data.supply);
+
+          // ✅ save fetched terms into the right state (so next time it's cached)
+          if (role_ === "user") setClient(res.data.supply);
+          else if (role_ === "coach") setCoach(res.data.supply);
+          else if (role_ === "ad") setAd(res.data.supply);
+          else if (role_ === "shop") setShop(res.data.supply);
+
           setLoading(false);
-        })
-        .catch((err) => {
-          Alert.alert("Warning", "Something went wrong");
-        });
-    } else if (role_ == "ad" && ad.length == 0) {
-      axios
-        .post(data.url + "/user/auth/get-terms-and-condition", {
-          role: role_,
-        })
-        .then((res) => {
-          console.log(res.data.supply);
-          setAlltermsandconditions(res.data.supply);
-          setLoading(false);
-        })
-        .catch((err) => {
-          Alert.alert("Warning", "Something went wrong");
-        });
-    } else if (role_ == "shop" && shop.length == 0) {
-      axios
-        .post(data.url + "/user/auth/get-terms-and-condition", {
-          role: role_,
-        })
-        .then((res) => {
-          console.log(res.data.supply);
-          setAlltermsandconditions(res.data.supply);
-          setLoading(false);
-        })
-        .catch((err) => {
-          Alert.alert("Warning", "Something went wrong");
-        });
-    } else if (role_ == "user" && client.length != 0) {
-      setAlltermsandconditions(client);
+        }
+      } catch (err) {
+        setLoading(false);
+        Alert.alert("Warning", "Something went wrong");
+      }
       setLoading(false);
-    } else if (role_ == "coach" && coach.length != 0) {
-      setAlltermsandconditions(coach);
-      setLoading(false);
-    } else if (role_ == "ad" && ad.length != 0) {
-      setAlltermsandconditions(ad);
-      setLoading(false);
-    } else if (role_ == "shop" && shop.length != 0) {
-      setAlltermsandconditions(shop);
-      setLoading(false);
-    }
-  }, []);
+    };
+
+    fetchTerms();
+  }, [role_, client, coach, ad, shop]);
+
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
@@ -144,18 +129,6 @@ export default function TermsAndCondition({ navigation, route }) {
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View style={styles.bs_2}>
-            {/* <Text style={styles.bs_2_cue_} numberOfLines={1}>
-              {role_ == "user"
-                ? "Client"
-                : role_ == "coach"
-                ? "Coach"
-                : role_ == "advertise"
-                ? "Event Organizer"
-                : "Product co."}{" "}
-              Terms & Conditions
-            </Text> */}
-          </View>
           <View style={styles.bs_3}></View>
         </View>
 
@@ -165,13 +138,12 @@ export default function TermsAndCondition({ navigation, route }) {
               ? "Client"
               : role_ == "coach"
               ? "Coach"
-              : role_ == "advertise"
+              : role_ == "ad"
               ? "Event Organizer"
-              : "Product co."}{" "}
+              : "Product Company"}{" "}
             Terms & Conditions
           </Text>
         </View>
-        {/* <View style={styles.top_portion}></View> */}
         <View style={styles.main_content_section}>
           {loading == true ? (
             <ActivityIndicator
@@ -221,30 +193,6 @@ export default function TermsAndCondition({ navigation, route }) {
               }
             })
           )}
-
-          {/* <View style={styles.title_section}>
-            <Text style={styles.title}>Mobile Application</Text>
-          </View>
-
-          <View style={styles.list_item_indi}>
-            <View style={styles.lii_dot_section}>
-              <View style={styles.dot}></View>
-            </View>
-            <Text style={styles.list_item_text}>
-              Efforts are made to ensure that information provided in Cue is
-              accurate and up-to-date.
-            </Text>
-          </View>
-          <View style={styles.list_item_indi}>
-            <View style={styles.lii_dot_section}>
-              <View style={styles.dot}></View>
-            </View>
-            <Text style={styles.list_item_text}>
-              However, due to the dynamic nature of the fields discussed, there
-              is no guarantee that all content will reflect the latest research
-              or developments.
-            </Text>
-          </View> */}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -31,7 +31,7 @@ function Signup({ navigation }) {
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("user"); // initially it will be user to avoid empty field issue
   const [eo_type, setEo_type] = useState("");
   const [pc_type, setPc_type] = useState("");
   const eo_type_ref = useRef(null);
@@ -46,8 +46,6 @@ function Signup({ navigation }) {
   const [all_countries, setAll_countries] = useState([]);
   const [selected_country, setSelected_country] = useState({});
   const country_ref = useRef(null);
-
-  // testing
 
   useEffect(() => {
     axios
@@ -103,7 +101,7 @@ function Signup({ navigation }) {
                   Alert.alert("Warning", "Please fill all the fields");
                 }
                 break;
-              case "advertise":
+              case "ad":
                 if (enu(eo_type)) {
                   if (eo_type == "company") {
                     if (enu(company_name, account_operator_name)) {
@@ -191,35 +189,9 @@ function Signup({ navigation }) {
         <ScrollView style={styles.main_scroll_view}>
           {/* back section */}
           <View style={styles.back_section}>
-            <View style={styles.bs_1}>
-              {/* <TouchableOpacity style={styles.bs_1_circle}>
-              <LinearGradient
-                style={styles.bs_1_stroke_circle}
-                colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-              >
-                <View style={styles.bs_1_circle_circle}>
-                  <Svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <Path
-                      d="M15.5 19L8.5 12L15.5 5"
-                      stroke="white"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity> */}
-            </View>
             <View style={styles.bs_2}>
               <Text style={styles.bs_2_cue_} numberOfLines={1}>
-                cue
+                CUE
               </Text>
             </View>
             <View style={styles.bs_3}></View>
@@ -299,24 +271,20 @@ function Signup({ navigation }) {
                 </Svg>
               </View>
               <View style={styles.input_section_text}>
-                {/* <TextInput
-                  style={styles.input}
-                  placeholder="Confirm password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={true}
-                /> */}
                 <Text
                   style={
                     role == "" ? styles.input_text : styles.input_text_active
                   }
                 >
                   {role == ""
-                    ? "Join as"
+                    ? "Client"
                     : role == "user"
                     ? "Client"
-                    : role == "advertise"
+                    : role == "coach"
+                    ? "Coach"
+                    : role == "ad"
                     ? "Event Organizer"
-                    : role}
+                    : "Product Company"}
                 </Text>
               </View>
               <View style={styles.svg_circle_eye}>
@@ -347,7 +315,7 @@ function Signup({ navigation }) {
             </LinearGradient>
           </TouchableOpacity>
 
-          {role == "advertise" ? (
+          {role == "ad" ? (
             <TouchableOpacity
               onPress={() => {
                 eo_type_ref.current.open();
@@ -396,12 +364,6 @@ function Signup({ navigation }) {
                   </Svg>
                 </View>
                 <View style={styles.input_section_text}>
-                  {/* <TextInput
-                  style={styles.input}
-                  placeholder="Confirm password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={true}
-                /> */}
                   <Text
                     style={
                       eo_type == ""
@@ -496,12 +458,6 @@ function Signup({ navigation }) {
                   </Svg>
                 </View>
                 <View style={styles.input_section_text}>
-                  {/* <TextInput
-                  style={styles.input}
-                  placeholder="Confirm password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={true}
-                /> */}
                   <Text
                     style={
                       pc_type == ""
@@ -737,7 +693,7 @@ function Signup({ navigation }) {
           ) : null}
 
           {/* event section here */}
-          {role == "advertise" && eo_type == "company" ? (
+          {role == "ad" && eo_type == "company" ? (
             <>
               {/* company name */}
               <View style={styles.input_whole_section}>
@@ -846,7 +802,7 @@ function Signup({ navigation }) {
                 </LinearGradient>
               </View>
             </>
-          ) : role == "advertise" && eo_type == "individual" ? (
+          ) : role == "ad" && eo_type == "individual" ? (
             <>
               {/* first name */}
               <View style={styles.input_whole_section}>
@@ -1434,7 +1390,7 @@ function Signup({ navigation }) {
             </LinearGradient>
           </View>
 
-          {role == "Product Company" || role == "advertise" ? null : (
+          {role == "Product Company" || role == "ad" ? null : (
             <View style={styles.input_whole_section}>
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
@@ -1475,7 +1431,7 @@ function Signup({ navigation }) {
           )}
 
           {/* COUNTRY */}
-          {role == "Product Company" || role == "advertise" ? (
+          {role == "Product Company" || role == "ad" ? (
             <TouchableOpacity
               onPress={() => {
                 country_ref.current.open();
@@ -1763,7 +1719,7 @@ function Signup({ navigation }) {
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
-              setRole("advertise");
+              setRole("ad");
               role_ref.current.close();
             }}
           >
@@ -1773,9 +1729,7 @@ function Signup({ navigation }) {
             >
               <View style={styles.oi_dot_section}>
                 <View
-                  style={
-                    role == "advertise" ? styles.oi_dot_active : styles.oi_dot
-                  }
+                  style={role == "ad" ? styles.oi_dot_active : styles.oi_dot}
                 ></View>
               </View>
               <View style={styles.oi_text_section}>

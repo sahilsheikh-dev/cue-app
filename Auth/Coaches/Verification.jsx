@@ -25,7 +25,7 @@ export default function Verification({ navigation }) {
           <Image source={require("./Verification.png")} />
         </View>
         <Text style={styles.title} numberOfLines={1}>
-          Coach Verification In Progress..
+          Verification In Progress..
         </Text>
         <Text style={styles.des} numberOfLines={5}>
           Thank you for your application ! Once your details have been verified,
