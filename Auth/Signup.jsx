@@ -164,15 +164,6 @@ function Signup({ navigation }) {
     }
   };
 
-  const [all_termsandconditions_client, setAlltermsandconditions_client] =
-    useState([]);
-  const [all_termsandconditions_coach, setAlltermsandconditions_coach] =
-    useState([]);
-  const [all_termsandconditions_ad, setAlltermsandconditions_ad] = useState([]);
-  const [all_termsandconditions_shop, setAlltermsandconditions_shop] = useState(
-    []
-  );
-
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
@@ -189,6 +180,7 @@ function Signup({ navigation }) {
         <ScrollView style={styles.main_scroll_view}>
           {/* back section */}
           <View style={styles.back_section}>
+            <View style={styles.bs_1}> </View>
             <View style={styles.bs_2}>
               <Text style={styles.bs_2_cue_} numberOfLines={1}>
                 CUE
@@ -1522,10 +1514,6 @@ function Signup({ navigation }) {
                   onPress={() => {
                     navigation.navigate("TandC", {
                       role: role,
-                      client: all_termsandconditions_client,
-                      coach: all_termsandconditions_coach,
-                      ad: all_termsandconditions_ad,
-                      shop: all_termsandconditions_shop,
                     });
                   }}
                 >

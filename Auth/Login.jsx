@@ -35,7 +35,8 @@ export default function Login({ navigation }) {
   const [whole_loading, setWhole_loading] = useState(true);
   const role_ref = useRef();
   const country_ref = useRef();
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("user"); // initially it will be user to avoid empty field issue
+  const [agree_tc, setAgree_tc] = useState(false);
 
   useEffect(() => {
     axios
@@ -66,88 +67,92 @@ export default function Login({ navigation }) {
   }, [selected_country]);
 
   const try_login = () => {
-    setLoading(true);
-    if (role == "user") {
-      console.log("hey user here");
-      axios
-        .post(data.url + "/user/auth/login", {
-          contact: selected_country.code + mobileNumber,
-          password: password,
-        })
-        .then((res) => {
-          console.log(res.data);
-          if (res.data.alert != undefined) {
+    if (agree_tc == false) {
+      Alert.alert("Warning", "Please agree to our Terms and Conditions.");
+    } else {
+      setLoading(true);
+      if (role == "user") {
+        console.log("hey user here");
+        axios
+          .post(data.url + "/user/auth/login", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              setLoading(false);
+              partial_login_together(res.data.supply, "user");
+            }
+          })
+          .catch((err) => {
             setLoading(false);
-            Alert.alert("Warning", res.data.alert);
-          } else {
+            console.log(err);
+          });
+      } else if (role == "coach") {
+        console.log("hey coach here");
+        axios
+          .post(data.url + "/user/auth/login-coach", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.token, "coach");
+            }
+          })
+          .catch((err) => {
             setLoading(false);
-            partial_login_together(res.data.supply, "user");
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.log(err);
-        });
-    } else if (role == "coach") {
-      console.log("hey coach here");
-      axios
-        .post(data.url + "/user/auth/login-coach", {
-          contact: selected_country.code + mobileNumber,
-          password: password,
-        })
-        .then((res) => {
-          console.log(res.data);
-          if (res.data.alert != undefined) {
+            console.log(err);
+          });
+      } else if (role == "ad") {
+        console.log("hey advertise here");
+        axios
+          .post(data.url + "/user/auth/login-event", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.supply, "ad");
+            }
+          })
+          .catch((err) => {
             setLoading(false);
-            Alert.alert("Warning", res.data.alert);
-          } else {
-            partial_login_together(res.data.token, "coach");
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.log(err);
-        });
-    } else if (role == "advertise") {
-      console.log("hey advertise here");
-      axios
-        .post(data.url + "/user/auth/login-event", {
-          contact: selected_country.code + mobileNumber,
-          password: password,
-        })
-        .then((res) => {
-          console.log(res.data);
-          if (res.data.alert != undefined) {
+            console.log(err);
+          });
+      } else if (role == "Product Company") {
+        console.log("hey product here");
+        axios
+          .post(data.url + "/user/auth/login-product", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.supply, "product");
+            }
+          })
+          .catch((err) => {
             setLoading(false);
-            Alert.alert("Warning", res.data.alert);
-          } else {
-            partial_login_together(res.data.supply, "ad");
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.log(err);
-        });
-    } else if (role == "Product Company") {
-      console.log("hey product here");
-      axios
-        .post(data.url + "/user/auth/login-product", {
-          contact: selected_country.code + mobileNumber,
-          password: password,
-        })
-        .then((res) => {
-          console.log(res.data);
-          if (res.data.alert != undefined) {
-            setLoading(false);
-            Alert.alert("Warning", res.data.alert);
-          } else {
-            partial_login_together(res.data.supply, "product");
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.log(err);
-        });
+            console.log(err);
+          });
+      }
     }
   };
 
@@ -279,12 +284,6 @@ export default function Login({ navigation }) {
                     </Svg>
                   </View>
                   <View style={styles.input_section_text}>
-                    {/* <TextInput
-                  style={styles.input}
-                  placeholder="Confirm password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={true}
-                /> */}
                     <Text
                       style={
                         role == ""
@@ -293,12 +292,14 @@ export default function Login({ navigation }) {
                       }
                     >
                       {role == ""
-                        ? "Join as"
+                        ? "Client"
                         : role == "user"
                         ? "Client"
-                        : role == "advertise"
+                        : role == "coach"
+                        ? "Coach"
+                        : role == "ad"
                         ? "Event Organizer"
-                        : role}
+                        : "Product Company"}
                     </Text>
                   </View>
                   <View style={styles.svg_circle_eye}>
@@ -588,6 +589,92 @@ export default function Login({ navigation }) {
                   )}
                 </LinearGradient>
               </View>
+              {/* agree section */}
+              <View style={styles.fp_whole_}>
+                <TouchableOpacity style={styles.fp_whole_text}>
+                  <Text style={styles.fp_text_center}>
+                    I agree to the Apps{" "}
+                    <Text
+                      style={styles.fp_inner_text}
+                      onPress={() => {
+                        navigation.navigate("TandC", {
+                          role: role,
+                        });
+                      }}
+                    >
+                      Terms & Conditions
+                    </Text>{" "}
+                    and{" "}
+                    <Text
+                      style={styles.fp_inner_text}
+                      onPress={() => {
+                        navigation.navigate("Privacy-Policy");
+                      }}
+                    >
+                      Privacy Policy
+                    </Text>
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.fp_whole_svg_section}
+                  onPress={() => {
+                    setAgree_tc(!agree_tc);
+                  }}
+                >
+                  {agree_tc ? (
+                    <Svg viewBox="0 0 24 24" fill="none" height={18} width={18}>
+                      <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
+                      <G
+                        id="SVGRepo_tracerCarrier"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></G>
+                      <G id="SVGRepo_iconCarrier">
+                        <G id="style=stroke">
+                          <G id="check-box">
+                            <Path
+                              id="vector (Stroke)"
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M16.5303 8.96967C16.8232 9.26256 16.8232 9.73744 16.5303 10.0303L11.9041 14.6566C11.2207 15.34 10.1126 15.34 9.42923 14.6566L7.46967 12.697C7.17678 12.4041 7.17678 11.9292 7.46967 11.6363C7.76256 11.3434 8.23744 11.3434 8.53033 11.6363L10.4899 13.5959C10.5875 13.6935 10.7458 13.6935 10.8434 13.5959L15.4697 8.96967C15.7626 8.67678 16.2374 8.67678 16.5303 8.96967Z"
+                              fill="#fff"
+                            ></Path>
+                            <Path
+                              id="vector (Stroke)_2"
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25H16C19.7279 1.25 22.75 4.27208 22.75 8V16C22.75 19.7279 19.7279 22.75 16 22.75H8C4.27208 22.75 1.25 19.7279 1.25 16V8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8V16C2.75 18.8995 5.10051 21.25 8 21.25H16C18.8995 21.25 21.25 18.8995 21.25 16V8C21.25 5.10051 18.8995 2.75 16 2.75H8Z"
+                              fill="#fff"
+                            ></Path>
+                          </G>
+                        </G>
+                      </G>
+                    </Svg>
+                  ) : (
+                    <Svg viewBox="0 0 24 24" fill="none" height={18} width={18}>
+                      <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
+                      <G
+                        id="SVGRepo_tracerCarrier"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></G>
+                      <G id="SVGRepo_iconCarrier">
+                        <G id="style=stroke">
+                          <G id="check-box">
+                            <Path
+                              id="vector (Stroke)_2"
+                              fill-rule="evenodd"
+                              clip-rule="evenodd"
+                              d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25H16C19.7279 1.25 22.75 4.27208 22.75 8V16C22.75 19.7279 19.7279 22.75 16 22.75H8C4.27208 22.75 1.25 19.7279 1.25 16V8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8V16C2.75 18.8995 5.10051 21.25 8 21.25H16C18.8995 21.25 21.25 18.8995 21.25 16V8C21.25 5.10051 18.8995 2.75 16 2.75H8Z"
+                              fill="#fff"
+                            ></Path>
+                          </G>
+                        </G>
+                      </G>
+                    </Svg>
+                  )}
+                </TouchableOpacity>
+              </View>
               <TouchableOpacity style={styles.fp_text_section}>
                 <Text style={styles.fp_text}>Forgot Password?</Text>
               </TouchableOpacity>
@@ -783,7 +870,7 @@ export default function Login({ navigation }) {
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
-              setRole("advertise");
+              setRole("ad");
               role_ref.current.close();
             }}
           >
@@ -793,9 +880,7 @@ export default function Login({ navigation }) {
             >
               <View style={styles.oi_dot_section}>
                 <View
-                  style={
-                    role == "advertise" ? styles.oi_dot_active : styles.oi_dot
-                  }
+                  style={role == "ad" ? styles.oi_dot_active : styles.oi_dot}
                 ></View>
               </View>
               <View style={styles.oi_text_section}>
