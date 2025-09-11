@@ -195,10 +195,11 @@ function Signup({ navigation }) {
 
           {/* choose role section */}
           <TouchableOpacity
-            onPress={() => {
-              role_ref.current.open();
-            }}
-            style={styles.input_whole_section}
+            disabled={true}
+            // onPress={() => {
+            //   role_ref.current.open();
+            // }}
+            // style={styles.input_whole_section}
           >
             <LinearGradient
               colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
@@ -1457,12 +1458,6 @@ function Signup({ navigation }) {
                   </Svg>
                 </View>
                 <View style={styles.input_section_text}>
-                  {/* <TextInput
-                              style={styles.input}
-                              placeholder="Confirm password"
-                              placeholderTextColor={"#ffffff90"}
-                              secureTextEntry={true}
-                            /> */}
                   <Text
                     style={
                       selected_country.country == undefined

@@ -634,7 +634,7 @@ export default function Home({ navigation }) {
               </Svg> */}
             </View>
           </View>
-          <View style={[styles.indi_acr_section, { marginTop: 2 }]}>
+          {/* <View style={[styles.indi_acr_section, { marginTop: 2 }]}>
             <Image source={img1} style={styles.acr__img} blurRadius={10} />
             <View style={styles.acr_main_view}>
               <View>
@@ -656,7 +656,7 @@ export default function Home({ navigation }) {
                 <Text style={styles.acr_btn_text}>Enter</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
           <View style={styles.indi_acr_section}>
             <Image source={img2} style={styles.acr__img} blurRadius={10} />
             <View style={styles.acr_main_view}>
@@ -681,7 +681,7 @@ export default function Home({ navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.indi_acr_section}>
+          {/* <View style={styles.indi_acr_section}>
             <Image source={img3} style={styles.acr__img} blurRadius={10} />
             <View style={styles.acr_main_view}>
               <View>
@@ -737,7 +737,7 @@ export default function Home({ navigation }) {
                 </View>
               </View>
             </View>
-          </View>
+          </View> */}
           <View style={styles.empty}></View>
         </ScrollView>
       </View>
