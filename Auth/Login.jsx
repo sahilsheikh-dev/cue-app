@@ -217,7 +217,7 @@ export default function Login({ navigation }) {
                 // onPress={() => {
                 //   role_ref.current.open();
                 // }}
-                // style={styles.input_whole_section}
+                style={styles.input_whole_section}
               >
                 <LinearGradient
                   colors={[

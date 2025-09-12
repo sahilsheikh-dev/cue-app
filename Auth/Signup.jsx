@@ -199,7 +199,7 @@ function Signup({ navigation }) {
             // onPress={() => {
             //   role_ref.current.open();
             // }}
-            // style={styles.input_whole_section}
+            style={styles.input_whole_section}
           >
             <LinearGradient
               colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
