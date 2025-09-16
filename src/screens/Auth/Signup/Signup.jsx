@@ -20,7 +20,6 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import axios from "axios";
 
 import { DataContext } from "../../../Context/DataContext";
-import { Role, roleScreens } from "../../../config/roles.config";
 
 // ---------- ROUTES ----------
 const ROUTES = {
