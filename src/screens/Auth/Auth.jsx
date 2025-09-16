@@ -11,7 +11,7 @@ import FinishYourProfile from './FinishYourProfile';
 
 import Login from './Login';
 import Subscription from './Subscription';
-import Splash from './Splash';
+import Splash from '../Common/Splash/Splash';
 import TermsAndCondition from '../Common/TermsAndConditions/TermsAndConditions';
 import Introduction from './Coaches/Introduction';
 import BuildProfile from './Coaches/BuildProfile';

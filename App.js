@@ -6,7 +6,7 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 import { useFonts } from 'expo-font';
 
 import { DataContext } from './src/Context/DataContext';
-import Splash from './src/screens/Splash';
+import Splash from './src/screens/Common/Splash/Splash';
 import Auth from './src/screens/Auth/Auth';
 
 // Secure store helpers
