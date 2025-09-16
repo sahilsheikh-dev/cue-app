@@ -13,7 +13,7 @@ import { WebView } from "react-native-webview";
 import styles from "../Legal/legalStyles"; // ✅ shared legal styles
 import { legalUrls } from "../../../config/legal.config"; // ✅ centralized legal URLs
 
-const background = require("../Images/background.png");
+const background = require("../../../../assets/images/background.png");
 
 export default function PrivacyPolicy() {
   const privacyUrl = legalUrls.privacy; // ✅ use from config

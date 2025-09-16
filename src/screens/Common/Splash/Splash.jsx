@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, Image } from 'react-native';
 import styles from './SplashCss';
-const background = require('../../assets/images/background.png');
+const background = require('../../../../assets/images/background.png');
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator } from 'react-native';

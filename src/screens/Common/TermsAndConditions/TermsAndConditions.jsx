@@ -13,7 +13,7 @@ import { WebView } from "react-native-webview";
 import styles from "./Terms&ConditionsCss";
 import { roleScreens } from "../../../config/roles.config"; // ✅ import roles config
 
-const background = require("../Images/background.png");
+const background = require("../../../../assets/images/background.png");
 
 // ✅ Centralized role labels
 const roleLabels = {
