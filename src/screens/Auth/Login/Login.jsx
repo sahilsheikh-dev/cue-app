@@ -14,8 +14,9 @@ import {
 import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../../../Context/DataContext";
-import CountryPicker from "react-native-country-picker-modal";
-import { Roles } from "../../config/roles.config";
+// import CountryPicker from "react-native-country-picker-modal";
+import CountryPicker from '@realtril/react-native-country-picker-modal';
+import { Roles } from "../../../config/roles.config";
 
 const loginEndpoints = {
   [Roles.USER]: "/user/auth/login",
