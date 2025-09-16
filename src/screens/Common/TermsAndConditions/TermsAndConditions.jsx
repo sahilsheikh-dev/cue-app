@@ -11,7 +11,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
 import styles from "./TermsAndConditionsCss";
-import { roleScreens } from "../../../config/roles.config"; // ✅ import roles config
 
 const background = require("../../../../assets/images/background.png");
 

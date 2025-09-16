@@ -10,13 +10,12 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
-import styles from "../Legal/legalStyles"; // ✅ shared legal styles
-import { legalUrls } from "../../../config/legal.config"; // ✅ centralized legal URLs
+import styles from "./PrivacyPolicyCss";
 
 const background = require("../../../../assets/images/background.png");
 
 export default function PrivacyPolicy() {
-  const privacyUrl = legalUrls.privacy; // ✅ use from config
+  const privacyUrl = 'https://cuewellness.net/privacy-policy';
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

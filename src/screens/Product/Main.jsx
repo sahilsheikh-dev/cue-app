@@ -1,121 +1,71 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState, useEffect } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 const Stack = createNativeStackNavigator();
-import { useState, useEffect, useContext } from 'react';
 
-import BuildProfileShop from './BuildProfileShop';
-import Manage from './Manage';
-import Agreement from './Agreement';
-import Verification from './Verification';
-import axios from 'axios';
-import { DataContext } from '../../Context/DataContext';
-import { ActivityIndicator, Alert, View } from 'react-native';
-import Dashboard from './Dashboard';
-import ProductVerification from './ProductVerification';
-import Profile from './Profile';
-// import Manage from "./Manage";
-
-export default function ProductMain() {
-  const { data, logout } = useContext(DataContext);
-  const [verified, setVerified] = useState('loading');
-  useEffect(() => {
-    console.log('auth token');
-    console.log(data.authToken);
-    axios
-      .post(data.url + '/product/is-verified', {
-        token: data.authToken,
-      })
-      .then(res => {
-        console.log('res.data');
-        console.log(res.data);
-        if (res.data.alert != undefined) {
-          Alert.alert('Warning', res.data.alert);
-        } else if (res.data.res == true) {
-          if (res.data.supply == true) {
-            setVerified(true);
-          } else {
-            setVerified(false);
-          }
-        } else if (res.data.logout == true) {
-          // logout()
-        }
-      });
-  }, []);
+// Generic dummy screen that shows the route name
+function DummyScreen({ route }) {
   return (
-    <>
-      {verified == 'loading' ? (
-        <View
-          style={{
-            height: '100%',
-            width: '100%',
-            backgroundColor: 'rgba(30, 63, 142, 1)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <ActivityIndicator size={20} color={'white'} />
-        </View>
-      ) : verified ? (
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Product-dashboard"
-              component={Dashboard}
-              options={{
-                headerShown: false,
-              }}
-            />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+        {route.name} Page Exists
+      </Text>
+    </View>
+  );
+}
+
+export default function Main() {
+  const [verified, setVerified] = useState("loading");
+
+  // Simulate async check
+  useEffect(() => {
+    setTimeout(() => {
+      setVerified(true); // change to false to test unverified flow
+    }, 1000);
+  }, []);
+
+  if (verified === "loading") {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(30, 63, 142, 1)",
+        }}
+      >
+        <ActivityIndicator size={30} color="white" />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {verified ? (
+          <>
+            <Stack.Screen name="Product-dashboard" component={DummyScreen} />
             <Stack.Screen
               name="Product-create-product"
-              component={BuildProfileShop}
-              options={{
-                headerShown: false,
-              }}
+              component={DummyScreen}
             />
-            <Stack.Screen
-              name="Product-agreement"
-              component={Agreement}
-              options={{
-                headerShown: false,
-              }}
-            />
+            <Stack.Screen name="Product-agreement" component={DummyScreen} />
             <Stack.Screen
               name="Product-item-verification"
-              component={ProductVerification}
-              options={{
-                headerShown: false,
-              }}
+              component={DummyScreen}
             />
-            <Stack.Screen
-              name="All-products"
-              component={Manage}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="profile"
-              component={Profile}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      ) : (
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Product-Verification"
-              component={Verification}
-              options={{
-                headerShown: false,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      )}
-    </>
+            <Stack.Screen name="All-products" component={DummyScreen} />
+            <Stack.Screen name="profile" component={DummyScreen} />
+          </>
+        ) : (
+          <Stack.Screen
+            name="Product-Verification"
+            component={DummyScreen}
+          />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

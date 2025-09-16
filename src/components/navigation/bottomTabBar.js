@@ -1,1 +1,0 @@
-// BottomTabBar.js
