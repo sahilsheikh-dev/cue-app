@@ -5,9 +5,7 @@
     "owner": "gavinjr",
     "version": "3.0.0",
     "orientation": "portrait",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "plugins": [
       [
         "expo-av",
@@ -44,6 +42,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "net.cuewellness",
+      "buildNumber": "1",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Cue Wellness needs access to your microphone so you can record reflections and voice notes during your wellness journey.",
         "NSPhotoLibraryUsageDescription": "Cue Wellness needs access to your photo library so you can upload certificates, profile picture and progress photos.",
@@ -71,7 +70,8 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.CAMERA"
       ],
-      "package": "net.cuewellness"
+      "package": "net.cuewellness",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -79,16 +79,6 @@
     "extra": {
       "eas": {
         "projectId": "3df595c5-ec85-4fb3-90c4-226f4bfd36dc"
-      }
-    }
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
       }
     }
   }
