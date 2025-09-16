@@ -16,7 +16,7 @@ export default function Splash() {
       ></LinearGradient>
       <View style={styles.main}>
         <Image
-          source={require('../../assets/images/splash2.png')}
+          source={require('../../../../assets/images/splash2.png')}
           style={styles.main_img}
         />
         <View style={styles.main_titles}>
