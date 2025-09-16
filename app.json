@@ -5,7 +5,9 @@
     "owner": "gavinjr",
     "version": "2.2.7",
     "orientation": "portrait",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
       [
         "expo-av",
@@ -27,7 +29,8 @@
           "paymentProvider": "both"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font"
     ],
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
