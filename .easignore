@@ -1,14 +1,48 @@
-node_modules
-.git
+# Node modules - EAS installs dependencies itself
+node_modules/
+
+# Git
+.git/
 .gitignore
+
+# macOS / System files
+.DS_Store
+
+# Logs and debug info
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 *.log
-android
-ios
-dist
-build
-.expo
-.expo-shared
+
+# Builds and artifacts
+dist/
+build/
+web-build/
 *.tar.gz
 *.apk
 *.aab
 *.ipa
+
+# Expo specific
+.expo/
+.expo-shared/
+expo-env.d.ts
+
+# Environment and secrets
+.env*
+*.pem
+*.p8
+*.p12
+*.key
+*.jks
+*.mobileprovision
+
+# TypeScript build files
+*.tsbuildinfo
+
+# Android / iOS native folders (if not using prebuild)
+android/
+ios/
+
+# Misc
+*.orig.*

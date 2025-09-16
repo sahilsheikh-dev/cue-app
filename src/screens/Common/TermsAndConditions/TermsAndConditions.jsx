@@ -1,0 +1,88 @@
+// src/screens/Common/Terms&Conditions/TermsAndConditions.jsx
+import React from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
+import { WebView } from "react-native-webview";
+import styles from "./Terms&ConditionsCss";
+import { roleScreens } from "../../../config/roles.config"; // ✅ import roles config
+
+const background = require("../Images/background.png");
+
+// ✅ Centralized role labels
+const roleLabels = {
+  user: "Client",
+  coach: "Coach",
+  advertiser: "Event Organizer",
+  product: "Product Company",
+};
+
+// ✅ Centralized role-based URLs (can move to legal.config.js later)
+const roleUrls = {
+  user: "https://cuewellness.net/client-terms-and-services",
+  coach: "https://cuewellness.net/coach-terms-and-services",
+  advertiser: "https://cuewellness.net/event-terms-and-services",
+  product: "https://cuewellness.net/product-terms-and-services",
+};
+
+export default function TermsAndConditions({ route }) {
+  // ✅ fallback role is user
+  const role = route?.params?.role || "user";
+
+  // ✅ ensure role is valid, otherwise fallback
+  const safeRole = roleUrls[role] ? role : "user";
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar style="light" />
+
+      {/* Background */}
+      <Image
+        source={background}
+        style={[styles.backgroundImage, { position: "absolute" }]}
+      />
+      <LinearGradient
+        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
+        style={[styles.backgroundView, { position: "absolute" }]}
+      />
+
+      {/* Header */}
+      <View style={styles.top_portion1} />
+      <View style={styles.bs_2_}>
+        <Text
+          style={styles.bs_2_cue_}
+          numberOfLines={1}
+          accessibilityRole="header"
+        >
+          {roleLabels[safeRole]} Terms & Conditions
+        </Text>
+      </View>
+
+      {/* WebView */}
+      <View style={{ flex: 1 }}>
+        <WebView
+          style={{ flex: 1 }}
+          source={{ uri: roleUrls[safeRole] }}
+          startInLoadingState={true}
+          renderLoading={() => (
+            <View
+              style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            >
+              <ActivityIndicator
+                size="large"
+                color="white"
+                accessibilityLabel="Loading terms and conditions"
+              />
+            </View>
+          )}
+        />
+      </View>
+    </SafeAreaView>
+  );
+}

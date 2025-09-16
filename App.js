@@ -1,151 +1,162 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { DataContext } from "./Context/DataContext";
-import { useState, useContext, useEffect } from "react";
-import axios from "axios";
-import { useFonts } from "expo-font";
-import Splash from "./Auth/Splash";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StripeProvider } from "@stripe/stripe-react-native";
-import Show from "./Auth/Show";
+// App.jsx
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { useFonts } from 'expo-font';
 
-// importing the put, get and delete for secure store
-import put from "./SecureStore/Put";
-import get from "./SecureStore/Get";
-import remove from "./SecureStore/Remove";
+import { DataContext } from './src/Context/DataContext';
+import Splash from './src/screens/Splash';
+import Auth from './src/screens/Auth/Auth';
 
-// importing auth and main
-import Auth from "./Auth/Auth";
-import Main from "./Main/Main";
-import CoachMain from "./Main/Coach/Main";
-import AdMain from "./Main/AdManager/Main";
-import ProductMain from "./Main/Product/Main";
-import { withIAPContext } from "react-native-iap";
+// Secure store helpers
+import put from './src/SecureStore/Put';
+import get from './src/SecureStore/Get';
+import remove from './src/SecureStore/Remove';
+
+// Role configuration
+import { roleScreens } from './src/config/roles.config';
+
+// App configuration
+import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from './src/config/app.config';
 
 function App() {
+  // Load fonts
   const [fontsLoaded] = useFonts({
-    "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
-    "Poppins-Thin": require("./assets/fonts/Poppins-Thin.ttf"),
-    "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
-    "Poppins-Black": require("./assets/fonts/Poppins-Black.ttf"),
-    "Poppins-Light": require("./assets/fonts/Poppins-Light.ttf"),
-    "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
+    'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Thin': require('./assets/fonts/Poppins-Thin.ttf'),
+    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+    'Poppins-Black': require('./assets/fonts/Poppins-Black.ttf'),
+    'Poppins-Light': require('./assets/fonts/Poppins-Light.ttf'),
+    'Poppins-Medium': require('./assets/fonts/Poppins-Medium.ttf'),
   });
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      Text.defaultProps = Text.defaultProps || {};
-      Text.defaultProps.style = { fontFamily: "Poppins-Regular" };
-    }
-  }, [fontsLoaded]);
-
-  const [loading, setLoading] = useState(false);
+  // Global state
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     auth: false,
-    // url: "http://97.74.83.27:9000",
-    url: "https://backend.cuewellness.net",
-    // url: "http://192.168.29.33:9000",
-    // url: "http://172.20.10.3:9000",
+    url: BASE_API_URL,
     authToken: undefined,
     role: undefined,
     data_filled: false,
   });
 
-  const login = (role) => {
-    // put("Auth", data.authToken);
-    let new_data = { ...data };
-    new_data.auth = true;
-    new_data.role = role;
-    // new_data.authToken = auth_token;
-    setData(new_data);
-    put("Role", role);
-  };
-
-  const checked_today = () => {
-    put("checked", "" + new Date());
-  };
-
-  const partial_login = (auth_token) => {
-    put("Auth", auth_token);
-    let new_data = { ...data };
-    // new_data.auth = true;
-    new_data.authToken = auth_token;
-    setData(new_data);
-  };
-
-  const partial_login_together = (auth_token, role) => {
-    put("Auth", auth_token);
-    put("Role", role);
-    let new_data = { ...data };
-    new_data.auth = true;
-    new_data.authToken = auth_token;
-    new_data.role = role;
-    setData(new_data);
-  };
-
-  const logout = () => {
-    console.log("logout triger");
-    remove("Auth").then(() => {
-      remove("data_filled").then(() => {
-        setData({
-          ...data,
-          auth: false,
-          authToken: undefined,
-          role: undefined,
-        });
-      });
-    });
-  };
-
-  remove("data_filled");
-
-  const data_filled = () => {
-    console.log("here we filled the data for coach");
-    put("data_filled", "true").then(() => {
-      setData({ ...data, data_filled: true });
-    });
-  };
-
-  remove("Auth");
-
-  useEffect(() => {
-    get("Auth").then((auth_data) => {
-      if (auth_data == undefined || auth_data == "" || auth_data == false) {
-        setData({ ...data, auth: false });
-        setLoading(false);
-      } else {
-        console.log("found data");
-        get("Role").then((role) => {
-          get("data_filled").then((df) => {
-            console.log(df);
-            if (df == undefined || df == false) {
-              setData({
-                ...data,
-                auth: true,
-                authToken: auth_data,
-                role: role,
-              });
-              setLoading(false);
-            } else if (df == "true") {
-              console.log("geeting the df from here");
-              setData({
-                ...data,
-                auth: true,
-                authToken: auth_data,
-                role: role,
-                data_filled: true,
-              });
-              setLoading(false);
-            }
-          });
-        });
-      }
-    });
+  // ---------- HELPERS ----------
+  const login = useCallback(async (role) => {
+    try {
+      setData(prev => ({ ...prev, auth: true, role }));
+      await put('Role', role || '');
+    } catch (err) {
+      console.error('login error:', err);
+    }
   }, []);
+
+  const partial_login = useCallback(async (auth_token) => {
+    try {
+      await put('Auth', auth_token);
+      setData(prev => ({ ...prev, authToken: auth_token }));
+    } catch (err) {
+      console.error('partial_login error:', err);
+    }
+  }, []);
+
+  const partial_login_together = useCallback(
+    async (auth_token, role) => {
+      try {
+        await Promise.all([put('Auth', auth_token), put('Role', role || '')]);
+        setData(prev => ({
+          ...prev,
+          auth: true,
+          authToken: auth_token,
+          role,
+        }));
+      } catch (err) {
+        console.error('partial_login_together error:', err);
+      }
+    },
+    [],
+  );
+
+  const checked_today = useCallback(async () => {
+    try {
+      await put('checked', new Date().toISOString());
+    } catch (err) {
+      console.error('checked_today error:', err);
+    }
+  }, []);
+
+  const mark_data_filled = useCallback(async () => {
+    try {
+      await put('data_filled', 'true');
+      setData(prev => ({ ...prev, data_filled: true }));
+    } catch (err) {
+      console.error('mark_data_filled error:', err);
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await Promise.all([
+        remove('Auth'),
+        remove('Role'),
+        remove('data_filled'),
+      ]);
+      setData(prev => ({
+        ...prev,
+        auth: false,
+        authToken: undefined,
+        role: undefined,
+        data_filled: false,
+      }));
+    } catch (err) {
+      console.error('logout error:', err);
+    }
+  }, []);
+
+  // ---------- INITIAL LOAD ----------
+  useEffect(() => {
+    let mounted = true;
+
+    async function initializeFromStore() {
+      try {
+        const [authToken, role, df] = await Promise.all([
+          get('Auth'),
+          get('Role'),
+          get('data_filled'),
+        ]);
+
+        if (!mounted) return;
+
+        setData({
+          auth: !!authToken,
+          authToken: authToken || undefined,
+          role: role,
+          url: BASE_API_URL,
+          data_filled: df === 'true',
+        });
+      } catch (err) {
+        console.error('initializeFromStore error:', err);
+        if (mounted) setData(prev => ({ ...prev, auth: false }));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    initializeFromStore();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // ---------- ROLE SCREENS ----------
+  const ActiveScreen = useMemo(() => {
+    if (!data.auth) return Auth;
+    return (data.role && roleScreens[data.role]) || Auth;
+  }, [data.auth, data.role]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StripeProvider publishableKey="pk_test_51QUpeKAgw3asoEkcwZXNQBnVDY99IjwwIEzJZAIKw3iu3FaM2vFzlTObWHVhS3JXXhEAmUXIQSS4NovDy9WiXoLB0067DbJvYP">
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <DataContext.Provider
           value={{
             data,
@@ -154,35 +165,16 @@ function App() {
             login,
             partial_login,
             partial_login_together,
-            data_filled,
+            data_filled: mark_data_filled,
             checked_today,
           }}
         >
-          {loading ? (
-            <Splash />
-          ) : data.auth ? (
-            data.role === "user" ? (
-              <Main />
-            ) : data.role === "coach" ? (
-              <CoachMain />
-            ) : data.role === "ad" ? (
-              <AdMain />
-            ) : data.role === "product" ? (
-              <ProductMain />
-            ) : (
-              <Auth />
-            )
-          ) : (
-            <Auth />
-          )}
+          {loading || !fontsLoaded ? <Splash /> : <ActiveScreen />}
         </DataContext.Provider>
+        <StatusBar style="auto" />
       </StripeProvider>
     </GestureHandlerRootView>
   );
-  // return <Show />;
 }
 
-// Text.defaultProps = Text.defaultProps || {};
-// Text.defaultProps.style = { fontFamily: "Poppins-Regular" };
-export default withIAPContext(App);
-// export default App;
+export default App;
