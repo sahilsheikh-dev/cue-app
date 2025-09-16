@@ -3,7 +3,7 @@
     "name": "cue_wellness",
     "slug": "cue_wellness",
     "owner": "gavinjr",
-    "version": "2.2.7",
+    "version": "3.0.0",
     "orientation": "portrait",
     "assetBundlePatterns": [
       "**/*"
