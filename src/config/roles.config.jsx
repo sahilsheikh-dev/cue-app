@@ -1,10 +1,10 @@
 // src/config/roles.config.js
 
-import Auth from '../screens/Auth/Auth';
-import Client from '../screens/Client/Main';
-import Coach from '../screens/Coach/Main';
-import Advertiser from '../screens/Advertiser/Main';
-import Product from '../screens/Product/Main';
+import Auth from '../screens/auth/main';
+import Client from '../screens/client/main';
+import Coach from '../screens/coach/main';
+import Advertiser from '../screens/advertiser/main';
+import Product from '../screens/product/main';
 
 // Define constants for roles (to keep consistency across app)
 export const Roles = {

@@ -1,26 +1,27 @@
-// App.jsx
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StripeProvider } from '@stripe/stripe-react-native';
+// import { StripeProvider } from '@stripe/stripe-react-native';
 import { useFonts } from 'expo-font';
-
-import { DataContext } from './src/Context/DataContext';
-import Splash from './src/screens/Common/Splash/Splash';
-import Auth from './src/screens/Auth/Auth'; // ⚠️ DO NOT REMOVE THIS IMPORT ⚠️ Even though `Auth` is not used directly in this file, it is required for `roleScreens[Roles.AUTH]` in roles.config.js. Removing this will cause the app to crash at runtime.
-import ErrorScreen from './src/screens/Error/Main';
-
-// Secure store helpers
-import put from './src/SecureStore/Put';
-import get from './src/SecureStore/Get';
-import remove from './src/SecureStore/Remove';
-
-// Role configuration
-import { roleScreens } from './src/config/roles.config';
-
-// App configuration
-import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from './src/config/app.config';
 import { NavigationContainer } from '@react-navigation/native';
+
+import { DataContext } from './src/context/dataContext';
+import Splash from './src/screens/common/splash/splash';
+
+import Auth from './src/screens/auth/main'; // ⚠️ DO NOT REMOVE THIS IMPORT ⚠️ Even though `Auth` is not referenced directly here, it is required by `roleScreens[Roles.AUTH]` in `roles.config.js`. Removing this will cause the app to crash at runtime.
+
+import ErrorScreen from './src/screens/error/main';
+import { roleScreens } from './src/config/roles.config';
+import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from './src/config/app.config';
+
+import authService, {
+  saveAuthTokenAndRole,
+  initializeAuth,
+  logout as authLogout,
+  checkedToday,
+  markDataFilled,
+} from './src/services/authServices/authService';
+import { Text } from 'react-native';
 
 export default function App() {
   // Load fonts
@@ -33,7 +34,7 @@ export default function App() {
     'Poppins-Medium': require('./assets/fonts/Poppins-Medium.ttf'),
   });
 
-    // Global state
+  // Global state
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     auth: false,
@@ -44,48 +45,21 @@ export default function App() {
   });
 
   // ---------- HELPERS ----------
-
-  const login = useCallback(
-    async (auth_token, role) => {
-      try {
-        await Promise.all([put('auth', auth_token), put('role', role || '')]);
-        setData(prev => ({
-          ...prev,
-          auth: true,
-          authToken: auth_token,
-          role,
-        }));
-      } catch (err) {
-        console.error('login error:', err);
-      }
-    },
-    [],
-  );
-
-  const checked_today = useCallback(async () => {
-    try {
-      await put('checked', new Date().toISOString());
-    } catch (err) {
-      console.error('checked_today error:', err);
-    }
-  }, []);
-
-  const data_filled = useCallback(async () => {
-    try {
-      await put('data_filled', 'true');
-      setData(prev => ({ ...prev, data_filled: true }));
-    } catch (err) {
-      console.error('data_filled error:', err);
+  const login = useCallback(async (authToken, role) => {
+    const ok = await saveAuthTokenAndRole(authToken, role);
+    if (ok) {
+      setData(prev => ({
+        ...prev,
+        auth: true,
+        authToken,
+        role,
+      }));
     }
   }, []);
 
   const logout = useCallback(async () => {
-    try {
-      await Promise.all([
-        remove('auth'),
-        remove('role'),
-        remove('data_filled'),
-      ]);
+    const ok = await authLogout();
+    if (ok) {
       setData(prev => ({
         ...prev,
         auth: false,
@@ -93,54 +67,49 @@ export default function App() {
         role: undefined,
         data_filled: false,
       }));
-    } catch (err) {
-      console.error('logout error:', err);
     }
+  }, []);
+
+  const markFilled = useCallback(async () => {
+    const ok = await markDataFilled();
+    if (ok) {
+      setData(prev => ({ ...prev, data_filled: true }));
+    }
+  }, []);
+
+  const markCheckedToday = useCallback(async () => {
+    await checkedToday(); // no UI state update
   }, []);
 
   // ---------- INITIAL LOAD ----------
   useEffect(() => {
     let mounted = true;
-
-    async function initializeFromStore() {
-      try {
-        const [authToken, role, df] = await Promise.all([
-          get('auth'),
-          get('role'),
-          get('data_filled'),
-        ]);
-
-        if (!mounted) return;
-
-        setData({
-          auth: !!authToken,
-          authToken: authToken || undefined,
-          role: role,
-          url: BASE_API_URL,
-          data_filled: df === 'true',
-        });
-      } catch (err) {
-        console.error('initializeFromStore error:', err);
-        if (mounted) setData(prev => ({ ...prev, auth: false }));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    initializeFromStore();
+    (async () => {
+      const { authToken, role, data_filled } = await initializeAuth();
+      if (!mounted) return;
+      setData({
+        auth: !!authToken,
+        authToken: authToken || undefined,
+        role,
+        url: BASE_API_URL,
+        data_filled,
+      });
+      setLoading(false);
+    })();
     return () => {
       mounted = false;
     };
   }, []);
 
+  // ---------- FALLBACK ----------
   const InvalidRoleScreen = ({ navigation }) => (
     <ErrorScreen
       navigation={navigation}
-      message={`Invalid or missing role: ${data.role || "undefined"}`}
+      message={`Invalid or missing role: ${data.role || 'undefined'}`}
     />
   );
 
-  // ---------- ROLE SCREENS ----------
+  // ---------- ACTIVE SCREEN ----------
   const ActiveScreen = useMemo(() => {
     if (!data.auth) return roleScreens.auth;
     if (!data.role || !roleScreens[data.role]) {
@@ -149,30 +118,31 @@ export default function App() {
     return roleScreens[data.role];
   }, [data.auth, data.role]);
 
+  // ---------- RENDER ----------
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+      {/* <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}> */}
         <DataContext.Provider
           value={{
             data,
             setData,
-            logout,
             login,
-            data_filled: data_filled,
-            checked_today,
+            logout,
+            data_filled: markFilled,
+            checked_today: markCheckedToday,
           }}
         >
           <NavigationContainer>
             {(!fontsLoaded || loading) ? (
-            <Splash />
-          ) : (
-              <ActiveScreen />
+              <Splash />
+            ) : (
+              // <ActiveScreen />   // work on signup and login screen is pending hence commented it out
+              <Text>Hi, this screen is working fine...</Text>
             )}
           </NavigationContainer>
         </DataContext.Provider>
         <StatusBar style="auto" />
-      </StripeProvider>
+      {/* </StripeProvider> */}
     </GestureHandlerRootView>
   );
-
 }

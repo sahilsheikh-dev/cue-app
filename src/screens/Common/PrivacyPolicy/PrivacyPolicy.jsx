@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
-import styles from "./PrivacyPolicyCss";
+import styles from "./privacyPolicyCss";
 
 const background = require("../../../../assets/images/background.png");
 
