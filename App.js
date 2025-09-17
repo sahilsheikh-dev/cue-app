@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { DataContext } from './src/Context/DataContext';
 import Splash from './src/screens/Common/Splash/Splash';
 import Auth from './src/screens/Auth/Auth';
+import ErrorScreen from './src/screens/Error/Main';
 
 // Secure store helpers
 import put from './src/SecureStore/Put';
@@ -19,6 +20,8 @@ import { roleScreens } from './src/config/roles.config';
 
 // App configuration
 import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from './src/config/app.config';
+import { Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
 function App() {
   // Load fonts
@@ -45,7 +48,7 @@ function App() {
   const login = useCallback(async (role) => {
     try {
       setData(prev => ({ ...prev, auth: true, role }));
-      await put('Role', role || '');
+      await put('role', role || '');
     } catch (err) {
       console.error('login error:', err);
     }
@@ -53,7 +56,7 @@ function App() {
 
   const partial_login = useCallback(async (auth_token) => {
     try {
-      await put('Auth', auth_token);
+      await put('auth', auth_token);
       setData(prev => ({ ...prev, authToken: auth_token }));
     } catch (err) {
       console.error('partial_login error:', err);
@@ -63,7 +66,7 @@ function App() {
   const partial_login_together = useCallback(
     async (auth_token, role) => {
       try {
-        await Promise.all([put('Auth', auth_token), put('Role', role || '')]);
+        await Promise.all([put('auth', auth_token), put('role', role || '')]);
         setData(prev => ({
           ...prev,
           auth: true,
@@ -85,20 +88,20 @@ function App() {
     }
   }, []);
 
-  const mark_data_filled = useCallback(async () => {
+  const data_filled = useCallback(async () => {
     try {
       await put('data_filled', 'true');
       setData(prev => ({ ...prev, data_filled: true }));
     } catch (err) {
-      console.error('mark_data_filled error:', err);
+      console.error('data_filled error:', err);
     }
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await Promise.all([
-        remove('Auth'),
-        remove('Role'),
+        remove('auth'),
+        remove('role'),
         remove('data_filled'),
       ]);
       setData(prev => ({
@@ -120,8 +123,8 @@ function App() {
     async function initializeFromStore() {
       try {
         const [authToken, role, df] = await Promise.all([
-          get('Auth'),
-          get('Role'),
+          get('auth'),
+          get('role'),
           get('data_filled'),
         ]);
 
@@ -148,10 +151,22 @@ function App() {
     };
   }, []);
 
+  const InvalidRoleScreen = ({ navigation }) => (
+    <ErrorScreen
+      navigation={navigation}
+      message={`Invalid or missing role: ${data.role || "undefined"}`}
+    />
+  );
+
   // ---------- ROLE SCREENS ----------
   const ActiveScreen = useMemo(() => {
     if (!data.auth) return Auth;
-    return (data.role && roleScreens[data.role]) || Auth;
+
+    if (!data.role || !roleScreens[data.role]) {
+      return InvalidRoleScreen;
+    }
+
+    return roleScreens[data.role];
   }, [data.auth, data.role]);
 
   return (
@@ -165,11 +180,17 @@ function App() {
             login,
             partial_login,
             partial_login_together,
-            data_filled: mark_data_filled,
+            data_filled: data_filled,
             checked_today,
           }}
         >
-          {loading || !fontsLoaded ? <Splash /> : <ActiveScreen />}
+          <NavigationContainer>
+            {(!fontsLoaded || loading) ? (
+            <Splash />
+            ) : (
+              <ActiveScreen />
+            )}
+          </NavigationContainer>
         </DataContext.Provider>
         <StatusBar style="auto" />
       </StripeProvider>

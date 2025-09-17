@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, Image } from 'react-native';
 import styles from './SplashCss';
-const background = require('../../../../assets/images/background.png');
+const background = require('../../../../assets/images/splash-icon-vertical.png');
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator } from 'react-native';
@@ -16,7 +16,7 @@ export default function Splash() {
       ></LinearGradient>
       <View style={styles.main}>
         <Image
-          source={require('../../../../assets/images/splash2.png')}
+          source={require('../../../../assets/images/icon.png')}
           style={styles.main_img}
         />
         <View style={styles.main_titles}>

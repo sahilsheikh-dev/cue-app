@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
@@ -25,7 +24,6 @@ function DummyScreen({ route }) {
 
 export default function Main() {
   return (
-    <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Screen name="Home" component={DummyScreen} />
         <Stack.Screen name="ChatWithUsers" component={DummyScreen} />
@@ -89,6 +87,5 @@ export default function Main() {
           component={DummyScreen}
         />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }

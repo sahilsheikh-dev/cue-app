@@ -1,4 +1,3 @@
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +35,6 @@ import PrivacyPolicy from '../Common/PrivacyPolicy/PrivacyPolicy';
 
 export default function Auth() {
   return (
-    <NavigationContainer>
       <Stack.Navigator>
         {/* ✅ available screens */}
         <Stack.Screen
@@ -92,6 +90,5 @@ export default function Auth() {
         <Stack.Screen name="Event-create2" component={Create2} options={{ headerShown: false }} />
         */}
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }

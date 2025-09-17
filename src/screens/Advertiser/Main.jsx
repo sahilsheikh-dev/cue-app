@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator, Alert } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
@@ -50,7 +49,6 @@ export default function Main() {
   }
 
   return (
-    <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Screen name="Advertiser-dashboard" component={DummyScreen} />
         <Stack.Screen name="Advertiser-create-event" component={DummyScreen} />
@@ -69,6 +67,5 @@ export default function Main() {
         <Stack.Screen name="TermsAndCondition" component={DummyScreen} />
         <Stack.Screen name="Personal-Information" component={DummyScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }

@@ -5,7 +5,9 @@ export default function Main({ navigation, message }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>⚠️ Something went wrong</Text>
-      <Text style={styles.message}>{message || 'An unexpected error occurred.'}</Text>
+      <Text style={styles.message}>
+        {message || 'An unexpected error occurred.'}
+      </Text>
       {navigation && (
         <Button
           title="Go Back"
