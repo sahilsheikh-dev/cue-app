@@ -4,8 +4,9 @@
     "slug": "cue_wellness",
     "owner": "gavinjr",
     "version": "3.0.0",
+    "sdkVersion": "53.0.0",
     "orientation": "portrait",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": ["assets/fonts/*"],
     "plugins": [
       [
         "expo-av",

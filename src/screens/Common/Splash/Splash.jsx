@@ -9,14 +9,13 @@ export default function Splash() {
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
       <LinearGradient
         colors={['rgba(30, 63, 142, 1)', 'rgba(8, 11, 46, 1)']}
         style={styles.backgroundView}
       ></LinearGradient>
       <View style={styles.main}>
         <Image
-          source={require('../../../../assets/images/icon.png')}
+          // source={require('../../../../assets/images/icon.png')}   // this image is not required, dont uncomment it
           style={styles.main_img}
         />
         <View style={styles.main_titles}>

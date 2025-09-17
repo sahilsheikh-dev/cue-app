@@ -19,16 +19,16 @@ import CountryPicker from '@realtril/react-native-country-picker-modal';
 import { Roles } from "../../../config/roles.config";
 
 const loginEndpoints = {
-  [Roles.USER]: "/user/auth/login",
+  [Roles.CLIENT]: "/user/auth/login-client",
   [Roles.COACH]: "/user/auth/login-coach",
   [Roles.ADVERTISER]: "/user/auth/login-event",
   [Roles.PRODUCT]: "/user/auth/login-product",
 };
 
 export default function Login() {
-  const { data, partial_login_together } = useContext(DataContext);
+  const { data, login } = useContext(DataContext);
 
-  const [role, setRole] = useState(Roles.USER);
+  const [role, setRole] = useState(Roles.CLIENT);
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [agreeTc, setAgreeTc] = useState(false);
@@ -81,7 +81,7 @@ export default function Login() {
         Alert.alert("Warning", res.data.alert);
       } else {
         const token = res.data.supply ?? res.data.token;
-        partial_login_together(token, role);
+        login(token, role);
       }
     } catch (err) {
       setLoading(false);

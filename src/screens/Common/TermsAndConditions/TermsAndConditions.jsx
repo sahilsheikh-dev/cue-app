@@ -16,7 +16,7 @@ const background = require("../../../../assets/images/background.png");
 
 // ✅ Centralized role labels
 const roleLabels = {
-  user: "Client",
+  client: "Client",
   coach: "Coach",
   advertiser: "Event Organizer",
   product: "Product Company",
@@ -24,18 +24,18 @@ const roleLabels = {
 
 // ✅ Centralized role-based URLs (can move to legal.config.js later)
 const roleUrls = {
-  user: "https://cuewellness.net/client-terms-and-services",
+  client: "https://cuewellness.net/client-terms-and-services",
   coach: "https://cuewellness.net/coach-terms-and-services",
   advertiser: "https://cuewellness.net/event-terms-and-services",
   product: "https://cuewellness.net/product-terms-and-services",
 };
 
 export default function TermsAndConditions({ route }) {
-  // ✅ fallback role is user
-  const role = route?.params?.role || "user";
+  // ✅ fallback role is client
+  const role = route?.params?.role || "client";
 
   // ✅ ensure role is valid, otherwise fallback
-  const safeRole = roleUrls[role] ? role : "user";
+  const safeRole = roleUrls[role] ? role : "client";
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 // App.jsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StripeProvider } from '@stripe/stripe-react-native';
@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 
 import { DataContext } from './src/Context/DataContext';
 import Splash from './src/screens/Common/Splash/Splash';
-import Auth from './src/screens/Auth/Auth';
+import Auth from './src/screens/Auth/Auth'; // ⚠️ DO NOT REMOVE THIS IMPORT ⚠️ Even though `Auth` is not used directly in this file, it is required for `roleScreens[Roles.AUTH]` in roles.config.js. Removing this will cause the app to crash at runtime.
 import ErrorScreen from './src/screens/Error/Main';
 
 // Secure store helpers
@@ -20,10 +20,9 @@ import { roleScreens } from './src/config/roles.config';
 
 // App configuration
 import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from './src/config/app.config';
-import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
-function App() {
+export default function App() {
   // Load fonts
   const [fontsLoaded] = useFonts({
     'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
@@ -34,7 +33,7 @@ function App() {
     'Poppins-Medium': require('./assets/fonts/Poppins-Medium.ttf'),
   });
 
-  // Global state
+    // Global state
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     auth: false,
@@ -45,25 +44,8 @@ function App() {
   });
 
   // ---------- HELPERS ----------
-  const login = useCallback(async (role) => {
-    try {
-      setData(prev => ({ ...prev, auth: true, role }));
-      await put('role', role || '');
-    } catch (err) {
-      console.error('login error:', err);
-    }
-  }, []);
 
-  const partial_login = useCallback(async (auth_token) => {
-    try {
-      await put('auth', auth_token);
-      setData(prev => ({ ...prev, authToken: auth_token }));
-    } catch (err) {
-      console.error('partial_login error:', err);
-    }
-  }, []);
-
-  const partial_login_together = useCallback(
+  const login = useCallback(
     async (auth_token, role) => {
       try {
         await Promise.all([put('auth', auth_token), put('role', role || '')]);
@@ -74,7 +56,7 @@ function App() {
           role,
         }));
       } catch (err) {
-        console.error('partial_login_together error:', err);
+        console.error('login error:', err);
       }
     },
     [],
@@ -160,12 +142,10 @@ function App() {
 
   // ---------- ROLE SCREENS ----------
   const ActiveScreen = useMemo(() => {
-    if (!data.auth) return Auth;
-
+    if (!data.auth) return roleScreens.auth;
     if (!data.role || !roleScreens[data.role]) {
       return InvalidRoleScreen;
     }
-
     return roleScreens[data.role];
   }, [data.auth, data.role]);
 
@@ -178,8 +158,6 @@ function App() {
             setData,
             logout,
             login,
-            partial_login,
-            partial_login_together,
             data_filled: data_filled,
             checked_today,
           }}
@@ -187,7 +165,7 @@ function App() {
           <NavigationContainer>
             {(!fontsLoaded || loading) ? (
             <Splash />
-            ) : (
+          ) : (
               <ActiveScreen />
             )}
           </NavigationContainer>
@@ -196,6 +174,5 @@ function App() {
       </StripeProvider>
     </GestureHandlerRootView>
   );
-}
 
-export default App;
+}

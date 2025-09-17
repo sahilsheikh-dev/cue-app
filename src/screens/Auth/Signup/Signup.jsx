@@ -40,7 +40,7 @@ const initialFormState = {
   phone: "",
   password: "",
   confirmPassword: "",
-  role: "user",
+  role: "client",
   country: null,
   agreeTc: false,
   error: "",
@@ -147,8 +147,8 @@ export default function Signup({ navigation }) {
 
       let endpoint = "";
       switch (role) {
-        case "user":
-          endpoint = "/user/auth/signup";
+        case "client":
+          endpoint = "/user/auth/signup-client";
           break;
         case "coach":
           endpoint = "/user/auth/signup-coach";
@@ -257,7 +257,7 @@ export default function Signup({ navigation }) {
       <CountrySelector countries={countries} selected={form.country} onSelect={c => dispatch({ country: c })} innerRef={countryRef} />
       <RoleSelector
         roles={[
-          { label: "Client", value: "user" },
+          { label: "Client", value: "client" },
           { label: "Coach", value: "coach" },
           { label: "Event Organizer", value: "advertiser" },
           { label: "Product Company", value: "product" },

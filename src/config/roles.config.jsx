@@ -1,14 +1,25 @@
 // src/config/roles.config.js
 
+import Auth from '../screens/Auth/Auth';
 import Client from '../screens/Client/Main';
 import Coach from '../screens/Coach/Main';
 import Advertiser from '../screens/Advertiser/Main';
 import Product from '../screens/Product/Main';
 
-// Define allowed roles
+// Define constants for roles (to keep consistency across app)
+export const Roles = {
+  CLIENT: "client",
+  COACH: "coach",
+  ADVERTISER: "advertiser",
+  PRODUCT: "product",
+  AUTH: "auth",
+};
+
+// Map roles to screens
 export const roleScreens = {
-  user: Client,
-  coach: Coach,
-  advertiser: Advertiser,
-  product: Product,
+  [Roles.AUTH]: Auth,
+  [Roles.CLIENT]: Client,
+  [Roles.COACH]: Coach,
+  [Roles.ADVERTISER]: Advertiser,
+  [Roles.PRODUCT]: Product,
 };
