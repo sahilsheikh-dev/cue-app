@@ -15,7 +15,7 @@ import styles from "./loginCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState, useEffect } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 import validateInputs from "../../../utils/validateInputs";
@@ -290,13 +290,13 @@ export default function Login({ navigation }) {
                   }}
                 >
                   {agree_tc ? (
-                    <MaterialIcons
+                    <MaterialCommunityIcons
                       name="checkbox-marked"
                       size={20}
                       color="#fff"
                     />
                   ) : (
-                    <MaterialIcons
+                    <MaterialCommunityIcons
                       name="checkbox-blank-outline"
                       size={20}
                       color="#fff"
