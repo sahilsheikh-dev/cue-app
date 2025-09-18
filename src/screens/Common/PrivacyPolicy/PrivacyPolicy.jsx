@@ -15,7 +15,7 @@ import styles from "./privacyPolicyCss";
 const background = require("../../../../assets/images/background.png");
 
 export default function PrivacyPolicy() {
-  const privacyUrl = 'https://cuewellness.net/privacy-policy';
+  const privacyUrl = "https://cuewellness.net/privacy-policy";
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -33,7 +33,7 @@ export default function PrivacyPolicy() {
 
       {/* Header */}
       <View style={styles.top_portion1} />
-      <View style={styles.bs_2}>
+      <View style={styles.bs_2_}>
         <Text
           style={styles.bs_2_cue_}
           numberOfLines={1}
@@ -60,7 +60,7 @@ export default function PrivacyPolicy() {
               <ActivityIndicator
                 size="large"
                 color="white"
-                accessibilityLabel="Loading privacy policy"
+                accessibilityLabel="Loading Privacy Policy"
               />
             </View>
           )}

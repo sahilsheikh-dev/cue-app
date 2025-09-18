@@ -71,13 +71,30 @@ export default function TermsAndConditions({ route }) {
           startInLoadingState={true}
           renderLoading={() => (
             <View
-              style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               <ActivityIndicator
                 size="large"
                 color="white"
-                accessibilityLabel="Loading terms and conditions"
+                accessibilityLabel="Loading Terms & Conditions"
               />
+            </View>
+          )}
+          onError={() => (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "white" }}>
+                Failed to load Terms and Conditions. Please try again later.
+              </Text>
             </View>
           )}
         />

@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.1.0",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-community/datetimepicker": "8.4.1",
     "@react-native-community/slider": "4.5.6",

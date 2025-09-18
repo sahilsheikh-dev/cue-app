@@ -1,12 +1,12 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 
 // ✅ existing files
-import Signup from './signup/signup';
-import Login from './login/login';
-import Splash from '../common/splash/splash';
-import TermsAndCondition from '../common/termsAndConditions/termsAndConditions';
-import PrivacyPolicy from '../common/privacyPolicy/privacyPolicy';
+import Signup from "./signup/signup";
+import Login from "./login/login";
+import Splash from "../common/splash/splash";
+import TermsAndCondition from "../common/termsAndConditions/termsAndConditions";
+import PrivacyPolicy from "../common/privacyPolicy/privacyPolicy";
 
 // ❌ missing files (commented until created)
 // import ContactNumber from './ContactNumber';
@@ -35,36 +35,36 @@ import PrivacyPolicy from '../common/privacyPolicy/privacyPolicy';
 
 export default function Auth() {
   return (
-      <Stack.Navigator>
-        {/* ✅ available screens */}
-        <Stack.Screen
-          name="Signup"
-          component={Signup}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Splash"
-          component={Splash}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="TandC"
-          component={TermsAndCondition}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Privacy-Policy"
-          component={PrivacyPolicy}
-          options={{ headerShown: false }}
-        />
+    <Stack.Navigator>
+      {/* ✅ available screens */}
+      <Stack.Screen
+        name="Signup"
+        component={Signup}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Splash"
+        component={Splash}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TandC"
+        component={TermsAndCondition}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Privacy-Policy"
+        component={PrivacyPolicy}
+        options={{ headerShown: false }}
+      />
 
-        {/* ❌ commented screens until files are created */}
-        {/*
+      {/* ❌ commented screens until files are created */}
+      {/*
         <Stack.Screen name="ContactNumber" component={ContactNumber} options={{ headerShown: false }} />
         <Stack.Screen name="Otp" component={Otp} options={{ headerShown: false }} />
         <Stack.Screen name="FinishYourProfile" component={FinishYourProfile} options={{ headerShown: false }} />
@@ -89,6 +89,6 @@ export default function Auth() {
         <Stack.Screen name="Event-create" component={Create} options={{ headerShown: false }} />
         <Stack.Screen name="Event-create2" component={Create2} options={{ headerShown: false }} />
         */}
-      </Stack.Navigator>
+    </Stack.Navigator>
   );
 }
