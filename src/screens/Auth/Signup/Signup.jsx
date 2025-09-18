@@ -1,3 +1,4 @@
+import React, { useRef, useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -9,13 +10,14 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from "react-native";
 import styles from "./signupCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState, useEffect } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
+import { useFocusEffect } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -45,6 +47,18 @@ function Signup({ navigation }) {
   const [all_countries, setAll_countries] = useState([]);
   const [selected_country, setSelected_country] = useState({});
   const country_ref = useRef(null);
+
+  // Android back: if on Signup, exit app
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBack = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+      BackHandler.addEventListener("hardwareBackPress", onBack);
+      return () => BackHandler.removeEventListener("hardwareBackPress", onBack);
+    }, [])
+  );
 
   useEffect(() => {
     setAll_countries([
@@ -130,7 +144,7 @@ function Signup({ navigation }) {
       <LinearGradient
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
         style={styles.backgroundView}
-      />
+      ></LinearGradient>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -139,15 +153,14 @@ function Signup({ navigation }) {
         <ScrollView style={styles.main_scroll_view}>
           {/* back section */}
           <View style={styles.back_section}>
-            <View style={styles.bs_1} />
+            <View style={styles.bs_1}> </View>
             <View style={styles.bs_2}>
               <Text style={styles.bs_2_cue_} numberOfLines={1}>
                 CUE
               </Text>
             </View>
-            <View style={styles.bs_3} />
+            <View style={styles.bs_3}></View>
           </View>
-
           {/* create a profile section */}
           <View style={styles.welcome_view}>
             <Text style={styles.welcome_text}>Create a Profile</Text>
@@ -155,7 +168,9 @@ function Signup({ navigation }) {
 
           {/* choose role section */}
           <TouchableOpacity
-            onPress={() => role_ref.current.open()}
+            onPress={() => {
+              role_ref.current.open();
+            }}
             style={styles.input_whole_section}
           >
             <LinearGradient
@@ -194,7 +209,9 @@ function Signup({ navigation }) {
 
           {role == "eventOrganizer" ? (
             <TouchableOpacity
-              onPress={() => eo_type_ref.current.open()}
+              onPress={() => {
+                eo_type_ref.current.open();
+              }}
               style={styles.input_whole_section}
             >
               <LinearGradient
@@ -234,7 +251,9 @@ function Signup({ navigation }) {
 
           {role == "productCompany" ? (
             <TouchableOpacity
-              onPress={() => pc_type_ref.current.open()}
+              onPress={() => {
+                pc_type_ref.current.open();
+              }}
               style={styles.input_whole_section}
             >
               <LinearGradient
@@ -273,6 +292,7 @@ function Signup({ navigation }) {
           ) : null}
 
           {role == "productCompany" && pc_type == "Company" ? (
+            // brand name
             <View style={styles.input_whole_section}>
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
@@ -287,13 +307,16 @@ function Signup({ navigation }) {
                     placeholder="Enter Brand Name"
                     placeholderTextColor={"#ffffff90"}
                     value={firstName}
-                    onChangeText={setFirstName}
+                    onChangeText={(text) => {
+                      setFirstName(text);
+                    }}
                   />
                 </View>
               </LinearGradient>
             </View>
           ) : role == "client" || role == "coach" ? (
             <>
+              {/* first name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -311,12 +334,15 @@ function Signup({ navigation }) {
                       placeholder="Enter First Name"
                       placeholderTextColor={"#ffffff90"}
                       value={firstName}
-                      onChangeText={setFirstName}
+                      onChangeText={(text) => {
+                        setFirstName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
               </View>
 
+              {/* last name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -334,12 +360,15 @@ function Signup({ navigation }) {
                       placeholder="Enter Last Name"
                       placeholderTextColor={"#ffffff90"}
                       value={lastName}
-                      onChangeText={setLastName}
+                      onChangeText={(text) => {
+                        setLastName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
               </View>
 
+              {/* pet name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -357,7 +386,9 @@ function Signup({ navigation }) {
                       placeholder="Enter Nickname (optional)"
                       placeholderTextColor={"#ffffff90"}
                       value={pet_name}
-                      onChangeText={setPet_name}
+                      onChangeText={(text) => {
+                        setPet_name(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
@@ -365,8 +396,10 @@ function Signup({ navigation }) {
             </>
           ) : null}
 
+          {/* event section here */}
           {role == "eventOrganizer" && eo_type == "company" ? (
             <>
+              {/* company name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -388,12 +421,15 @@ function Signup({ navigation }) {
                       placeholder="Enter Company Name"
                       placeholderTextColor={"#ffffff90"}
                       value={company_name}
-                      onChangeText={setCompany_name}
+                      onChangeText={(text) => {
+                        setCompany_name(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
               </View>
 
+              {/* account operator name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -415,7 +451,9 @@ function Signup({ navigation }) {
                       placeholder="Account Operator Name"
                       placeholderTextColor={"#ffffff90"}
                       value={account_operator_name}
-                      onChangeText={setAccount_operator_name}
+                      onChangeText={(text) => {
+                        setAccount_operator_name(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
@@ -423,6 +461,7 @@ function Signup({ navigation }) {
             </>
           ) : role == "eventOrganizer" && eo_type == "individual" ? (
             <>
+              {/* first name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -440,12 +479,15 @@ function Signup({ navigation }) {
                       placeholder="Enter First Name"
                       placeholderTextColor={"#ffffff90"}
                       value={firstName}
-                      onChangeText={setFirstName}
+                      onChangeText={(text) => {
+                        setFirstName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
               </View>
 
+              {/* last name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -463,7 +505,9 @@ function Signup({ navigation }) {
                       placeholder="Enter Last Name"
                       placeholderTextColor={"#ffffff90"}
                       value={lastName}
-                      onChangeText={setLastName}
+                      onChangeText={(text) => {
+                        setLastName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
@@ -471,6 +515,7 @@ function Signup({ navigation }) {
             </>
           ) : role == "productCompany" && pc_type == "Coach" ? (
             <>
+              {/* first name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -488,12 +533,15 @@ function Signup({ navigation }) {
                       placeholder="Enter First Name"
                       placeholderTextColor={"#ffffff90"}
                       value={firstName}
-                      onChangeText={setFirstName}
+                      onChangeText={(text) => {
+                        setFirstName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
               </View>
 
+              {/* last name */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -511,7 +559,9 @@ function Signup({ navigation }) {
                       placeholder="Enter Last Name"
                       placeholderTextColor={"#ffffff90"}
                       value={lastName}
-                      onChangeText={setLastName}
+                      onChangeText={(text) => {
+                        setLastName(text);
+                      }}
                     />
                   </View>
                 </LinearGradient>
@@ -538,20 +588,26 @@ function Signup({ navigation }) {
                   autoComplete="off"
                   autoCorrect={false}
                   spellCheck={false}
-                  onChangeText={setPassword}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                  }}
                 />
               </View>
               {password_show ? (
                 <TouchableOpacity
                   style={styles.svg_circle_eye}
-                  onPress={() => setPassword_show(!password_show)}
+                  onPress={() => {
+                    setPassword_show(!password_show);
+                  }}
                 >
                   <Ionicons name="eye" size={20} color="#fff" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.svg_circle_eye}
-                  onPress={() => setPassword_show(!password_show)}
+                  onPress={() => {
+                    setPassword_show(!password_show);
+                  }}
                 >
                   <Ionicons name="eye-off" size={20} color="#fff" />
                 </TouchableOpacity>
@@ -578,20 +634,26 @@ function Signup({ navigation }) {
                   autoComplete="off"
                   autoCorrect={false}
                   spellCheck={false}
-                  onChangeText={setConfirmPassword}
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                  }}
                 />
               </View>
               {confirmPassword_show ? (
                 <TouchableOpacity
                   style={styles.svg_circle_eye}
-                  onPress={() => setConfirmPassword_show(!confirmPassword_show)}
+                  onPress={() => {
+                    setConfirmPassword_show(!confirmPassword_show);
+                  }}
                 >
                   <Ionicons name="eye" size={20} color="#fff" />
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.svg_circle_eye}
-                  onPress={() => setConfirmPassword_show(!confirmPassword_show)}
+                  onPress={() => {
+                    setConfirmPassword_show(!confirmPassword_show);
+                  }}
                 >
                   <Ionicons name="eye-off" size={20} color="#fff" />
                 </TouchableOpacity>
@@ -614,7 +676,9 @@ function Signup({ navigation }) {
                     placeholder="Enter Referral Code (optional)"
                     placeholderTextColor={"#ffffff90"}
                     value={referal_code}
-                    onChangeText={setReferal_code}
+                    onChangeText={(text) => {
+                      setReferal_code(text);
+                    }}
                   />
                 </View>
               </LinearGradient>
@@ -624,7 +688,9 @@ function Signup({ navigation }) {
           {/* COUNTRY */}
           {role == "productCompany" || role == "eventOrganizer" ? (
             <TouchableOpacity
-              onPress={() => country_ref.current.open()}
+              onPress={() => {
+                country_ref.current.open();
+              }}
               style={styles.input_whole_section}
             >
               <LinearGradient
@@ -654,7 +720,7 @@ function Signup({ navigation }) {
             </TouchableOpacity>
           ) : null}
 
-          {/* agree section with role-aware T&C navigation */}
+          {/* agree section with role-aware T&C */}
           <View style={styles.fp_whole_}>
             <TouchableOpacity style={styles.fp_whole_text}>
               <Text style={styles.fp_text_center}>
@@ -680,17 +746,19 @@ function Signup({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.fp_whole_svg_section}
-              onPress={() => setAgree_tc(!agree_tc)}
+              onPress={() => {
+                setAgree_tc(!agree_tc);
+              }}
             >
               {agree_tc ? (
                 <MaterialCommunityIcons
-                  name="checkbox-marked"
+                  name="checkbox-marked-outline"
                   size={20}
                   color="#fff"
                 />
               ) : (
                 <MaterialCommunityIcons
-                  name="checkbox-blank-outline"
+                  name="checkbox-outline"
                   size={20}
                   color="#fff"
                 />
@@ -701,7 +769,9 @@ function Signup({ navigation }) {
           {/* get started */}
           <TouchableOpacity
             style={styles.input_whole_section_btn}
-            onPress={trySignup}
+            onPress={() => {
+              trySignup();
+            }}
           >
             <LinearGradient
               colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
@@ -711,10 +781,12 @@ function Signup({ navigation }) {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* login */}
+          {/* login (push) */}
           <TouchableOpacity
             style={styles.login_text_section}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => {
+              navigation.navigate("Login");
+            }}
           >
             <Text style={styles.login_text_tl}>Login?</Text>
           </TouchableOpacity>
@@ -731,20 +803,26 @@ function Signup({ navigation }) {
         draggable={true}
         borderRadius={10}
         customStyles={{
-          wrapper: { backgroundColor: "transparent" },
+          wrapper: {
+            backgroundColor: "transparent",
+          },
           container: {
             backgroundColor: "rgb(40, 57, 109)",
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
-          draggableIcon: { backgroundColor: "white" },
+          draggableIcon: {
+            backgroundColor: "white",
+          },
           borderRadius: 10,
         }}
         customModalProps={{
           animationType: "slide",
           statusBarTranslucent: true,
         }}
-        customAvoidingViewProps={{ enabled: false }}
+        customAvoidingViewProps={{
+          enabled: false,
+        }}
       >
         <LinearGradient
           style={styles.bs_whole_view}
@@ -766,14 +844,13 @@ function Signup({ navigation }) {
                   style={
                     role == "client" ? styles.oi_dot_active : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Client</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
@@ -788,14 +865,13 @@ function Signup({ navigation }) {
               <View style={styles.oi_dot_section}>
                 <View
                   style={role == "coach" ? styles.oi_dot_active : styles.oi_dot}
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Coach</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
@@ -814,14 +890,13 @@ function Signup({ navigation }) {
                       ? styles.oi_dot_active
                       : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Event Organizer</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
@@ -840,7 +915,7 @@ function Signup({ navigation }) {
                       ? styles.oi_dot_active
                       : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Product Company</Text>
@@ -860,62 +935,70 @@ function Signup({ navigation }) {
         draggable={true}
         borderRadius={10}
         customStyles={{
-          wrapper: { backgroundColor: "transparent" },
+          wrapper: {
+            backgroundColor: "transparent",
+          },
           container: {
             backgroundColor: "rgb(40, 57, 109)",
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
-          draggableIcon: { backgroundColor: "white" },
+          draggableIcon: {
+            backgroundColor: "white",
+          },
           borderRadius: 10,
         }}
         customModalProps={{
           animationType: "slide",
           statusBarTranslucent: true,
         }}
-        customAvoidingViewProps={{ enabled: false }}
+        customAvoidingViewProps={{
+          enabled: false,
+        }}
       >
         <ScrollView>
           <LinearGradient
             style={styles.bs_whole_view}
             colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
           >
-            {all_countries.map((indi_country) => (
-              <TouchableOpacity
-                key={indi_country._id}
-                style={styles.option_indi_whole}
-                onPress={() => {
-                  setSelected_country(indi_country);
-                  country_ref.current.close();
-                }}
-              >
-                <LinearGradient
-                  style={styles.option_indi}
-                  colors={[
-                    "rgba(255, 255, 255, 0.1)",
-                    "rgba(30, 53, 126, 0.1)",
-                  ]}
+            {all_countries.map((indi_country) => {
+              return (
+                <TouchableOpacity
+                  key={indi_country._id}
+                  style={styles.option_indi_whole}
+                  onPress={() => {
+                    setSelected_country(indi_country);
+                    country_ref.current.close();
+                  }}
                 >
-                  <View style={styles.oi_dot_section}>
-                    <View
-                      style={
-                        selected_country._id == indi_country._id
-                          ? styles.oi_dot_active
-                          : styles.oi_dot
-                      }
-                    />
-                  </View>
-                  <View style={styles.oi_text_section}>
-                    <Text style={styles.oi_text}>{indi_country.country}</Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
+                  <LinearGradient
+                    style={styles.option_indi}
+                    colors={[
+                      "rgba(255, 255, 255, 0.1)",
+                      "rgba(30, 53, 126, 0.1)",
+                    ]}
+                  >
+                    <View style={styles.oi_dot_section}>
+                      <View
+                        style={
+                          selected_country._id == indi_country._id
+                            ? styles.oi_dot_active
+                            : styles.oi_dot
+                        }
+                      ></View>
+                    </View>
+                    <View style={styles.oi_text_section}>
+                      <Text style={styles.oi_text}>{indi_country.country}</Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            })}
           </LinearGradient>
         </ScrollView>
       </RBSheet>
 
-      {/* event organizer type */}
+      {/* type of event organizer */}
       <RBSheet
         ref={eo_type_ref}
         height={320}
@@ -925,20 +1008,26 @@ function Signup({ navigation }) {
         draggable={true}
         borderRadius={10}
         customStyles={{
-          wrapper: { backgroundColor: "transparent" },
+          wrapper: {
+            backgroundColor: "transparent",
+          },
           container: {
             backgroundColor: "rgb(40, 57, 109)",
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
-          draggableIcon: { backgroundColor: "white" },
+          draggableIcon: {
+            backgroundColor: "white",
+          },
           borderRadius: 10,
         }}
         customModalProps={{
           animationType: "slide",
           statusBarTranslucent: true,
         }}
-        customAvoidingViewProps={{ enabled: false }}
+        customAvoidingViewProps={{
+          enabled: false,
+        }}
       >
         <LinearGradient
           style={styles.bs_whole_view}
@@ -960,14 +1049,13 @@ function Signup({ navigation }) {
                   style={
                     eo_type == "company" ? styles.oi_dot_active : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Company</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
@@ -986,7 +1074,7 @@ function Signup({ navigation }) {
                       ? styles.oi_dot_active
                       : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Individual</Text>
@@ -996,7 +1084,7 @@ function Signup({ navigation }) {
         </LinearGradient>
       </RBSheet>
 
-      {/* product company type */}
+      {/* type of product company */}
       <RBSheet
         ref={pc_type_ref}
         height={320}
@@ -1006,20 +1094,26 @@ function Signup({ navigation }) {
         draggable={true}
         borderRadius={10}
         customStyles={{
-          wrapper: { backgroundColor: "transparent" },
+          wrapper: {
+            backgroundColor: "transparent",
+          },
           container: {
             backgroundColor: "rgb(40, 57, 109)",
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
-          draggableIcon: { backgroundColor: "white" },
+          draggableIcon: {
+            backgroundColor: "white",
+          },
           borderRadius: 10,
         }}
         customModalProps={{
           animationType: "slide",
           statusBarTranslucent: true,
         }}
-        customAvoidingViewProps={{ enabled: false }}
+        customAvoidingViewProps={{
+          enabled: false,
+        }}
       >
         <LinearGradient
           style={styles.bs_whole_view}
@@ -1041,14 +1135,13 @@ function Signup({ navigation }) {
                   style={
                     pc_type == "Company" ? styles.oi_dot_active : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Company</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
@@ -1065,7 +1158,7 @@ function Signup({ navigation }) {
                   style={
                     pc_type == "Coach" ? styles.oi_dot_active : styles.oi_dot
                   }
-                />
+                ></View>
               </View>
               <View style={styles.oi_text_section}>
                 <Text style={styles.oi_text}>Coach</Text>
