@@ -33,7 +33,7 @@ export default function Login({ navigation }) {
 
   const role_ref = useRef();
   const country_ref = useRef();
-  const [role, setRole] = useState("user"); // initially user to avoid empty field issue
+  const [role, setRole] = useState(""); // empty until user selects
   const [agree_tc, setAgree_tc] = useState(false);
 
   useEffect(() => {
@@ -408,6 +408,10 @@ export default function Login({ navigation }) {
                     <View style={styles.oi_text_section}>
                       <Text style={styles.oi_text}>{item.code}</Text>
                     </View>
+
+                    <View style={styles.oi_text_section}>
+                      <Text style={styles.oi_text}>{item.name}</Text>
+                    </View>
                   </LinearGradient>
                 </TouchableOpacity>
               );
@@ -455,7 +459,7 @@ export default function Login({ navigation }) {
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
-              setRole("user");
+              setRole("client");
               role_ref.current.close();
             }}
           >
@@ -499,7 +503,7 @@ export default function Login({ navigation }) {
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
-              setRole("ad");
+              setRole("eventOrganizer");
               role_ref.current.close();
             }}
           >
@@ -521,7 +525,7 @@ export default function Login({ navigation }) {
           <TouchableOpacity
             style={styles.option_indi_whole}
             onPress={() => {
-              setRole("Product Company");
+              setRole("productCompany");
               role_ref.current.close();
             }}
           >
