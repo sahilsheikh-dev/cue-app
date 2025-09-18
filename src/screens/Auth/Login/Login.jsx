@@ -241,7 +241,7 @@ export default function Login({ navigation }) {
                         setPassword_show(!password_show);
                       }}
                     >
-                      <Ionicons name="eye-off-outline" size={20} color="#fff" />
+                      <Ionicons name="eye" size={20} color="#fff" />
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
@@ -250,7 +250,7 @@ export default function Login({ navigation }) {
                         setPassword_show(!password_show);
                       }}
                     >
-                      <Ionicons name="eye-outline" size={20} color="#fff" />
+                      <Ionicons name="eye-off" size={20} color="#fff" />
                     </TouchableOpacity>
                   )}
                 </LinearGradient>
