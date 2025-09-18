@@ -28,6 +28,7 @@ function Signup({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [referal_code, setReferal_code] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("user"); // initially it will be user to avoid empty field issue
@@ -38,6 +39,7 @@ function Signup({ navigation }) {
   const [pet_name, setPet_name] = useState("");
   const [company_name, setCompany_name] = useState("");
   const [account_operator_name, setAccount_operator_name] = useState("");
+
   const [password_show, setPassword_show] = useState(false);
   const [confirmPassword_show, setConfirmPassword_show] = useState(false);
   const [agree_tc, setAgree_tc] = useState(false);
@@ -193,9 +195,10 @@ function Signup({ navigation }) {
 
           {/* choose role section */}
           <TouchableOpacity
-            onPress={() => {
-              role_ref.current.open();
-            }}
+            disabled={true}
+            // onPress={() => {
+            //   role_ref.current.open();
+            // }}
             style={styles.input_whole_section}
           >
             <LinearGradient
@@ -269,12 +272,12 @@ function Signup({ navigation }) {
                   {role == ""
                     ? "Client"
                     : role == "user"
-                    ? "Client"
-                    : role == "coach"
-                    ? "Coach"
-                    : role == "ad"
-                    ? "Event Organizer"
-                    : "Product Company"}
+                      ? "Client"
+                      : role == "coach"
+                        ? "Coach"
+                        : role == "ad"
+                          ? "Event Organizer"
+                          : "Product Company"}
                 </Text>
               </View>
               <View style={styles.svg_circle_eye}>
@@ -364,10 +367,10 @@ function Signup({ navigation }) {
                     {eo_type == ""
                       ? "Choose type"
                       : eo_type == "company"
-                      ? "Company"
-                      : eo_type == "individual"
-                      ? "Individual"
-                      : null}
+                        ? "Company"
+                        : eo_type == "individual"
+                          ? "Individual"
+                          : null}
                   </Text>
                 </View>
                 <View style={styles.svg_circle_eye}>
@@ -458,10 +461,10 @@ function Signup({ navigation }) {
                     {pc_type == ""
                       ? "Choose type"
                       : pc_type == "Company"
-                      ? "Company"
-                      : pc_type == "Coach"
-                      ? "Coach"
-                      : null}
+                        ? "Company"
+                        : pc_type == "Coach"
+                          ? "Coach"
+                          : null}
                   </Text>
                 </View>
                 <View style={styles.svg_circle_eye}>
@@ -1455,12 +1458,6 @@ function Signup({ navigation }) {
                   </Svg>
                 </View>
                 <View style={styles.input_section_text}>
-                  {/* <TextInput
-                              style={styles.input}
-                              placeholder="Confirm password"
-                              placeholderTextColor={"#ffffff90"}
-                              secureTextEntry={true}
-                            /> */}
                   <Text
                     style={
                       selected_country.country == undefined

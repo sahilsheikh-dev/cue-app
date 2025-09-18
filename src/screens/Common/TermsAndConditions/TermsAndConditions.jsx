@@ -18,16 +18,16 @@ const background = require("../../../../assets/images/background.png");
 const roleLabels = {
   client: "Client",
   coach: "Coach",
-  advertiser: "Event Organizer",
-  product: "Product Company",
+  eventOrganizer: "Event Organizer",
+  productCompany: "Product Company",
 };
 
 // ✅ Centralized role-based URLs (can move to legal.config.js later)
 const roleUrls = {
   client: "https://cuewellness.net/client-terms-and-services",
   coach: "https://cuewellness.net/coach-terms-and-services",
-  advertiser: "https://cuewellness.net/event-terms-and-services",
-  product: "https://cuewellness.net/product-terms-and-services",
+  eventOrganizer: "https://cuewellness.net/event-terms-and-services",
+  productCompany: "https://cuewellness.net/product-terms-and-services",
 };
 
 export default function TermsAndConditions({ route }) {

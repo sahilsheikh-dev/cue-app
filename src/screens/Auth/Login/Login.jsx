@@ -1,93 +1,158 @@
-// src/screens/Auth/Login/Login.jsx
-import React, { useState, useEffect, useContext } from "react";
 import {
-  View,
   Text,
-  TouchableOpacity,
-  TextInput,
+  View,
+  SafeAreaView,
+  Image,
   ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from "react-native";
 import styles from "./loginCss";
-import axios from "axios";
+import { Svg, Path, Mask, G, Rect } from "react-native-svg";
+import { StatusBar } from "expo-status-bar";
+const background = require("../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
+import { useRef, useState, useContext, useEffect } from "react";
+import RBSheet from "react-native-raw-bottom-sheet";
 import { DataContext } from "../../../context/dataContext";
-// import CountryPicker from "react-native-country-picker-modal";
-import CountryPicker from '@realtril/react-native-country-picker-modal';
-import { Roles } from "../../../config/roles.config";
+import validateInputs from "../../../utils/validateInputs";
+import axios from "axios";
 
-const loginEndpoints = {
-  [Roles.CLIENT]: "/user/auth/login-client",
-  [Roles.COACH]: "/user/auth/login-coach",
-  [Roles.ADVERTISER]: "/user/auth/login-event",
-  [Roles.PRODUCT]: "/user/auth/login-product",
-};
-
-export default function Login() {
-  const { data, login } = useContext(DataContext);
-
-  const [role, setRole] = useState(Roles.CLIENT);
-  const [mobileNumber, setMobileNumber] = useState("");
+export default function Login({ navigation }) {
+  const { data, partial_login, login, partial_login_together } =
+    useContext(DataContext);
+  const [password_show, setPassword_show] = useState(false);
+  const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [agreeTc, setAgreeTc] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [all_countries, setAll_countries] = useState([]);
+  const [selected_country, setSelected_country] = useState({});
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [whole_loading, setWhole_loading] = useState(true);
+  const role_ref = useRef();
+  const country_ref = useRef();
+  const [role, setRole] = useState("user"); // initially it will be user to avoid empty field issue
+  const [agree_tc, setAgree_tc] = useState(false);
 
-  const [countries, setCountries] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState(null);
-
-  // ---------- FETCH COUNTRIES ----------
   useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const res = await axios.post(data.url + "/user/auth/get-countries", {});
-        if (res.data?.countries) {
-          setCountries(res.data.countries);
-          setSelectedCountry(res.data.countries[0]); // pick first as default
+    axios
+      .post(
+        data.url + "/user/auth/get-countries",
+        {},
+        {
+          withCredentials: true,
         }
-      } catch (err) {
-        console.error("fetchCountries error:", err);
-        Alert.alert("Error", "Failed to fetch countries.");
-      }
-    };
-    fetchCountries();
-  }, [data.url]);
-
-  // ---------- LOGIN HANDLER ----------
-  const loginHandler = async () => {
-    if (!agreeTc) {
-      Alert.alert("Warning", "Please agree to our Terms and Conditions.");
-      return;
-    }
-
-    if (!selectedCountry) {
-      Alert.alert("Warning", "Please select a country.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const endpoint = loginEndpoints[role];
-      const res = await axios.post(data.url + endpoint, {
-        contact: selectedCountry.code + mobileNumber,
-        password,
+      )
+      .then((res) => {
+        if (res.data.alert != undefined) {
+          Alert.alert("Warning", res.data.alert);
+        } else {
+          setAll_countries(res.data.supply);
+          setSelected_country(res.data.supply[0]);
+          setWhole_loading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setWhole_loading(false);
       });
+  }, []);
 
-      setLoading(false);
+  useEffect(() => {
+    setMobileNumber("");
+  }, [selected_country]);
 
-      if (res.data.alert) {
-        Alert.alert("Warning", res.data.alert);
-      } else {
-        const token = res.data.supply ?? res.data.token;
-        login(token, role);
+  const try_login = () => {
+    if (agree_tc == false) {
+      Alert.alert("Warning", "Please agree to our Terms and Conditions.");
+    } else {
+      setLoading(true);
+      if (role == "user") {
+        console.log("hey user here");
+        axios
+          .post(data.url + "/user/auth/login", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              setLoading(false);
+              partial_login_together(res.data.supply, "user");
+            }
+          })
+          .catch((err) => {
+            setLoading(false);
+            console.log(err);
+          });
+      } else if (role == "coach") {
+        console.log("hey coach here");
+        axios
+          .post(data.url + "/user/auth/login-coach", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.token, "coach");
+            }
+          })
+          .catch((err) => {
+            setLoading(false);
+            console.log(err);
+          });
+      } else if (role == "ad") {
+        console.log("hey advertise here");
+        axios
+          .post(data.url + "/user/auth/login-event", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.supply, "ad");
+            }
+          })
+          .catch((err) => {
+            setLoading(false);
+            console.log(err);
+          });
+      } else if (role == "Product Company") {
+        console.log("hey product here");
+        axios
+          .post(data.url + "/user/auth/login-product", {
+            contact: selected_country.code + mobileNumber,
+            password: password,
+          })
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.alert != undefined) {
+              setLoading(false);
+              Alert.alert("Warning", res.data.alert);
+            } else {
+              partial_login_together(res.data.supply, "product");
+            }
+          })
+          .catch((err) => {
+            setLoading(false);
+            console.log(err);
+          });
       }
-    } catch (err) {
-      setLoading(false);
-      console.error("Login error:", err);
-      Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
 
@@ -230,12 +295,12 @@ export default function Login() {
                       {role == ""
                         ? "Client"
                         : role == "user"
-                        ? "Client"
-                        : role == "coach"
-                        ? "Coach"
-                        : role == "ad"
-                        ? "Event Organizer"
-                        : "Product Company"}
+                          ? "Client"
+                          : role == "coach"
+                            ? "Coach"
+                            : role == "ad"
+                              ? "Event Organizer"
+                              : "Product Company"}
                     </Text>
                   </View>
                   <View style={styles.svg_circle_eye}>

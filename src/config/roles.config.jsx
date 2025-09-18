@@ -3,15 +3,15 @@
 import Auth from '../screens/auth/main';
 import Client from '../screens/client/main';
 import Coach from '../screens/coach/main';
-import Advertiser from '../screens/advertiser/main';
-import Product from '../screens/product/main';
+import EventOrganizer from '../screens/eventOrganizer/main';
+import ProductCompany from '../screens/productCompany/main';
 
 // Define constants for roles (to keep consistency across app)
 export const Roles = {
   CLIENT: "client",
   COACH: "coach",
-  ADVERTISER: "advertiser",
-  PRODUCT: "product",
+  EVENTORGANIZER: "eventOrganizer",
+  PRODUCTCOMPANY: "productCompany",
   AUTH: "auth",
 };
 
@@ -20,6 +20,6 @@ export const roleScreens = {
   [Roles.AUTH]: Auth,
   [Roles.CLIENT]: Client,
   [Roles.COACH]: Coach,
-  [Roles.ADVERTISER]: Advertiser,
-  [Roles.PRODUCT]: Product,
+  [Roles.EVENTORGANIZER]: EventOrganizer,
+  [Roles.PRODUCTCOMPANY]: ProductCompany,
 };

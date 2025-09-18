@@ -21,7 +21,6 @@ import authService, {
   checkedToday,
   markDataFilled,
 } from './src/services/authServices/authService';
-import { Text } from 'react-native';
 
 export default function App() {
   // Load fonts
@@ -137,7 +136,7 @@ export default function App() {
               <Splash />
             ) : (
               // <ActiveScreen />   // work on signup and login screen is pending hence commented it out
-              <Text>Hi, this screen is working fine...</Text>
+              <Splash />
             )}
           </NavigationContainer>
         </DataContext.Provider>
