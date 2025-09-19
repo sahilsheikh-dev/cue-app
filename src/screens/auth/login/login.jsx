@@ -33,7 +33,7 @@ export default function Login({ navigation }) {
 
   const role_ref = useRef();
   const country_ref = useRef();
-  const [role, setRole] = useState(""); // empty until user selects
+  const [role, setRole] = useState("client");
   const [agree_tc, setAgree_tc] = useState(false);
 
   useEffect(() => {
