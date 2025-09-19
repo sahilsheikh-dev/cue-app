@@ -18,7 +18,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState, useEffect } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-import validateInputs from "../../../utils/validateInputs";
 
 export default function Login({ navigation }) {
   const [password_show, setPassword_show] = useState(false);

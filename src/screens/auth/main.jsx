@@ -1,42 +1,32 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 
-// ✅ existing files
 import Signup from "./signup/signup";
 import Login from "./login/login";
 import Splash from "../common/splash/splash";
 import TermsAndCondition from "../common/termsAndConditions/termsAndConditions";
 import PrivacyPolicy from "../common/privacyPolicy/privacyPolicy";
-
-// ❌ missing files (commented until created)
-// import ContactNumber from './ContactNumber';
-// import Otp from './Otp';
-// import FinishYourProfile from './FinishYourProfile';
-// import Subscription from './Subscription';
-// import Introduction from './Coaches/Introduction';
-// import BuildProfile from './Coaches/BuildProfile';
-// import BuildProfile2 from './Coaches/BuildProfile2';
-// import ReviewConfirm from './Coaches/ReviewConfirm';
-// import AddCertificates from './Coaches/AddCertificates';
-// import ChooseCategory from './Coaches/ChooseCategory';
-// import Verification from './Coaches/Verification';
-// import ContactNumberCoach from './Coaches/ContactNumberCoach';
-// import OtpVerificationCoach from './Coaches/OtpVerificationCoach';
-// import Chat from './Coaches/Chat';
-// import Agreement from './Coaches/Agreement';
-// import AccountInfo from './Coaches/AccountInfo';
-// import Create from './Events/Create';
-// import Create2 from './Events/Create2';
-// import AdContactNumber from './AdsManager/AdContactNumber';
-// import AdOtp from './AdsManager/AdOtp';
-// import ShopContactNumber from './Shop/ShopContactNumber';
-// import ShopOtp from './Shop/ShopOtp';
-// import SubscriptionInApp from './SubscriptionInApp';
+import CoachIntroduction from "./registration/coach/coachIntroduction/coachIntroduction";
+import ContactNumber from "./registration/common/mobileNumberVerification/contactNumber/contactNumber";
+import OtpVerification from "./registration/common/mobileNumberVerification/otpVerification/otpVerification";
+import AccountVerificationStatus from "./registration/common/accountVerificationStatus/accountVerificationStatus";
+import CoachProfileBasicDetails from "./registration/coach/coachProfileBasicDetails/coachProfileBasicDetails";
+import CoachProfileCategoryDetails from "./registration/coach/coachProfileCategoryDetails/coachProfileCategoryDetails";
+import CoachProfileExperienceDetails from "./registration/coach/coachProfileExperienceDetails/coachProfileExperienceDetails";
+import CoachProfileCertificateDetails from "./registration/coach/coachProfileCertificateDetails/coachProfileCertificateDetails";
+import CoachProfileReviewConfirmDetails from "./registration/coach/coachProfileReviewConfirmDetails/coachProfileReviewConfirmDetails";
+import CoachAgreementDetails from "./registration/coach/coachAgreementDetails/coachAgreementDetails";
+import CoachCreateServiceDetails from "./registration/coach/coachCreateServiceDetails/coachCreateServiceDetails";
+import CoachYourStoryDetails from "./registration/coach/coachYourStoryDetails/coachYourStoryDetails";
+import CoachVirtualPricingDetails from "./registration/coach/coachVirtualPricingDetails/coachVirtualPricingDetails";
+import CoachInPersonPricingDetails from "./registration/coach/coachInPersonPricingDetails/coachInPersonPricingDetails";
+import CoachServicePictures from "./registration/coach/coachServicePictures/coachServicePictures";
+import CoachAccountDetails from "./registration/coach/coachAccountDetails/coachAccountDetails";
 
 export default function Auth() {
   return (
     <Stack.Navigator>
-      {/* ✅ available screens */}
+      {/* COMMON SCREENS */}
       <Stack.Screen
         name="Signup"
         component={Signup}
@@ -63,32 +53,88 @@ export default function Auth() {
         options={{ headerShown: false }}
       />
 
-      {/* ❌ commented screens until files are created */}
-      {/*
-        <Stack.Screen name="ContactNumber" component={ContactNumber} options={{ headerShown: false }} />
-        <Stack.Screen name="Otp" component={Otp} options={{ headerShown: false }} />
-        <Stack.Screen name="FinishYourProfile" component={FinishYourProfile} options={{ headerShown: false }} />
-        <Stack.Screen name="Subscription" component={Subscription} options={{ headerShown: false }} />
-        <Stack.Screen name="SubscriptionInApp" component={SubscriptionInApp} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-introduction" component={Introduction} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-build-profile" component={BuildProfile} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-build-profile2" component={BuildProfile2} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-review-confirm" component={ReviewConfirm} options={{ headerShown: false }} />
-        <Stack.Screen name="Add-Certificates" component={AddCertificates} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-choose-category" component={ChooseCategory} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-verification" component={Verification} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-contact-number" component={ContactNumberCoach} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-otp-verification" component={OtpVerificationCoach} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-account-info" component={AccountInfo} options={{ headerShown: false }} />
-        <Stack.Screen name="Chat" component={Chat} options={{ headerShown: false }} />
-        <Stack.Screen name="Coach-Add-Agreement" component={Agreement} options={{ headerShown: false }} />
-        <Stack.Screen name="Ad-contact-number" component={AdContactNumber} options={{ headerShown: false }} />
-        <Stack.Screen name="Ad-otp" component={AdOtp} options={{ headerShown: false }} />
-        <Stack.Screen name="Shop-contact-number" component={ShopContactNumber} options={{ headerShown: false }} />
-        <Stack.Screen name="Shop-otp" component={ShopOtp} options={{ headerShown: false }} />
-        <Stack.Screen name="Event-create" component={Create} options={{ headerShown: false }} />
-        <Stack.Screen name="Event-create2" component={Create2} options={{ headerShown: false }} />
-        */}
+      {/* COACH REGISTRATION SCREENS */}
+      <Stack.Screen
+        name="CoachIntroduction"
+        component={CoachIntroduction}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ContactNumber"
+        component={ContactNumber}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OtpVerification"
+        component={OtpVerification}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AccountVerificationStatus"
+        component={AccountVerificationStatus}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachProfileBasicDetails"
+        component={CoachProfileBasicDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachProfileCategoryDetails"
+        component={CoachProfileCategoryDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachProfileExperienceDetails"
+        component={CoachProfileExperienceDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachProfileCertificateDetails"
+        component={CoachProfileCertificateDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachProfileReviewConfirmDetails"
+        component={CoachProfileReviewConfirmDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachAgreementDetails"
+        component={CoachAgreementDetails}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="CoachCreateServiceDetails"
+        component={CoachCreateServiceDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachYourStoryDetails"
+        component={CoachYourStoryDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachVirtualPricingDetails"
+        component={CoachVirtualPricingDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachInPersonPricingDetails"
+        component={CoachInPersonPricingDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachServicePictures"
+        component={CoachServicePictures}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CoachAccountDetails"
+        component={CoachAccountDetails}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
