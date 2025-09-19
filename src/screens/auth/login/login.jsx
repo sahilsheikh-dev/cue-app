@@ -409,7 +409,7 @@ export default function Login({ navigation }) {
                     </View>
 
                     <View style={styles.oi_text_section}>
-                      <Text style={styles.oi_text}>{item.name}</Text>
+                      <Text style={styles.oi_text}> - {item.name}</Text>
                     </View>
                   </LinearGradient>
                 </TouchableOpacity>
