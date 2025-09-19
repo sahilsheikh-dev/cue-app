@@ -146,7 +146,6 @@ export default function Login({ navigation }) {
                         : "Product Company"}
                     </Text>
                   </View>
-
                   <View style={styles.svg_circle_eye}>
                     <Ionicons name="chevron-down" size={20} color="#fff" />
                   </View>
@@ -469,7 +468,9 @@ export default function Login({ navigation }) {
             >
               <View style={styles.oi_dot_section}>
                 <View
-                  style={role == "user" ? styles.oi_dot_active : styles.oi_dot}
+                  style={
+                    role == "client" ? styles.oi_dot_active : styles.oi_dot
+                  }
                 ></View>
               </View>
               <View style={styles.oi_text_section}>
@@ -513,7 +514,11 @@ export default function Login({ navigation }) {
             >
               <View style={styles.oi_dot_section}>
                 <View
-                  style={role == "ad" ? styles.oi_dot_active : styles.oi_dot}
+                  style={
+                    role == "eventOrganizer"
+                      ? styles.oi_dot_active
+                      : styles.oi_dot
+                  }
                 ></View>
               </View>
               <View style={styles.oi_text_section}>
@@ -536,7 +541,7 @@ export default function Login({ navigation }) {
               <View style={styles.oi_dot_section}>
                 <View
                   style={
-                    role == "Product Company"
+                    role == "productCompany"
                       ? styles.oi_dot_active
                       : styles.oi_dot
                   }
