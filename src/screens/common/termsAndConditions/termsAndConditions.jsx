@@ -59,7 +59,7 @@ export default function TermsAndConditions({ route }) {
           numberOfLines={1}
           accessibilityRole="header"
         >
-          {roleLabels[safeRole]} Terms & Conditions
+          {roleLabels[safeRole]}'s Terms & Conditions
         </Text>
       </View>
 
