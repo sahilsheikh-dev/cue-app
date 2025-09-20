@@ -53,12 +53,7 @@ export default function Auth() {
         options={{ headerShown: false }}
       />
 
-      {/* COACH REGISTRATION SCREENS */}
-      <Stack.Screen
-        name="CoachIntroduction"
-        component={CoachIntroduction}
-        options={{ headerShown: false }}
-      />
+      {/* COMMON REGISTRATION SCREENS */}
       <Stack.Screen
         name="ContactNumber"
         component={ContactNumber}
@@ -72,6 +67,14 @@ export default function Auth() {
       <Stack.Screen
         name="AccountVerificationStatus"
         component={AccountVerificationStatus}
+        options={{ headerShown: false }}
+      />
+
+      {/* COACH REGISTRATION SCREENS */}
+      {/* COACH - UNVERIFIED ACCESS */}
+      <Stack.Screen
+        name="CoachIntroduction"
+        component={CoachIntroduction}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -99,11 +102,8 @@ export default function Auth() {
         component={CoachProfileReviewConfirmDetails}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="CoachAgreementDetails"
-        component={CoachAgreementDetails}
-        options={{ headerShown: false }}
-      />
+
+      {/* COACH - SEMI VERIFIED ACCESS */}
 
       <Stack.Screen
         name="CoachCreateServiceDetails"
@@ -135,6 +135,25 @@ export default function Auth() {
         component={CoachAccountDetails}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="CoachAgreementDetails"
+        component={CoachAgreementDetails}
+        options={{ headerShown: false }}
+      />
+
+      {/* COACH - FULLY VERIFIED ACCESS - REDIRECT TO THE COACH > MAIN SECTION */}
+
+      {/* CLIENT REGISTRATION SCREENS */}
+      {/* CLIENT - UNVERIFIED ACCESS */}
+      {/* CLIENT - FULLY VERIFIED ACCESS - REDIRECT TO THE CLIENT > MAIN SECTION */}
+
+      {/* EVENT ORGANIZER REGISTRATION SCREENS */}
+      {/* EVENT ORGANIZER - UNVERIFIED ACCESS */}
+      {/* EVENT ORGANIZER - FULLY VERIFIED ACCESS - REDIRECT TO THE EVENT ORGANIZER > MAIN SECTION */}
+
+      {/* PRODUCT COMPANY REGISTRATION SCREENS */}
+      {/* PRODUCT COMPANY - UNVERIFIED ACCESS */}
+      {/* PRODUCT COMPANY - FULLY VERIFIED ACCESS - REDIRECT TO THE PRODUCT COMPANY > MAIN SECTION */}
     </Stack.Navigator>
   );
 }
