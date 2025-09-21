@@ -10,7 +10,10 @@ import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function AccountVerificationStatus({ navigation }) {
+// ✅ Import vector icons
+import { Ionicons } from "@expo/vector-icons";
+
+export default function AccountVerificationStatus() {
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
@@ -32,15 +35,12 @@ export default function AccountVerificationStatus({ navigation }) {
         <Text style={styles.des} numberOfLines={5}>
           Thank you for your application ! Once your details have been verified,
           someone from our team will get in touch with you to finalize the
-          details before we go live.
+          details before we go live.
         </Text>
       </View>
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={() => {
-          navigation.navigate("CoachIntroduction");
-        }}
-      >
+
+      {/* ✅ Hardcoded button */}
+      <TouchableOpacity style={styles.input_whole_section_btn}>
         <LinearGradient
           colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
           style={styles.input_inner_section_btn}
@@ -48,6 +48,8 @@ export default function AccountVerificationStatus({ navigation }) {
           <Text style={styles.login_text}>Get started</Text>
         </LinearGradient>
       </TouchableOpacity>
+
+      {/* ✅ Hardcoded footer */}
       <View style={styles.nhcs_section}>
         <TouchableOpacity style={styles.nh_cs}>
           <Text style={styles.need_help}>

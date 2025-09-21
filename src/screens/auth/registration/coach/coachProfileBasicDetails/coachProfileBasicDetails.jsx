@@ -22,7 +22,7 @@ import { DataContext } from "../../../../../context/dataContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function CoachProfileBasicDetails({ navigation }) {
-  const { data } = useContext(DataContext);
+  // const { data } = useContext(DataContext);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [gender, setGender] = useState("");
   const [dob, setDob] = useState("");
@@ -30,6 +30,7 @@ export default function CoachProfileBasicDetails({ navigation }) {
   const [agree1, setAgree1] = useState(false);
   const [agree2, setAgree2] = useState(false);
   const [agree3, setAgree3] = useState(false);
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -56,63 +57,64 @@ export default function CoachProfileBasicDetails({ navigation }) {
   };
 
   const sendData = () => {
-    if (agree2 == false) {
-      Alert.alert(
-        "Warning",
-        "Please confirm that you agree to the refund policy."
-      );
-      return;
-    } else if (agree1 == false && agree3 == false) {
-      Alert.alert(
-        "Warning",
-        "You either need to have the necessary certifications and licenses or you need to have the telent and experience"
-      );
-      return;
-    } else {
-      if (email == "" || dob == "" || gender == "") {
-        Alert.alert("Warning", "Please fill all the fields.");
-        return;
-      } else {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(email)) {
-          // Check if dob is more than 18 years ago
-          const [day, month, year] = dob.split("-");
-          const dobDate = new Date(`${year}-${month}-${day}`);
-          const today = new Date();
-          let age = today.getFullYear() - dobDate.getFullYear();
-          const m = today.getMonth() - dobDate.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
-            age--;
-          }
-          if (age < 18) {
-            Alert.alert("Warning", "You must be at least 18 years old.");
-            return;
-          }
-          navigation.navigate("Coach-choose-category", {
-            email: email,
-            dob: dob,
-            gender: gender,
-            certification: agree1,
-            telent: agree3,
-            refund: agree2,
-          });
-          // navigation.navigate("Coach-build-profile2", {
-          //   email: email,
-          //   dob: dob,
-          //   gender: gender,
-          //   certification: agree1,
-          //   telent: agree3,
-          //   refund: agree2,
-          // });
-        } else {
-          Alert.alert("Warning", "Please enter a valid email address.");
-          return;
-        }
-      }
-    }
+    // if (agree2 == false) {
+    //   Alert.alert(
+    //     "Warning",
+    //     "Please confirm that you agree to the refund policy."
+    //   );
+    //   return;
+    // } else if (agree1 == false && agree3 == false) {
+    //   Alert.alert(
+    //     "Warning",
+    //     "You either need to have the necessary certifications and licenses or you need to have the telent and experience"
+    //   );
+    //   return;
+    // } else {
+    //   if (email == "" || dob == "" || gender == "") {
+    //     Alert.alert("Warning", "Please fill all the fields.");
+    //     return;
+    //   } else {
+    //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //     if (emailRegex.test(email)) {
+    //       // Check if dob is more than 18 years ago
+    //       const [day, month, year] = dob.split("-");
+    //       const dobDate = new Date(`${year}-${month}-${day}`);
+    //       const today = new Date();
+    //       let age = today.getFullYear() - dobDate.getFullYear();
+    //       const m = today.getMonth() - dobDate.getMonth();
+    //       if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+    //         age--;
+    //       }
+    //       if (age < 18) {
+    //         Alert.alert("Warning", "You must be at least 18 years old.");
+    //         return;
+    //       }
+    //       navigation.navigate("Coach-choose-category", {
+    //         email: email,
+    //         dob: dob,
+    //         gender: gender,
+    //         certification: agree1,
+    //         telent: agree3,
+    //         refund: agree2,
+    //       });
+    //       // navigation.navigate("Coach-build-profile2", {
+    //       //   email: email,
+    //       //   dob: dob,
+    //       //   gender: gender,
+    //       //   certification: agree1,
+    //       //   telent: agree3,
+    //       //   refund: agree2,
+    //       // });
+    //     } else {
+    //       Alert.alert("Warning", "Please enter a valid email address.");
+    //       return;
+    //     }
+    //   }
+    // }
   };
 
   const gender_ref = useRef();
+
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
@@ -475,7 +477,8 @@ export default function CoachProfileBasicDetails({ navigation }) {
           <TouchableOpacity
             style={styles.input_whole_section_btn}
             onPress={() => {
-              sendData();
+              // sendData();
+              navigation.navigate("CoachProfileCategoryDetails");
             }}
           >
             <LinearGradient

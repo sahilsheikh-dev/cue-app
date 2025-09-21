@@ -6,58 +6,67 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
 import styles from "./contactNumberCss";
-import { Svg, Path, Mask, G, Rect, Defs, ClipPath } from "react-native-svg";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState, useContext, useEffect } from "react";
+import { useRef } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-import { DataContext } from "../../../../../../context/dataContext";
-import axios from "axios";
 
-export default function ContactNumber({ navigation, route }) {
-  // const { firstName, lastName, password, uc_role, referal_code, pet_name } = route.params;
-  // const [h_role, setH_role] = useState(false);
-  const { data } = useContext(DataContext);
+// ✅ import Ionicons from expo vector icons
+import { Ionicons } from "@expo/vector-icons";
+
+export default function ContactNumber({ navigation }) {
   const role_ref = useRef();
-  //   const [firstName, setFirstName] = useState("");
-  //   const [lastName, setLastName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  //   const [password, setPassword] = useState("");
-  //   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState(1);
-  const [selected_country, setSelected_country] = useState({});
 
-  // const [agree_tc, setAgree_tc] = useState(false);
-  const [all_countries, setAll_countries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [send_otp_loading, setSendOtpLoading] = useState(false);
+  // ✅ Hardcoded dummy country data
+  const all_countries = [
+    {
+      _id: "in",
+      name: "India",
+      code: "+91",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/in.svg",
+    },
+    {
+      _id: "us",
+      name: "United States",
+      code: "+1",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/us.svg",
+    },
+    {
+      _id: "gb",
+      name: "United Kingdom",
+      code: "+44",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/gb.svg",
+    },
+    {
+      _id: "ca",
+      name: "Canada",
+      code: "+1",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/ca.svg",
+    },
+    {
+      _id: "au",
+      name: "Australia",
+      code: "+61",
+      number_of_digit: "9",
+      img: "https://flagcdn.com/au.svg",
+    },
+  ];
 
-  useEffect(() => {
-    const initialCountries = [
-      { _id: "in", name: "India", code: "+91", number_of_digit: "10" },
-      { _id: "us", name: "United States", code: "+1", number_of_digit: "10" },
-      { _id: "gb", name: "United Kingdom", code: "+44", number_of_digit: "10" },
-      { _id: "ca", name: "Canada", code: "+1", number_of_digit: "10" },
-      { _id: "au", name: "Australia", code: "+61", number_of_digit: "9" },
-    ];
-    setAll_countries(initialCountries);
-    setSelected_country(initialCountries[0]);
-  }, []);
-
-  useEffect(() => {
-    setMobileNumber("");
-  }, [selected_country]);
-
-  const trySignup = () => {
-    navigation.navigate("OtpVerification");
-  };
+  // ✅ Hardcoded selected country & phone number
+  const selected_country = all_countries[0]; // India
+  const mobileNumber = "9876543210"; // Dummy number
+  const loading = false;
+  const send_otp_loading = false;
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -112,7 +121,7 @@ export default function ContactNumber({ navigation, route }) {
                     <View style={styles.svg_view}>
                       <Image
                         style={styles.flag}
-                        source={{ uri: data.url + "/" + selected_country.img }}
+                        source={{ uri: selected_country.img }}
                       />
                     </View>
                     <View style={styles.cc_view}>
@@ -121,28 +130,13 @@ export default function ContactNumber({ navigation, route }) {
                       </Text>
                     </View>
                     <View style={styles.drop_down_section}>
-                      <Svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                      {/* ✅ Replaced SVG with Ionicons */}
+                      <Ionicons
+                        name="chevron-down"
+                        size={20}
+                        color="#fff"
                         style={styles.dd_svg}
-                      >
-                        <G id="SVGRepo_bgCarrier" strokeWidth="0"></G>
-                        <G
-                          id="SVGRepo_tracerCarrier"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        ></G>
-                        <G id="SVGRepo_iconCarrier">
-                          <Path
-                            d="M19 9L14 14.1599C13.7429 14.4323 13.4329 14.6493 13.089 14.7976C12.7451 14.9459 12.3745 15.0225 12 15.0225C11.6255 15.0225 11.2549 14.9459 10.9109 14.7976C10.567 14.6493 10.2571 14.4323 10 14.1599L5 9"
-                            stroke="#fff"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          ></Path>
-                        </G>
-                      </Svg>
+                      />
                     </View>
                   </TouchableOpacity>
                   <View style={styles.input_section}>
@@ -152,10 +146,7 @@ export default function ContactNumber({ navigation, route }) {
                       placeholderTextColor={"#ffffff90"}
                       keyboardType="phone-pad"
                       value={mobileNumber}
-                      maxLength={parseInt(selected_country.number_of_digit)}
-                      onChangeText={(text) => {
-                        setMobileNumber(text);
-                      }}
+                      editable={false} // hardcoded dummy
                     />
                   </View>
                 </LinearGradient>
@@ -164,13 +155,12 @@ export default function ContactNumber({ navigation, route }) {
             <TouchableOpacity
               style={styles.input_whole_section_btn}
               onPress={() => {
-                // navigation.navigate("Otp");
-                trySignup();
+                navigation.navigate("OtpVerification");
               }}
             >
               <LinearGradient
                 colors={
-                  mobileNumber == ""
+                  mobileNumber === ""
                     ? ["rgba(244, 244, 244, 0.1)", "rgba(244, 244, 244, 0.1)"]
                     : ["rgb(255, 255, 255)", "rgb(181, 195, 227)"]
                 }
@@ -181,7 +171,7 @@ export default function ContactNumber({ navigation, route }) {
                 ) : (
                   <Text
                     style={
-                      mobileNumber == ""
+                      mobileNumber === ""
                         ? styles.login_text_fade
                         : styles.login_text
                     }
@@ -230,9 +220,9 @@ export default function ContactNumber({ navigation, route }) {
                 {all_countries.map((item) => {
                   return (
                     <TouchableOpacity
+                      key={item._id}
                       style={styles.option_indi_whole}
                       onPress={() => {
-                        setSelected_country(item);
                         role_ref.current.close();
                       }}
                     >
@@ -246,7 +236,7 @@ export default function ContactNumber({ navigation, route }) {
                         <View style={styles.oi_dot_section}>
                           <View
                             style={
-                              selected_country._id == item._id
+                              selected_country._id === item._id
                                 ? styles.oi_dot_active
                                 : styles.oi_dot
                             }
@@ -255,9 +245,7 @@ export default function ContactNumber({ navigation, route }) {
                         <View style={styles.oi_text_section_flag}>
                           <Image
                             style={styles.flag}
-                            source={{
-                              uri: data.url + "/" + item.img,
-                            }}
+                            source={{ uri: item.img }}
                           />
                         </View>
                         <View style={styles.oi_text_section}>

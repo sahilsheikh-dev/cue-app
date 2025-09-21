@@ -26,6 +26,11 @@ import CoachAccountDetails from "./registration/coach/coachAccountDetails/coachA
 export default function Auth() {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="AccountVerificationStatus"
+        component={AccountVerificationStatus}
+        options={{ headerShown: false }}
+      />
       {/* COMMON SCREENS */}
       <Stack.Screen
         name="Signup"
@@ -64,11 +69,11 @@ export default function Auth() {
         component={OtpVerification}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="AccountVerificationStatus"
         component={AccountVerificationStatus}
         options={{ headerShown: false }}
-      />
+      /> */}
 
       {/* COACH REGISTRATION SCREENS */}
       {/* COACH - UNVERIFIED ACCESS */}

@@ -11,18 +11,17 @@ const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function CoachIntroduction({ navigation, route }) {
-  const { firstName, lastName, password, uc_role, referal_code, role } =
-    route.params;
+  // const { firstName, lastName, password, uc_role, referal_code, role } = route.params;
 
   const go_to_contact = () => {
-    navigation.navigate("Coach-contact-number", {
-      firstName: firstName,
-      lastName: lastName,
-      password: password,
-      uc_role: uc_role,
-      referal_code: referal_code,
-      role: role,
-    });
+    // navigation.navigate("Coach-contact-number", {
+    //   firstName: firstName,
+    //   lastName: lastName,
+    //   password: password,
+    //   uc_role: uc_role,
+    //   referal_code: referal_code,
+    //   role: role,
+    // });
   };
 
   return (
@@ -56,7 +55,8 @@ export default function CoachIntroduction({ navigation, route }) {
       <TouchableOpacity
         style={styles.input_whole_section_btn}
         onPress={() => {
-          go_to_contact();
+          // go_to_contact();
+          navigation.navigate("CoachProfileBasicDetails");
         }}
       >
         <LinearGradient

@@ -278,9 +278,27 @@ export default function Login({ navigation }) {
                 <Text style={styles.fp_text}>Forgot Password?</Text>
               </TouchableOpacity>
 
+              {/* TEMP REDIRECT */}
               <TouchableOpacity
                 style={styles.input_whole_section_btn}
-                onPress={() => navigation.navigate("CoachDashboard")}
+                onPress={() => {
+                  navigation.navigate("CoachDashboard");
+                }}
+              >
+                <LinearGradient
+                  colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+                  style={styles.input_inner_section_btn}
+                >
+                  <Text style={styles.login_text}>Next</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+              {/* TEMP REDIRECT */}
+
+              <TouchableOpacity
+                style={styles.input_whole_section_btn}
+                onPress={() => {
+                  navigation.navigate("CoachDashboard");
+                }}
               >
                 <LinearGradient
                   colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}

@@ -6,7 +6,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
@@ -15,35 +14,14 @@ import styles from "./otpVerificationCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState, useContext } from "react";
-import { useRoute } from "@react-navigation/native";
-import axios from "axios";
-import validateInputs from "../../../../../../utils/validateInputs";
-import { DataContext } from "../../../../../../context/dataContext";
+
+// ✅ Import expo vector icons
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 export default function OtpVerification({ navigation }) {
-  const input1 = useRef("");
-  const input2 = useRef("");
-  const input3 = useRef("");
-  const input4 = useRef("");
-  const input5 = useRef("");
-
-  const [inp1, setInp1] = useState("");
-  const [inp2, setInp2] = useState("");
-  const [inp3, setInp3] = useState("");
-  const [inp4, setInp4] = useState("");
-  const [inp5, setInp5] = useState("");
-
-  // loading use state
-  const [loading, setLoading] = useState(false);
-
-  const tryOtp = () => {
-    navigation.navigate("AccountVerificationStatus");
-  };
-
-  const resend_otp = () => {
-    console.log("resend otp");
-  };
+  // ✅ Hardcoded dummy OTP values
+  const dummyOtp = ["1", "2", "3", "4", "5"];
+  const loading = false;
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -59,118 +37,46 @@ export default function OtpVerification({ navigation }) {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <ScrollView style={styles.main_scroll_view}>
-          <View style={styles.top_portion}></View>
+          <View style={styles.top_portion}>
+            {/* ✅ Back button with vector icon */}
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.welcome_view}>
             <Text style={styles.welcome_text}>OTP Verification</Text>
             <Text style={styles.welcome_des}>
               Enter the code from the SMS we sent you
             </Text>
           </View>
+
           <View style={styles.otp_whole_section}>
-            <View style={styles.otp_indi}>
-              <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
-                style={styles.oi_lg}
-              >
-                <TextInput
-                  ref={input1}
-                  style={styles.oi_input}
-                  keyboardType="phone-pad"
-                  onChangeText={(text) => {
-                    setInp1(text);
-                    if (text == "") {
-                      input1.current.focus();
-                    } else {
-                      input2.current.focus();
-                    }
-                  }}
-                />
-              </LinearGradient>
-            </View>
-            <View style={styles.otp_indi}>
-              <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
-                style={styles.oi_lg}
-              >
-                <TextInput
-                  ref={input2}
-                  style={styles.oi_input}
-                  keyboardType="phone-pad"
-                  onChangeText={(text) => {
-                    setInp2(text);
-                    if (text == "") {
-                      input1.current.focus();
-                    } else {
-                      input3.current.focus();
-                    }
-                  }}
-                />
-              </LinearGradient>
-            </View>
-            <View style={styles.otp_indi}>
-              <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
-                style={styles.oi_lg}
-              >
-                <TextInput
-                  ref={input3}
-                  style={styles.oi_input}
-                  keyboardType="phone-pad"
-                  onChangeText={(text) => {
-                    setInp3(text);
-                    if (text == "") {
-                      input2.current.focus();
-                    } else {
-                      input4.current.focus();
-                    }
-                  }}
-                />
-              </LinearGradient>
-            </View>
-            <View style={styles.otp_indi}>
-              <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
-                style={styles.oi_lg}
-              >
-                <TextInput
-                  ref={input4}
-                  style={styles.oi_input}
-                  keyboardType="phone-pad"
-                  onChangeText={(text) => {
-                    setInp4(text);
-                    if (text == "") {
-                      input3.current.focus();
-                    } else {
-                      input5.current.focus();
-                    }
-                  }}
-                />
-              </LinearGradient>
-            </View>
-            <View style={styles.otp_indi}>
-              <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
-                style={styles.oi_lg}
-              >
-                <TextInput
-                  ref={input5}
-                  style={styles.oi_input}
-                  keyboardType="phone-pad"
-                  onChangeText={(text) => {
-                    setInp5(text);
-                    if (text == "") {
-                      input4.current.focus();
-                    }
-                  }}
-                />
-              </LinearGradient>
-            </View>
+            {dummyOtp.map((val, index) => (
+              <View key={index} style={styles.otp_indi}>
+                <LinearGradient
+                  colors={[
+                    "rgba(255, 255, 255, 0.1)",
+                    "rgba(30, 53, 126, 0.1)",
+                  ]}
+                  style={styles.oi_lg}
+                >
+                  {/* ✅ Hardcoded dummy OTP values */}
+                  <TextInput
+                    style={styles.oi_input}
+                    value={val}
+                    editable={false} // disabled for demo
+                  />
+                </LinearGradient>
+              </View>
+            ))}
           </View>
         </ScrollView>
+
         <TouchableOpacity
           style={styles.input_whole_section_btn}
           onPress={() => {
-            tryOtp();
+            navigation.navigate("AccountVerificationStatus");
           }}
         >
           <LinearGradient
@@ -184,16 +90,14 @@ export default function OtpVerification({ navigation }) {
             )}
           </LinearGradient>
         </TouchableOpacity>
+
         <View style={styles.fp_whole}>
-          <TouchableOpacity
-            style={styles.fp_inner}
-            onPress={() => {
-              resend_otp();
-            }}
-          >
+          <TouchableOpacity style={styles.fp_inner}>
             <Text style={styles.fp_text_center}>
               Didn't Receive Anything?{" "}
-              <Text style={styles.su_text}>Resend Code</Text>
+              <Text style={styles.su_text}>Resend Code</Text>{" "}
+              {/* ✅ Resend icon */}
+              <Feather name="refresh-ccw" size={16} color="#fff" />
             </Text>
           </TouchableOpacity>
         </View>
