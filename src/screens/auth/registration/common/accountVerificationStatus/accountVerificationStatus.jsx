@@ -35,6 +35,19 @@ export default function AccountVerificationStatus({ navigation }) {
           details before we go live.
         </Text>
       </View>
+      <TouchableOpacity
+        style={styles.input_whole_section_btn}
+        onPress={() => {
+          navigation.navigate("CoachIntroduction");
+        }}
+      >
+        <LinearGradient
+          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+          style={styles.input_inner_section_btn}
+        >
+          <Text style={styles.login_text}>Get started</Text>
+        </LinearGradient>
+      </TouchableOpacity>
       <View style={styles.nhcs_section}>
         <TouchableOpacity style={styles.nh_cs}>
           <Text style={styles.need_help}>

@@ -27,7 +27,6 @@ function Signup({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [referal_code, setReferal_code] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -72,73 +71,6 @@ function Signup({ navigation }) {
       { _id: "AU", country: "Australia" },
     ]);
   }, []);
-
-  const trySignup = () => {
-    if (!role) {
-      Alert.alert("Warning", "Please select how you want to join us");
-      return;
-    }
-    if (password.length < 8) {
-      Alert.alert("Warning", "Password must be at least 8 characters long.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("Warning", "Password and confirm password do not match");
-      return;
-    }
-    if (!agree_tc) {
-      Alert.alert("Warning", "Please agree to our Terms and Conditions.");
-      return;
-    }
-
-    if (role === "client" || role === "coach") {
-      if (!firstName || !lastName) {
-        Alert.alert("Warning", "Please fill all the fields");
-        return;
-      }
-    } else if (role === "eventOrganizer") {
-      if (!eo_type) {
-        Alert.alert("Warning", "Please select type");
-        return;
-      }
-      if (eo_type === "company") {
-        if (
-          !company_name ||
-          !account_operator_name ||
-          !selected_country.country
-        ) {
-          Alert.alert("Warning", "Please fill all the details");
-          return;
-        }
-      } else {
-        if (!firstName || !lastName || !selected_country.country) {
-          Alert.alert("Warning", "Please fill all the details");
-          return;
-        }
-      }
-    } else if (role === "productCompany") {
-      if (!selected_country.country) {
-        Alert.alert("Warning", "Please fill all the fields");
-        return;
-      }
-      if (pc_type === "Company") {
-        if (!firstName) {
-          Alert.alert("Warning", "Please enter Brand Name");
-          return;
-        }
-      } else if (pc_type === "Coach") {
-        if (!firstName || !lastName) {
-          Alert.alert("Warning", "Please fill all the fields");
-          return;
-        }
-      } else {
-        Alert.alert("Warning", "Please choose type");
-        return;
-      }
-    }
-
-    Alert.alert("Signup", "Signed up successfully.");
-  };
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -718,7 +650,7 @@ function Signup({ navigation }) {
           {/* get started */}
           <TouchableOpacity
             style={styles.input_whole_section_btn}
-            onPress={trySignup}
+            onPress={() => navigation.navigate("ContactNumber")}
           >
             <LinearGradient
               colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}

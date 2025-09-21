@@ -21,7 +21,6 @@ import RBSheet from "react-native-raw-bottom-sheet";
 
 export default function Login({ navigation }) {
   const [password_show, setPassword_show] = useState(false);
-  const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -52,18 +51,6 @@ export default function Login({ navigation }) {
     setMobileNumber("");
   }, [selected_country]);
 
-  const try_login = () => {
-    if (agree_tc == false) {
-      Alert.alert("Warning", "Please agree to our Terms and Conditions.");
-      return;
-    }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert("Login", "login");
-    }, 800);
-  };
-
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
@@ -80,23 +67,7 @@ export default function Login({ navigation }) {
           <View style={styles.top_portion1}></View>
 
           <View style={styles.back_section}>
-            <View style={styles.bs_1}>
-              {/* <TouchableOpacity
-                style={styles.bs_1_circle}
-                onPress={() => {
-                  navigation.goBack();
-                }}
-              >
-                <LinearGradient
-                  style={styles.bs_1_stroke_circle}
-                  colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-                >
-                  <View style={styles.bs_1_circle_circle}>
-                    <Ionicons name="chevron-back" size={20} color="#fff" />
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity> */}
-            </View>
+            <View style={styles.bs_1}></View>
             <View style={styles.bs_2}></View>
             <View style={styles.bs_3}></View>
           </View>
@@ -309,7 +280,7 @@ export default function Login({ navigation }) {
 
               <TouchableOpacity
                 style={styles.input_whole_section_btn}
-                onPress={try_login}
+                onPress={() => navigation.navigate("CoachDashboard")}
               >
                 <LinearGradient
                   colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}

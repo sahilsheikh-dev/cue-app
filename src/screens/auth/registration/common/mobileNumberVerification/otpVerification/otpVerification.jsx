@@ -22,10 +22,6 @@ import validateInputs from "../../../../../../utils/validateInputs";
 import { DataContext } from "../../../../../../context/dataContext";
 
 export default function OtpVerification({ navigation }) {
-  const { data, partial_login } = useContext(DataContext);
-  const route = useRoute();
-  const { otpId } = route.params;
-  //   console.log(otpId);
   const input1 = useRef("");
   const input2 = useRef("");
   const input3 = useRef("");
@@ -42,43 +38,13 @@ export default function OtpVerification({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const tryOtp = () => {
-    setLoading(true);
-    if (validateInputs(inp1, inp2, inp3, inp4, inp5)) {
-      axios
-        .post(data.url + "/user/auth/otp", {
-          otp: inp1 + inp2 + inp3 + inp4 + inp5,
-          otpId: otpId,
-        })
-        .then((res) => {
-          if (res.data.alert != undefined) {
-            Alert.alert("Warning", res.data.alert);
-            setLoading(false);
-          } else {
-            partial_login(res.data.token);
-            navigation.navigate("FinishYourProfile");
-          }
-        });
-    } else {
-      Alert.alert("Warning", "Please enter valid Otp");
-    }
+    navigation.navigate("AccountVerificationStatus");
   };
 
   const resend_otp = () => {
-    axios
-      .post(data.url + "/user/auth/resend-otp", {
-        otpId: otpId,
-      })
-      .then((res) => {
-        if (res.data.alert != undefined) {
-          Alert.alert("Warning", res.data.alert);
-        } else {
-          Alert.alert("Success", "OTP send successfully");
-        }
-      })
-      .catch((err) => {
-        Alert.alert("Warning", "Something went wrong");
-      });
+    console.log("resend otp");
   };
+
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />

@@ -22,8 +22,7 @@ import { DataContext } from "../../../../../../context/dataContext";
 import axios from "axios";
 
 export default function ContactNumber({ navigation, route }) {
-  const { firstName, lastName, password, uc_role, referal_code, pet_name } =
-    route.params;
+  // const { firstName, lastName, password, uc_role, referal_code, pet_name } = route.params;
   // const [h_role, setH_role] = useState(false);
   const { data } = useContext(DataContext);
   const role_ref = useRef();
@@ -41,26 +40,15 @@ export default function ContactNumber({ navigation, route }) {
   const [send_otp_loading, setSendOtpLoading] = useState(false);
 
   useEffect(() => {
-    axios
-      .post(
-        data.url + "/user/auth/get-countries",
-        {},
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        if (res.data.alert != undefined) {
-          Alert.alert("Warning", res.data.alert);
-        } else {
-          setAll_countries(res.data.supply);
-          setSelected_country(res.data.supply[0]);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const initialCountries = [
+      { _id: "in", name: "India", code: "+91", number_of_digit: "10" },
+      { _id: "us", name: "United States", code: "+1", number_of_digit: "10" },
+      { _id: "gb", name: "United Kingdom", code: "+44", number_of_digit: "10" },
+      { _id: "ca", name: "Canada", code: "+1", number_of_digit: "10" },
+      { _id: "au", name: "Australia", code: "+61", number_of_digit: "9" },
+    ];
+    setAll_countries(initialCountries);
+    setSelected_country(initialCountries[0]);
   }, []);
 
   useEffect(() => {
@@ -68,32 +56,7 @@ export default function ContactNumber({ navigation, route }) {
   }, [selected_country]);
 
   const trySignup = () => {
-    if (mobileNumber == "") {
-      Alert.alert("Please enter a valid mobile number");
-    } else {
-      setSendOtpLoading(true);
-      axios
-        .post(data.url + "/user/auth/signup", {
-          name: firstName + " " + lastName,
-          contact: "" + selected_country.code + mobileNumber,
-          password: password,
-          role: uc_role,
-          referal_code: referal_code,
-          pet_name: pet_name,
-        })
-        .then((res) => {
-          if (res.data.alert != undefined) {
-            Alert.alert("Warning", res.data.alert);
-            setSendOtpLoading(false);
-          } else {
-            navigation.navigate("Otp", { otpId: res.data.otpId });
-          }
-          // console.log(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    navigation.navigate("OtpVerification");
   };
 
   return (
@@ -116,32 +79,7 @@ export default function ContactNumber({ navigation, route }) {
             <ScrollView style={styles.main_scroll_view}>
               <View style={styles.top_portion1}></View>
               <View style={styles.back_section}>
-                <View style={styles.bs_1}>
-                  {/* <TouchableOpacity style={styles.bs_1_circle}>
-                <LinearGradient
-                  style={styles.bs_1_stroke_circle}
-                  colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-                >
-                  <View style={styles.bs_1_circle_circle}>
-                    <Svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <Path
-                        d="M15.5 19L8.5 12L15.5 5"
-                        stroke="white"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </Svg>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity> */}
-                </View>
+                <View style={styles.bs_1}></View>
                 <View style={styles.bs_2}>
                   <Text style={styles.bs_2_cue}>cue</Text>
                 </View>
