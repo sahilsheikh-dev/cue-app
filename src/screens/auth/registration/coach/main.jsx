@@ -1,0 +1,92 @@
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+const Stack = createNativeStackNavigator();
+
+import CoachIntroduction from "./coachIntroduction/coachIntroduction";
+import CoachProfileBasicDetails from "./coachProfileBasicDetails/coachProfileBasicDetails";
+import CoachProfileCategoryDetails from "./coachProfileCategoryDetails/coachProfileCategoryDetails";
+import CoachProfileExperienceDetails from "./coachProfileExperienceDetails/coachProfileExperienceDetails";
+import CoachProfileCertificateDetails from "./coachProfileCertificateDetails/coachProfileCertificateDetails";
+import CoachProfileReviewConfirmDetails from "./coachProfileReviewConfirmDetails/coachProfileReviewConfirmDetails";
+import CoachAgreementDetails from "./coachAgreementDetails/coachAgreementDetails";
+import CoachCreateServiceDetails from "./coachCreateServiceDetails/coachCreateServiceDetails";
+import CoachYourStoryDetails from "./coachYourStoryDetails/coachYourStoryDetails";
+import CoachVirtualPricingDetails from "./coachVirtualPricingDetails/coachVirtualPricingDetails";
+import CoachInPersonPricingDetails from "./coachInPersonPricingDetails/coachInPersonPricingDetails";
+import CoachServicePictures from "./coachServicePictures/coachServicePictures";
+import CoachAccountDetails from "./coachAccountDetails/coachAccountDetails";
+
+export const CoachRegistrationScreens = (Stack) => [
+  //   COACH - UNVERIFIED ACCESS
+  <Stack.Screen
+    name="CoachIntroduction"
+    component={CoachIntroduction}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachProfileBasicDetails"
+    component={CoachProfileBasicDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachProfileCategoryDetails"
+    component={CoachProfileCategoryDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachProfileExperienceDetails"
+    component={CoachProfileExperienceDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachProfileCertificateDetails"
+    component={CoachProfileCertificateDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachProfileReviewConfirmDetails"
+    component={CoachProfileReviewConfirmDetails}
+    options={{ headerShown: false }}
+  />,
+
+  //   COACH - SEMI VERIFIED ACCESS
+
+  <Stack.Screen
+    name="CoachCreateServiceDetails"
+    component={CoachCreateServiceDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachYourStoryDetails"
+    component={CoachYourStoryDetails}
+    options={{ headerShown: false }}
+  />,
+
+  //   PENDING
+  <Stack.Screen
+    name="CoachVirtualPricingDetails"
+    component={CoachVirtualPricingDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachInPersonPricingDetails"
+    component={CoachInPersonPricingDetails}
+    options={{ headerShown: false }}
+  />,
+  //   PENDING
+
+  <Stack.Screen
+    name="CoachServicePictures"
+    component={CoachServicePictures}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachAccountDetails"
+    component={CoachAccountDetails}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    name="CoachAgreementDetails"
+    component={CoachAgreementDetails}
+    options={{ headerShown: false }}
+  />,
+];
