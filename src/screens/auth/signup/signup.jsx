@@ -1,4 +1,3 @@
-// Signup.jsx (Demo with Dummy Data Object)
 import {
   Text,
   View,
@@ -25,7 +24,6 @@ const background = require("../../../../assets/images/background.png");
 function Signup({ navigation }) {
   const role_ref = useRef();
 
-  // ✅ Dummy data object
   const dummyData = {
     role: "client",
     firstName: "John",
@@ -36,7 +34,7 @@ function Signup({ navigation }) {
   };
 
   // Local states for interactivity
-  const [role, setRole] = useState(dummyData.role);
+  const [role, setRole] = useState("");
   const [firstName, setFirstName] = useState(dummyData.firstName);
   const [lastName, setLastName] = useState(dummyData.lastName);
   const [password, setPassword] = useState(dummyData.password);
@@ -108,14 +106,14 @@ function Signup({ navigation }) {
                   }
                 >
                   {role === ""
-                    ? "Client"
+                    ? "Join As"
                     : role === "client"
                     ? "Client"
                     : role === "coach"
                     ? "Coach"
                     : role === "eventOrganizer"
                     ? "Event Organizer"
-                    : eole === "productCompany"
+                    : role === "productCompany"
                     ? "Product Company"
                     : "ERROR"}
                 </Text>
@@ -233,8 +231,17 @@ function Signup({ navigation }) {
           </View>
 
           {/* Agree section */}
-          <View style={styles.fp_whole_}>
-            <TouchableOpacity style={styles.fp_whole_text}>
+          <View
+            style={[
+              styles.fp_whole_,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
+          >
+            <TouchableOpacity style={{ flex: 1 }}>
               <Text style={styles.fp_text_center}>
                 I agree to the Apps{" "}
                 <Text
@@ -254,8 +261,9 @@ function Signup({ navigation }) {
                 </Text>
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={styles.fp_whole_svg_section}
+              style={{ paddingLeft: 10 }}
               onPress={() => setAgree_tc(!agree_tc)}
             >
               <MaterialCommunityIcons
@@ -295,6 +303,9 @@ function Signup({ navigation }) {
           style={styles.bs_whole_view}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
+          {/* Spacer at top */}
+          <View style={{ height: 10 }} />
+
           {["client", "coach", "eventOrganizer", "productCompany"].map((r) => (
             <TouchableOpacity
               key={r}

@@ -1,4 +1,3 @@
-// CoachAccountDetails.jsx (Dummy with Static Commission + Validations)
 import {
   Text,
   View,
@@ -15,49 +14,12 @@ import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker"; // ✅ Date picker
 
-// ✅ Icons
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CoachAccountDetails({ navigation }) {
-  // 🔹 Dummy Data Object
-  const dummyData = {
-    coach_share: 80,
-    cue_share: 20,
-    card_holder_name: "John Doe",
-    card_number: "1234 5678 9876 5432",
-    expiry_date: new Date(2025, 11, 31), // Dec 2025
-    cvv: "123",
-  };
-
-  // 🔹 Local State
   const [coach_share] = useState(dummyData.coach_share);
   const [cue_share] = useState(dummyData.cue_share);
-  const [chn, setChn] = useState(dummyData.card_holder_name);
-  const [chnumber, setChnumber] = useState(dummyData.card_number);
-  const [ed, setEd] = useState(dummyData.expiry_date);
-  const [cvv, setCvv] = useState(dummyData.cvv);
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  // Format card number with space every 4 digits
-  const handleCardNumber = (text) => {
-    const cleaned = text.replace(/\D+/g, ""); // only digits
-    const limited = cleaned.slice(0, 16); // max 16
-    const formatted = limited.replace(/(.{4})/g, "$1 ").trim();
-    setChnumber(formatted);
-  };
-
-  // Limit CVV to 3 digits
-  const handleCvv = (text) => {
-    const cleaned = text.replace(/\D+/g, "").slice(0, 3);
-    setCvv(cleaned);
-  };
-
-  const send_data = () => {
-    navigation.navigate("CoachAgreementDetailsAgreement");
-  };
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -88,7 +50,7 @@ export default function CoachAccountDetails({ navigation }) {
         </View>
 
         <View style={styles.bs_2}>
-          <Text style={styles.byp_text}>Accounting Info</Text>
+          <Text style={styles.byp_text}>Accounting Information</Text>
         </View>
 
         <View style={styles.bs_3}>
@@ -145,93 +107,12 @@ export default function CoachAccountDetails({ navigation }) {
             </View>
           </LinearGradient>
 
-          {/* Bank Details Section */}
-          <LinearGradient
-            style={styles.bankdetail_section}
-            colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-          >
-            <View style={styles.bd_inner}>
-              <View style={styles.bd_top_section}>
-                <MaterialCommunityIcons
-                  name="credit-card-outline"
-                  size={20}
-                  color="#fff"
-                />
-                <Text style={styles.bd_text}>Add Bank Card Details</Text>
-              </View>
-
-              <View style={styles.bank_details_inner}>
-                {/* Card Holder Name */}
-                <View style={styles.bd_details_text_view}>
-                  <TextInput
-                    placeholder="Card Holder Name : John Doe"
-                    placeholderTextColor={"#ffffff60"}
-                    style={styles.banking_info_input}
-                    value={chn}
-                    onChangeText={setChn}
-                  />
-                </View>
-
-                {/* Card Number */}
-                <View style={styles.bd_details_text_view}>
-                  <TextInput
-                    placeholder="Card Number : 1234 5678 9876 5432"
-                    placeholderTextColor={"#ffffff60"}
-                    style={styles.banking_info_input}
-                    keyboardType="numeric"
-                    value={chnumber}
-                    onChangeText={handleCardNumber}
-                  />
-                </View>
-
-                {/* Expiry Date */}
-                <View style={styles.bd_details_text_view}>
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(true)}
-                    style={{ width: "100%" }}
-                  >
-                    <Text style={styles.banking_info_input}>
-                      {ed
-                        ? `${ed.getMonth() + 1}-${ed
-                            .getFullYear()
-                            .toString()
-                            .slice(-2)}`
-                        : "Select Expiry Date"}
-                    </Text>
-                  </TouchableOpacity>
-                  {showDatePicker && (
-                    <DateTimePicker
-                      value={ed || new Date()}
-                      mode="date"
-                      display="default"
-                      onChange={(event, selectedDate) => {
-                        setShowDatePicker(false);
-                        if (selectedDate) setEd(selectedDate);
-                      }}
-                    />
-                  )}
-                </View>
-
-                {/* CVV */}
-                <View style={styles.bd_details_text_view}>
-                  <TextInput
-                    placeholder="CVV : 123"
-                    placeholderTextColor={"#ffffff60"}
-                    style={styles.banking_info_input}
-                    keyboardType="numeric"
-                    value={cvv}
-                    onChangeText={handleCvv}
-                    maxLength={3}
-                  />
-                </View>
-              </View>
-            </View>
-          </LinearGradient>
-
           {/* Next Button */}
           <TouchableOpacity
             style={styles.input_whole_section_btn}
-            onPress={send_data}
+            onPress={() => {
+              navigation.navigate("CoachAgreementDetails");
+            }}
           >
             <LinearGradient
               colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}

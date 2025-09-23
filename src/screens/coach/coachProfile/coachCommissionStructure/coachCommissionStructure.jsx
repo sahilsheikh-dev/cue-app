@@ -49,7 +49,7 @@ export default function CoachCommissionStructure({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.bs_2}>
-          <Text style={styles.byp_text}>Accounting Info</Text>
+          <Text style={styles.byp_text}>Accounting Information</Text>
         </View>
         <View style={styles.bs_3}></View>
       </View>

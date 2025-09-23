@@ -76,23 +76,52 @@ export default function Login({ navigation }) {
   const country_ref = useRef();
 
   const handleLogin = async () => {
-    // validate minimal
+    // Terms and conditions check
     if (!agree_tc) {
-      Alert.alert("Please agree to Terms & Conditions");
+      Alert.alert("Validation Error", "Please agree to Terms & Conditions");
       return;
     }
+
+    // Role check
     if (!role) {
-      Alert.alert("Please select a role");
+      Alert.alert("Validation Error", "Please select a role");
       return;
     }
+
+    // Mobile validations
+    if (!mobileNumber || mobileNumber.trim() === "") {
+      Alert.alert("Validation Error", "Please enter your phone number");
+      return;
+    }
+    if (!/^\d+$/.test(mobileNumber)) {
+      Alert.alert("Validation Error", "Phone number must contain only digits");
+      return;
+    }
+    if (mobileNumber.length !== parseInt(selected_country.number_of_digit)) {
+      Alert.alert(
+        "Validation Error",
+        `Phone number must be ${selected_country.number_of_digit} digits for ${selected_country.name}`
+      );
+      return;
+    }
+
+    // Password validations
+    if (!password || password.trim() === "") {
+      Alert.alert("Validation Error", "Please enter your password");
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert("Validation Error", "Password must be at least 6 characters");
+      return;
+    }
+
+    // If all good → continue
     setLoading(true);
     try {
-      // decide what you send as mobile:
-      // Option A: send only local number
-      const mobileToSend = mobileNumber;
-      // Option B: send with country code (uncomment if your backend expects it)
-      // const mobileToSend = `${selected_country.code}${mobileNumber.replace(/^0+/,"")}`;
-
+      const mobileToSend = `${selected_country.code}${mobileNumber.replace(
+        /^0+/,
+        ""
+      )}`;
       const res = await loginWithApi(mobileToSend, password, role);
 
       if (res.ok) {
@@ -147,14 +176,14 @@ export default function Login({ navigation }) {
                   }
                 >
                   {role === ""
-                    ? "Client"
+                    ? "Login As"
                     : role === "client"
                     ? "Client"
                     : role === "coach"
                     ? "Coach"
                     : role === "eventOrganizer"
                     ? "Event Organizer"
-                    : eole === "productCompany"
+                    : role === "productCompany"
                     ? "Product Company"
                     : "ERROR"}
                 </Text>
@@ -240,8 +269,17 @@ export default function Login({ navigation }) {
           </View>
 
           {/* Agree Section */}
-          <View style={styles.fp_whole_}>
-            <TouchableOpacity style={styles.fp_whole_text}>
+          <View
+            style={[
+              styles.fp_whole_,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
+          >
+            <TouchableOpacity style={{ flex: 1 }}>
               <Text style={styles.fp_text_center}>
                 I agree to the Apps{" "}
                 <Text
@@ -262,7 +300,7 @@ export default function Login({ navigation }) {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.fp_whole_svg_section}
+              style={{ paddingLeft: 10 }}
               onPress={() => setAgree_tc(!agree_tc)}
             >
               <MaterialCommunityIcons
@@ -312,13 +350,14 @@ export default function Login({ navigation }) {
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
           <ScrollView style={styles.country_scroll}>
+            <View style={{ height: 10 }} />
             {countries.map((item) => (
               <TouchableOpacity
                 key={item._id}
                 style={styles.option_indi_whole}
                 onPress={() => {
                   setSelected_country(item);
-                  setMobileNumber(""); // reset number on country change
+                  setMobileNumber("");
                   country_ref.current.close();
                 }}
               >
@@ -357,6 +396,7 @@ export default function Login({ navigation }) {
           style={styles.bs_whole_view}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
+          <View style={{ height: 10 }} />
           {["client", "coach", "eventOrganizer", "productCompany"].map((r) => (
             <TouchableOpacity
               key={r}
