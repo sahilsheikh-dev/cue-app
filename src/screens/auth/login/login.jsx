@@ -1,4 +1,3 @@
-// Login.jsx (Demo with dummyData object + flags + digit limits)
 import {
   Text,
   View,
@@ -17,79 +16,96 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useContext, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
+import { Alert } from "react-native";
+
+import { loginWithApi } from "../../../services/authServices/authService";
 import { DataContext } from "../../../context/dataContext";
 
 const background = require("../../../../assets/images/background.png");
 
 export default function Login({ navigation }) {
-  // ✅ single dummy object to hold demo info
-  const dummyData = {
-    password: "demo1234",
-    role: "client",
-    agree_tc: false,
-    mobileNumber: "9876543210",
-    countries: [
-      {
-        _id: "in",
-        name: "India",
-        code: "+91",
-        number_of_digit: "10",
-        img: "https://flagcdn.com/w20/in.png",
-      },
-      {
-        _id: "us",
-        name: "United States",
-        code: "+1",
-        number_of_digit: "10",
-        img: "https://flagcdn.com/w20/us.png",
-      },
-      {
-        _id: "gb",
-        name: "United Kingdom",
-        code: "+44",
-        number_of_digit: "10",
-        img: "https://flagcdn.com/w20/gb.png",
-      },
-      {
-        _id: "ca",
-        name: "Canada",
-        code: "+1",
-        number_of_digit: "10",
-        img: "https://flagcdn.com/w20/ca.png",
-      },
-      {
-        _id: "au",
-        name: "Australia",
-        code: "+61",
-        number_of_digit: "9",
-        img: "https://flagcdn.com/w20/au.png",
-      },
-    ],
-  };
+  // get login function from context
+  const { login } = useContext(DataContext);
+  const countries = [
+    {
+      _id: "in",
+      name: "India",
+      code: "+91",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/w20/in.png",
+    },
+    {
+      _id: "us",
+      name: "United States",
+      code: "+1",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/w20/us.png",
+    },
+    {
+      _id: "gb",
+      name: "United Kingdom",
+      code: "+44",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/w20/gb.png",
+    },
+    {
+      _id: "ca",
+      name: "Canada",
+      code: "+1",
+      number_of_digit: "10",
+      img: "https://flagcdn.com/w20/ca.png",
+    },
+    {
+      _id: "au",
+      name: "Australia",
+      code: "+61",
+      number_of_digit: "9",
+      img: "https://flagcdn.com/w20/au.png",
+    },
+  ];
 
-  // ✅ useState for interactivity, seeded from dummyData
+  const [role, setRole] = useState("");
+  const [mobileNumber, setMobileNumber] = useState();
+  const [password, setPassword] = useState();
   const [password_show, setPassword_show] = useState(false);
-  const [password, setPassword] = useState(dummyData.password);
+  const [selected_country, setSelected_country] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState(dummyData.role);
-  const [agree_tc, setAgree_tc] = useState(dummyData.agree_tc);
-  const [selected_country, setSelected_country] = useState(
-    dummyData.countries[0]
-  );
-  const [mobileNumber, setMobileNumber] = useState(dummyData.mobileNumber);
+  const [agree_tc, setAgree_tc] = useState(false);
 
   const role_ref = useRef();
   const country_ref = useRef();
 
-  // get login function from context
-  const { login } = useContext(DataContext);
-
   const handleLogin = async () => {
+    // validate minimal
+    if (!agree_tc) {
+      Alert.alert("Please agree to Terms & Conditions");
+      return;
+    }
+    if (!role) {
+      Alert.alert("Please select a role");
+      return;
+    }
     setLoading(true);
-    setTimeout(async () => {
-      await login("demo-token", "coach"); // hardcoded for demo
+    try {
+      // decide what you send as mobile:
+      // Option A: send only local number
+      const mobileToSend = mobileNumber;
+      // Option B: send with country code (uncomment if your backend expects it)
+      // const mobileToSend = `${selected_country.code}${mobileNumber.replace(/^0+/,"")}`;
+
+      const res = await loginWithApi(mobileToSend, password, role);
+
+      if (res.ok) {
+        await login(res.token, role, res.user);
+      } else {
+        Alert.alert("Login failed", res.data?.message || res.error || "Error");
+      }
+    } catch (err) {
+      console.error("handleLogin error:", err);
+      Alert.alert("Login failed", "Network error");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -130,13 +146,17 @@ export default function Login({ navigation }) {
                     role === "" ? styles.input_text : styles.input_text_active
                   }
                 >
-                  {role === "client"
+                  {role === ""
+                    ? "Client"
+                    : role === "client"
                     ? "Client"
                     : role === "coach"
                     ? "Coach"
                     : role === "eventOrganizer"
                     ? "Event Organizer"
-                    : "Product Company"}
+                    : eole === "productCompany"
+                    ? "Product Company"
+                    : "ERROR"}
                 </Text>
               </View>
               <View style={styles.svg_circle_eye}>
@@ -292,7 +312,7 @@ export default function Login({ navigation }) {
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
           <ScrollView style={styles.country_scroll}>
-            {dummyData.countries.map((item) => (
+            {countries.map((item) => (
               <TouchableOpacity
                 key={item._id}
                 style={styles.option_indi_whole}

@@ -1,4 +1,3 @@
-// CoachProfile.jsx (Demo with Dummy Data Object)
 import React, { useState, useContext } from "react";
 import {
   Text,
@@ -12,61 +11,53 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "./coachProfileCss";
 import { Ionicons } from "@expo/vector-icons";
+
 import { DataContext } from "../../../context/dataContext";
 
 const background = require("../../../../assets/images/background.png");
 
 export default function CoachProfile({ navigation }) {
-  // ✅ Dummy data object
-  const dummyData = {
-    profile: {
-      name: "Sahil Sheikh",
-      image: require("../../../../assets/images/dummy_profile.png"),
+  const optionsData = [
+    {
+      id: "personal",
+      title: "Personal Information",
+      screen: "CoachPersonalInformation",
     },
-    options: [
-      {
-        id: "personal",
-        title: "Personal Information",
-        screen: "CoachPersonalInformation",
-      },
-      {
-        id: "billing",
-        title: "Billing History",
-        screen: "CoachBillingHistory",
-      },
-      {
-        id: "passive",
-        title: "Commission Structure",
-        screen: "CoachCommissionStructure",
-      },
-      {
-        id: "guideline",
-        title: "Cue Guideline",
-        screen: "CueGuideline",
-      },
-      {
-        id: "coachTerms",
-        title: "Coach Agreement Terms",
-        screen: "CoachAgreementDetails",
-      },
-      {
-        id: "cueTerms",
-        title: "Cue Terms & Conditions",
-        screen: "TermsAndConditions",
-      },
-    ],
-    logout: {
-      title: "Log Out",
-      screen: "Login",
-      icon: "log-out-outline",
+    {
+      id: "billing",
+      title: "Billing History",
+      screen: "CoachBillingHistory",
     },
-  };
+    {
+      id: "passive",
+      title: "Commission Structure",
+      screen: "CoachCommissionStructure",
+    },
+    {
+      id: "guideline",
+      title: "Cue Guideline",
+      screen: "CueGuideline",
+    },
+    {
+      id: "coachTerms",
+      title: "Coach Agreement Terms",
+      screen: "CoachAgreementDetails",
+    },
+    {
+      id: "cueTerms",
+      title: "Cue Terms & Conditions",
+      screen: "TermsAndConditions",
+    },
+  ];
 
   // keep options editable in state for interactivity if needed
-  const [options] = useState(dummyData.options);
+  const [options] = useState(optionsData);
 
   // get logout from context
   const { logout, data } = useContext(DataContext);
+  const userName = data.user?.name || "Coach"; // fallback if missing
+  const userImage =
+    data.user?.image || require("../../../../assets/images/dummy_profile.png");
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -105,17 +96,13 @@ export default function CoachProfile({ navigation }) {
         {/* Profile section */}
         <View style={styles.name_profile_section}>
           <View style={styles.profile_section}>
-            <Image
-              source={dummyData.profile.image}
-              style={styles.profile_img}
-            />
+            <Image source={userImage} style={styles.profile_img} />
           </View>
           <View style={styles.name_section}>
-            <Text style={styles.name_text}>{dummyData.profile.name}</Text>
+            <Text style={styles.name_text}>{userName}</Text>
           </View>
         </View>
 
-        {/* Menu options (loop from dummyData.options) */}
         {options.map((opt) => (
           <TouchableOpacity
             key={opt.id}
@@ -149,10 +136,10 @@ export default function CoachProfile({ navigation }) {
           }}
         >
           <View style={styles.io_name_section}>
-            <Text style={styles.io_name}>{dummyData.logout.title}</Text>
+            <Text style={styles.io_name}>Log Out</Text>
           </View>
           <View style={styles.indi_option_svg_section}>
-            <Ionicons name={dummyData.logout.icon} size={26} color="#fff" />
+            <Ionicons name="log-out-outline" size={26} color="#fff" />
           </View>
         </TouchableOpacity>
 

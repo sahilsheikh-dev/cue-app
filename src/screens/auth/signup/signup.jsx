@@ -107,13 +107,17 @@ function Signup({ navigation }) {
                     role === "" ? styles.input_text : styles.input_text_active
                   }
                 >
-                  {role === "client"
+                  {role === ""
+                    ? "Client"
+                    : role === "client"
                     ? "Client"
                     : role === "coach"
                     ? "Coach"
                     : role === "eventOrganizer"
                     ? "Event Organizer"
-                    : "Product Company"}
+                    : eole === "productCompany"
+                    ? "Product Company"
+                    : "ERROR"}
                 </Text>
               </View>
               <View style={styles.svg_circle_eye}>

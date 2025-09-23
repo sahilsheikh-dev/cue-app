@@ -13,7 +13,8 @@ import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from "./src/config/app.config";
 import {
   saveAuthTokenAndRole,
   initializeAuth,
-  logout as authLogout,
+  logout as clearLocalAuth,
+  serverLogout,
   checkedToday,
   markDataFilled,
 } from "./src/services/authServices/authService";
@@ -40,16 +41,23 @@ export default function App() {
   });
 
   // ---------- Context helpers ----------
-  const login = useCallback(async (authToken, role) => {
-    const ok = await saveAuthTokenAndRole(authToken, role);
+  const login = useCallback(async (authToken, role, user) => {
+    const ok = await saveAuthTokenAndRole(authToken, role, user);
     if (ok) {
-      setData((prev) => ({ ...prev, auth: true, authToken, role }));
-      setLoading(false); // 👈 ensure we exit splash immediately
+      setData((prev) => ({
+        ...prev,
+        auth: true,
+        authToken,
+        role,
+        user,
+      }));
+      setLoading(false);
     }
   }, []);
 
   const logout = useCallback(async () => {
-    const ok = await authLogout();
+    // call server logout (best-effort) and clear local storage inside serverLogout
+    const ok = await serverLogout();
     if (ok) {
       setData((prev) => ({
         ...prev,
@@ -57,6 +65,7 @@ export default function App() {
         authToken: undefined,
         role: undefined,
         data_filled: false,
+        user: null,
       }));
     }
   }, []);
@@ -76,12 +85,13 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { authToken, role, data_filled } = await initializeAuth();
+      const { authToken, role, data_filled, user } = await initializeAuth();
       if (!mounted) return;
       setData({
         auth: !!authToken,
         authToken: authToken || undefined,
         role,
+        user,
         url: BASE_API_URL,
         data_filled,
       });
