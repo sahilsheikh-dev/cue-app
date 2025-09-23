@@ -10,30 +10,24 @@ import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function CoachIntroduction({ navigation, route }) {
-  // const { firstName, lastName, password, uc_role, referal_code, role } = route.params;
+// ✅ Import vector icons
+import { Ionicons } from "@expo/vector-icons";
 
-  const go_to_contact = () => {
-    // navigation.navigate("Coach-contact-number", {
-    //   firstName: firstName,
-    //   lastName: lastName,
-    //   password: password,
-    //   uc_role: uc_role,
-    //   referal_code: referal_code,
-    //   role: role,
-    // });
-  };
-
+export default function CoachIntroduction({ navigation }) {
   return (
     <SafeAreaView style={styles.sav}>
       <StatusBar style="light" />
+      {/* ✅ Background image */}
       <Image source={background} style={styles.backgroundImage} />
       <LinearGradient
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
         style={styles.backgroundView}
       ></LinearGradient>
+
       <View style={styles.top_portion1}></View>
       <View style={styles.top_portion1}></View>
+
+      {/* ✅ Header with icons and title */}
       <View style={styles.back_section}>
         <View style={styles.bs_1}></View>
         <View style={styles.bs_2}>
@@ -43,6 +37,8 @@ export default function CoachIntroduction({ navigation, route }) {
         </View>
         <View style={styles.bs_3}></View>
       </View>
+
+      {/* ✅ Static content */}
       <View style={styles.main_scroll_view}>
         <Text style={styles.content}>
           At Cue we focus on promoting individuals rather than businesses,
@@ -52,10 +48,11 @@ export default function CoachIntroduction({ navigation, route }) {
           the journey with us and wish you all the very best !
         </Text>
       </View>
+
+      {/* ✅ Hardcoded button */}
       <TouchableOpacity
         style={styles.input_whole_section_btn}
         onPress={() => {
-          // go_to_contact();
           navigation.navigate("CoachProfileBasicDetails");
         }}
       >

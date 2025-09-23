@@ -24,7 +24,7 @@ import axios from "axios";
 export default function CoachVirtualPricingDetails({ navigation }) {
   const { data, logout } = useContext(DataContext);
   const [save_loading, setSave_loading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [level, setLevel] = useState("");
   const [choosen_level, setChoosen_level] = useState("advanced");
   const calendar_ref = useRef(null);
@@ -162,7 +162,7 @@ export default function CoachVirtualPricingDetails({ navigation }) {
   };
 
   const [categories, setCategories] = useState([]);
-  const [choosen_category, setChoosen_category] = useState({});
+  const [choosen_category, setChoosen_category] = useState([]);
 
   useEffect(() => {
     axios
@@ -502,7 +502,8 @@ export default function CoachVirtualPricingDetails({ navigation }) {
             })}
           </ScrollView>
           <View style={styles.bia_section}>
-            {choosen_category.level.map((item) => {
+            {/* {choosen_category.level.map((item) => { */}
+            {choosen_category.map((item) => {
               return (
                 <TouchableOpacity
                   onPress={() => {

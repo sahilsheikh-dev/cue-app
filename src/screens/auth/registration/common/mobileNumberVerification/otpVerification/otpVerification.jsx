@@ -76,7 +76,7 @@ export default function OtpVerification({ navigation }) {
         <TouchableOpacity
           style={styles.input_whole_section_btn}
           onPress={() => {
-            navigation.navigate("AccountVerificationStatus");
+            navigation.navigate("CoachIntroduction");
           }}
         >
           <LinearGradient

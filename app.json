@@ -6,7 +6,9 @@
     "version": "3.0.0",
     "sdkVersion": "53.0.0",
     "orientation": "portrait",
-    "assetBundlePatterns": ["assets/fonts/*"],
+    "assetBundlePatterns": [
+      "assets/fonts/*"
+    ],
     "plugins": [
       [
         "expo-av",
@@ -29,7 +31,9 @@
         }
       ],
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      "expo-audio",
+      "expo-video"
     ],
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",

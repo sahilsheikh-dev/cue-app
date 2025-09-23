@@ -1,20 +1,16 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { StripeProvider } from "@stripe/stripe-react-native";
+import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { DataContext } from "./src/context/dataContext";
 import Splash from "./src/screens/common/splash/splash";
+import RootNavigator from "./src/screens/rootNavigator";
 
-import Auth from "./src/screens/auth/main"; // ⚠️ DO NOT REMOVE THIS IMPORT ⚠️ Even though `Auth` is not referenced directly here, it is required by `roleScreens[Roles.AUTH]` in `roles.config.js`. Removing this will cause the app to crash at runtime.
-
-import ErrorScreen from "./src/screens/error/main";
-import { roleScreens } from "./src/config/roles.config";
 import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from "./src/config/app.config";
-
-import authService, {
+import {
   saveAuthTokenAndRole,
   initializeAuth,
   logout as authLogout,
@@ -23,7 +19,7 @@ import authService, {
 } from "./src/services/authServices/authService";
 
 export default function App() {
-  // Load fonts
+  // ---------- Load fonts ----------
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Thin": require("./assets/fonts/Poppins-Thin.ttf"),
@@ -33,7 +29,7 @@ export default function App() {
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
   });
 
-  // Global state
+  // ---------- Global state ----------
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     auth: false,
@@ -43,16 +39,11 @@ export default function App() {
     data_filled: false,
   });
 
-  // ---------- HELPERS ----------
+  // ---------- Context helpers ----------
   const login = useCallback(async (authToken, role) => {
     const ok = await saveAuthTokenAndRole(authToken, role);
     if (ok) {
-      setData((prev) => ({
-        ...prev,
-        auth: true,
-        authToken,
-        role,
-      }));
+      setData((prev) => ({ ...prev, auth: true, authToken, role }));
     }
   }, []);
 
@@ -77,10 +68,10 @@ export default function App() {
   }, []);
 
   const markCheckedToday = useCallback(async () => {
-    await checkedToday(); // no UI state update
+    await checkedToday(); // no state update needed
   }, []);
 
-  // ---------- INITIAL LOAD ----------
+  // ---------- Initial auth load ----------
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -100,27 +91,10 @@ export default function App() {
     };
   }, []);
 
-  // ---------- FALLBACK ----------
-  const InvalidRoleScreen = ({ navigation }) => (
-    <ErrorScreen
-      navigation={navigation}
-      message={`Invalid or missing role: ${data.role || "undefined"}`}
-    />
-  );
-
-  // ---------- ACTIVE SCREEN ----------
-  const ActiveScreen = useMemo(() => {
-    if (!data.auth) return roleScreens.auth;
-    if (!data.role || !roleScreens[data.role]) {
-      return InvalidRoleScreen;
-    }
-    return roleScreens[data.role];
-  }, [data.auth, data.role]);
-
-  // ---------- RENDER ----------
+  // ---------- Render ----------
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}> */}
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <DataContext.Provider
           value={{
             data,
@@ -132,11 +106,15 @@ export default function App() {
           }}
         >
           <NavigationContainer>
-            {!fontsLoaded || loading ? <Splash /> : <ActiveScreen />}
+            {!fontsLoaded || loading ? (
+              <Splash />
+            ) : (
+              <RootNavigator initialRole={data.auth ? data.role : "auth"} />
+            )}
           </NavigationContainer>
         </DataContext.Provider>
         <StatusBar style="auto" />
-      {/* </StripeProvider> */}
+      </StripeProvider>
     </GestureHandlerRootView>
   );
 }
