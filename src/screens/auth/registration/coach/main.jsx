@@ -7,7 +7,6 @@ import CoachProfileCategoryDetails from "./coachProfileCategoryDetails/coachProf
 import CoachProfileExperienceDetails from "./coachProfileExperienceDetails/coachProfileExperienceDetails";
 import CoachProfileCertificateDetails from "./coachProfileCertificateDetails/coachProfileCertificateDetails";
 import CoachProfileReviewConfirmDetails from "./coachProfileReviewConfirmDetails/coachProfileReviewConfirmDetails";
-import CoachAgreementDetails from "./coachAgreementDetails/coachAgreementDetails";
 import CoachCreateServiceDetails from "./coachCreateServiceDetails/coachCreateServiceDetails";
 import CoachYourStoryDetails from "./coachYourStoryDetails/coachYourStoryDetails";
 import CoachVirtualPricingDetails from "./coachVirtualPricingDetails/coachVirtualPricingDetails";
@@ -82,11 +81,6 @@ export const CoachRegistrationScreens = (Stack) => [
   <Stack.Screen
     name="CoachAccountDetails"
     component={CoachAccountDetails}
-    options={{ headerShown: false }}
-  />,
-  <Stack.Screen
-    name="CoachAgreementDetails"
-    component={CoachAgreementDetails}
     options={{ headerShown: false }}
   />,
 ];

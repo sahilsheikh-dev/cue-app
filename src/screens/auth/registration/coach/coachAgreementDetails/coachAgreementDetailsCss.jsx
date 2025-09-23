@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     opacity: 0.25,
   },
   main_scroll_view: {
+    marginTop: "50px",
     height: "100%",
     width: "100%",
     zIndex: 10,

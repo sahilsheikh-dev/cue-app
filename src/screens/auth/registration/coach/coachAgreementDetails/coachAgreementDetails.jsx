@@ -21,7 +21,7 @@ import { useState } from "react";
 import { Ionicons, Feather } from "@expo/vector-icons";
 
 export default function CoachAgreementDetails({ navigation }) {
-  // 🔹 Dummy Data Object
+  // Dummy Data Object
   const dummyData = {
     title: "My Agreement Title",
     agreement_term: [
@@ -31,43 +31,42 @@ export default function CoachAgreementDetails({ navigation }) {
     ],
   };
 
-  // 🔹 Local states
   const [loading, setLoading] = useState(false);
   const [agreement_term, setAgreement_term] = useState(
-    dummyData.agreement_term
+    dummyData.agreement_term || []
   );
-  const [title, setTitle] = useState(dummyData.title);
+  const [title, setTitle] = useState(dummyData.title || "");
+  const [editMode, setEditMode] = useState(false); // 🔹 toggle between view & edit
 
-  // 🔹 Save handler
+  // Save
   const save_agreement = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      const agreementJSON = {
-        title,
-        terms: agreement_term,
-      };
-      console.log("Saved Agreement JSON:", agreementJSON);
-      navigation.navigate("AccountVerificationStatus", {
-        status: "inprogress",
-        data: agreementJSON,
-      });
-    }, 1500);
+      setEditMode(false); // switch back to view mode
+    }, 1200);
   };
 
-  // 🔹 Add section
+  // Delete
+  const delete_agreement = () => {
+    setTitle("");
+    setAgreement_term([]);
+    setEditMode(false);
+  };
+
+  // Add Section
   const addSection = (type) => {
     setAgreement_term([...agreement_term, { type, content: "" }]);
   };
 
-  // 🔹 Remove section
+  // Remove Section
   const removeSection = (index) => {
     let all = [...agreement_term];
     all.splice(index, 1);
     setAgreement_term(all);
   };
 
-  // 🔹 Update section
+  // Update Section
   const updateSection = (index, text) => {
     let all = [...agreement_term];
     all[index] = { ...all[index], content: text };
@@ -102,73 +101,113 @@ export default function CoachAgreementDetails({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.bs_2}>
-          <Text style={styles.bs_2_cue} numberOfLines={1}>
-            Coach Agreement Terms
-          </Text>
+          <Text style={styles.bs_2_cue}>Coach Agreement Terms</Text>
         </View>
-        <View style={styles.bs_3}></View>
+        <View style={styles.bs_3}>
+          <TouchableOpacity
+            style={styles.bs_1_circle}
+            onPress={() => setEditMode(!editMode)}
+          >
+            <LinearGradient
+              style={styles.bs_1_stroke_circle}
+              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
+            >
+              <View style={styles.bs_1_circle_circle}>
+                <Feather
+                  name={editMode ? "eye" : "edit-3"}
+                  size={18}
+                  color="#fff"
+                />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Content */}
-      <Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
-        <ScrollView style={styles.main_scroll_view}>
-          {/* Agreement Title Input */}
-          <LinearGradient
-            colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-            style={styles.main_agreement_section}
-          >
-            <View style={styles.mas_inner}>
-              <TextInput
-                style={styles.mas_input}
-                placeholder="Title here..."
-                multiline
-                placeholderTextColor={"#ffffff90"}
-                value={title}
-                onChangeText={setTitle}
-              />
-            </View>
-          </LinearGradient>
-
-          {/* Agreement Terms Sections */}
-          {agreement_term.map((item, index) => (
-            <View key={index}>
-              <Text style={styles.label}>
-                {item.type === "title"
-                  ? "Title"
-                  : item.type === "paragraph"
-                  ? "Paragraph"
-                  : "Bullet Point"}
-              </Text>
+      <ScrollView style={styles.main_scroll_view}>
+        {!title && agreement_term.length === 0 && !editMode ? (
+          <Text style={{ color: "#fff", textAlign: "center", marginTop: 20 }}>
+            Please add your agreement details
+          </Text>
+        ) : (
+          <>
+            {/* Title */}
+            {editMode ? (
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-                style={styles.main_agreement_section_content}
+                style={styles.main_agreement_section}
               >
-                {/* Remove Button */}
-                <TouchableOpacity
-                  style={styles.cut_circle}
-                  onPress={() => removeSection(index)}
-                >
-                  <Feather name="x" size={15} color="#000" />
-                </TouchableOpacity>
-
-                {/* Editable Input */}
                 <TextInput
                   style={styles.mas_input}
-                  placeholder={`Enter ${item.type} here...`}
+                  placeholder="Title here..."
                   multiline
                   placeholderTextColor={"#ffffff90"}
-                  value={item.content}
-                  onChangeText={(text) => updateSection(index, text)}
+                  value={title}
+                  onChangeText={setTitle}
                 />
               </LinearGradient>
-            </View>
-          ))}
+            ) : title ? (
+              <Text
+                style={[
+                  styles.label,
+                  { fontSize: 18, fontWeight: "bold", textAlign: "center" },
+                ]}
+              >
+                {title}
+              </Text>
+            ) : null}
 
-          {/* Add Buttons */}
+            {/* Terms */}
+            {agreement_term.map((item, index) => (
+              <View key={index} style={{ marginTop: 10 }}>
+                {editMode ? (
+                  <LinearGradient
+                    colors={[
+                      "rgba(255, 255, 255, 0.1)",
+                      "rgba(30, 53, 126, 0)",
+                    ]}
+                    style={styles.main_agreement_section_content}
+                  >
+                    <TouchableOpacity
+                      style={styles.cut_circle}
+                      onPress={() => removeSection(index)}
+                    >
+                      <Feather name="x" size={15} color="#000" />
+                    </TouchableOpacity>
+                    <TextInput
+                      style={styles.mas_input}
+                      placeholder={`Enter ${item.type}...`}
+                      multiline
+                      placeholderTextColor={"#ffffff90"}
+                      value={item.content}
+                      onChangeText={(text) => updateSection(index, text)}
+                    />
+                  </LinearGradient>
+                ) : (
+                  <Text
+                    style={{
+                      color: "#fff",
+                      marginLeft: 5,
+                      textAlign: "center",
+                    }}
+                  >
+                    {item.type === "bullet"
+                      ? `• ${item.content}`
+                      : item.content}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </>
+        )}
+
+        {/* Add buttons only in edit mode */}
+        {editMode && (
           <View style={styles.add_btn_view}>
             <TouchableOpacity onPress={() => addSection("title")}>
               <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
                 style={styles.add_btn}
               >
                 <Text style={styles.add_btn_text}>Add Title</Text>
@@ -176,7 +215,7 @@ export default function CoachAgreementDetails({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addSection("paragraph")}>
               <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
                 style={styles.add_btn}
               >
                 <Text style={styles.add_btn_text}>Add Paragraph</Text>
@@ -184,34 +223,47 @@ export default function CoachAgreementDetails({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addSection("bullet")}>
               <LinearGradient
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
                 style={styles.add_btn}
               >
                 <Text style={styles.add_btn_text}>Add Bullet Point</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
+        )}
+      </ScrollView>
 
-          <View style={styles.empty_space}></View>
-        </ScrollView>
-      </Pressable>
-
-      {/* Confirm Button */}
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={save_agreement}
-      >
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
+      {/* Action Buttons */}
+      {editMode ? (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            padding: 10,
+          }}
         >
-          {loading ? (
-            <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
-          ) : (
-            <Text style={styles.login_text}>Confirm</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
+          <TouchableOpacity onPress={delete_agreement}>
+            <Text style={{ color: "red" }}>Delete</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={save_agreement}>
+            <Text style={{ color: "white" }}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        (title || agreement_term.length > 0) && (
+          <TouchableOpacity
+            style={styles.input_whole_section_btn}
+            onPress={() => navigation.navigate("AccountVerificationStatus")}
+          >
+            <LinearGradient
+              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+              style={styles.input_inner_section_btn}
+            >
+              <Text style={styles.login_text}>Confirm</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )
+      )}
     </SafeAreaView>
   );
 }

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import styles from "./CoachBillingHistoryCss";
+import styles from "./coachBillingHistoryCss";
 import { Ionicons } from "@expo/vector-icons";
 import "./coachBillingHistoryCss";
 

@@ -39,16 +39,20 @@ export default function CoachProfile({ navigation }) {
         title: "Commission Structure",
         screen: "CoachCommissionStructure",
       },
-      { id: "guideline", title: "Cue Guideline", screen: "CueGuideline" },
+      {
+        id: "guideline",
+        title: "Cue Guideline",
+        screen: "CueGuideline",
+      },
       {
         id: "coachTerms",
         title: "Coach Agreement Terms",
-        screen: "CoachAgreementTerms",
+        screen: "CoachAgreementDetails",
       },
       {
         id: "cueTerms",
         title: "Cue Terms & Conditions",
-        screen: "CueTermsAndConditions",
+        screen: "TermsAndConditions",
       },
     ],
     logout: {
@@ -62,7 +66,7 @@ export default function CoachProfile({ navigation }) {
   const [options] = useState(dummyData.options);
 
   // get logout from context
-  const { logout } = useContext(DataContext);
+  const { logout, data } = useContext(DataContext);
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -116,7 +120,16 @@ export default function CoachProfile({ navigation }) {
           <TouchableOpacity
             key={opt.id}
             style={styles.indi_options}
-            onPress={() => navigation.navigate(opt.screen)}
+            onPress={() => {
+              if (
+                opt.screen === "CueGuideline" ||
+                opt.screen === "TermsAndConditions"
+              ) {
+                navigation.navigate(opt.screen, { role: data.role });
+              } else {
+                navigation.navigate(opt.screen);
+              }
+            }}
           >
             <View style={styles.io_name_section}>
               <Text style={styles.io_name}>{opt.title}</Text>
