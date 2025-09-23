@@ -10,14 +10,14 @@ export const CommonScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
   <Stack.Screen
-    key="TandC"
-    name="TandC"
+    key="TermsAndConditions"
+    name="TermsAndConditions"
     component={TermsAndConditions}
     options={{ headerShown: false }}
   />,
   <Stack.Screen
-    key="Privacy-Policy"
-    name="Privacy-Policy"
+    key="PrivacyPolicy"
+    name="PrivacyPolicy"
     component={PrivacyPolicy}
     options={{ headerShown: false }}
   />,

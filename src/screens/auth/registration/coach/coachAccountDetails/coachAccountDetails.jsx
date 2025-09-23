@@ -1,3 +1,4 @@
+// CoachAccountDetails.jsx (Dummy with Static Commission + Validations)
 import {
   Text,
   View,
@@ -13,35 +14,55 @@ import styles from "./coachAccountDetailsCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState } from "react";
-import RBSheet from "react-native-raw-bottom-sheet";
+import { useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker"; // ✅ Date picker
 
-// ✅ Expo vector icons
+// ✅ Icons
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CoachAccountDetails({ navigation }) {
-  // ✅ Dummy percentages
-  const [coach_share, setCoachShare] = useState(80);
-  const [cue_share, setCue_share] = useState(20);
-  const coach_share_ref = useRef(null);
-  const cue_share_ref = useRef(null);
-  const all_percent = Array.from({ length: 100 }, (_, i) => i + 1);
+  // 🔹 Dummy Data Object
+  const dummyData = {
+    coach_share: 80,
+    cue_share: 20,
+    card_holder_name: "John Doe",
+    card_number: "1234 5678 9876 5432",
+    expiry_date: new Date(2025, 11, 31), // Dec 2025
+    cvv: "123",
+  };
 
-  // ✅ Dummy card details
-  const [chn, setChn] = useState("John Doe");
-  const [chnumber, setChnumber] = useState("1234 5678 9876 5432");
-  const [ed, setEd] = useState("12-25");
-  const [cvv, setCvv] = useState("123");
+  // 🔹 Local State
+  const [coach_share] = useState(dummyData.coach_share);
+  const [cue_share] = useState(dummyData.cue_share);
+  const [chn, setChn] = useState(dummyData.card_holder_name);
+  const [chnumber, setChnumber] = useState(dummyData.card_number);
+  const [ed, setEd] = useState(dummyData.expiry_date);
+  const [cvv, setCvv] = useState(dummyData.cvv);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Format card number with space every 4 digits
+  const handleCardNumber = (text) => {
+    const cleaned = text.replace(/\D+/g, ""); // only digits
+    const limited = cleaned.slice(0, 16); // max 16
+    const formatted = limited.replace(/(.{4})/g, "$1 ").trim();
+    setChnumber(formatted);
+  };
+
+  // Limit CVV to 3 digits
+  const handleCvv = (text) => {
+    const cleaned = text.replace(/\D+/g, "").slice(0, 3);
+    setCvv(cleaned);
+  };
 
   const send_data = () => {
-    // ✅ Just navigate with dummy data
     navigation.navigate("Coach-Add-Agreement", {
-      coach_share: coach_share,
-      cue_share: cue_share,
+      coach_share,
+      cue_share,
       card_holder_name: chn,
       card_number: chnumber,
       expiry_date: ed,
-      cvv: cvv,
+      cvv,
     });
   };
 
@@ -104,7 +125,7 @@ export default function CoachAccountDetails({ navigation }) {
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <ScrollView style={styles.main_scroll_view}>
-          {/* Commission Section */}
+          {/* Commission Section (Static) */}
           <LinearGradient
             style={styles.percent_section}
             colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
@@ -114,28 +135,18 @@ export default function CoachAccountDetails({ navigation }) {
                 <Text style={styles.ps_text}>Agreed Commission Structure</Text>
               </View>
               <View style={styles.ps_ips}>
-                {/* Coach Share */}
                 <View style={styles.ps_ips_indi_section}>
                   <Text style={styles.ps_member}>Coach</Text>
-                  <TouchableOpacity
-                    style={styles.percent_ps}
-                    onPress={() => coach_share_ref.current.open()}
-                  >
+                  <View style={styles.percent_ps}>
                     <Text style={styles.percent_text}>{coach_share}%</Text>
-                    <Ionicons name="chevron-down" size={16} color="#fff" />
-                  </TouchableOpacity>
+                  </View>
                 </View>
 
-                {/* Cue Share */}
                 <View style={styles.ps_ips_indi_section}>
                   <Text style={styles.ps_member}>Cue</Text>
-                  <TouchableOpacity
-                    style={styles.percent_ps}
-                    onPress={() => cue_share_ref.current.open()}
-                  >
+                  <View style={styles.percent_ps}>
                     <Text style={styles.percent_text}>{cue_share}%</Text>
-                    <Ionicons name="chevron-down" size={16} color="#fff" />
-                  </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
@@ -174,20 +185,38 @@ export default function CoachAccountDetails({ navigation }) {
                     placeholder="Card Number : 1234 5678 9876 5432"
                     placeholderTextColor={"#ffffff60"}
                     style={styles.banking_info_input}
+                    keyboardType="numeric"
                     value={chnumber}
-                    onChangeText={setChnumber}
+                    onChangeText={handleCardNumber}
                   />
                 </View>
 
                 {/* Expiry Date */}
                 <View style={styles.bd_details_text_view}>
-                  <TextInput
-                    placeholder="Expiry Date : 12-25"
-                    placeholderTextColor={"#ffffff60"}
-                    style={styles.banking_info_input}
-                    value={ed}
-                    onChangeText={setEd}
-                  />
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    style={{ width: "100%" }}
+                  >
+                    <Text style={styles.banking_info_input}>
+                      {ed
+                        ? `${ed.getMonth() + 1}-${ed
+                            .getFullYear()
+                            .toString()
+                            .slice(-2)}`
+                        : "Select Expiry Date"}
+                    </Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={ed || new Date()}
+                      mode="date"
+                      display="default"
+                      onChange={(event, selectedDate) => {
+                        setShowDatePicker(false);
+                        if (selectedDate) setEd(selectedDate);
+                      }}
+                    />
+                  )}
                 </View>
 
                 {/* CVV */}
@@ -196,8 +225,10 @@ export default function CoachAccountDetails({ navigation }) {
                     placeholder="CVV : 123"
                     placeholderTextColor={"#ffffff60"}
                     style={styles.banking_info_input}
+                    keyboardType="numeric"
                     value={cvv}
-                    onChangeText={setCvv}
+                    onChangeText={handleCvv}
+                    maxLength={3}
                   />
                 </View>
               </View>
@@ -207,10 +238,7 @@ export default function CoachAccountDetails({ navigation }) {
           {/* Next Button */}
           <TouchableOpacity
             style={styles.input_whole_section_btn}
-            // onPress={send_data}
-            onPress={() => {
-              navigation.navigate("CoachAgreementDetails");
-            }}
+            onPress={send_data}
           >
             <LinearGradient
               colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
@@ -221,91 +249,6 @@ export default function CoachAccountDetails({ navigation }) {
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* Bottom Sheets with Dummy Values */}
-      <RBSheet ref={coach_share_ref} height={250}>
-        <ScrollView>
-          <LinearGradient
-            style={styles.bs_whole_view}
-            colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
-          >
-            {all_percent.map((item) => (
-              <TouchableOpacity
-                key={item}
-                style={styles.option_indi_whole}
-                onPress={() => {
-                  setCoachShare(item);
-                  setCue_share(100 - item);
-                  coach_share_ref.current.close();
-                }}
-              >
-                <LinearGradient
-                  style={styles.option_indi}
-                  colors={[
-                    "rgba(255, 255, 255, 0.1)",
-                    "rgba(30, 53, 126, 0.1)",
-                  ]}
-                >
-                  <View style={styles.oi_dot_section}>
-                    <View
-                      style={
-                        coach_share === item
-                          ? styles.oi_dot_active
-                          : styles.oi_dot
-                      }
-                    />
-                  </View>
-                  <View style={styles.oi_text_section}>
-                    <Text style={styles.oi_text}>{item}%</Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </LinearGradient>
-        </ScrollView>
-      </RBSheet>
-
-      <RBSheet ref={cue_share_ref} height={250}>
-        <ScrollView>
-          <LinearGradient
-            style={styles.bs_whole_view}
-            colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
-          >
-            {all_percent.map((item) => (
-              <TouchableOpacity
-                key={item}
-                style={styles.option_indi_whole}
-                onPress={() => {
-                  setCue_share(item);
-                  setCoachShare(100 - item);
-                  cue_share_ref.current.close();
-                }}
-              >
-                <LinearGradient
-                  style={styles.option_indi}
-                  colors={[
-                    "rgba(255, 255, 255, 0.1)",
-                    "rgba(30, 53, 126, 0.1)",
-                  ]}
-                >
-                  <View style={styles.oi_dot_section}>
-                    <View
-                      style={
-                        cue_share === item
-                          ? styles.oi_dot_active
-                          : styles.oi_dot
-                      }
-                    />
-                  </View>
-                  <View style={styles.oi_text_section}>
-                    <Text style={styles.oi_text}>{item}%</Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </LinearGradient>
-        </ScrollView>
-      </RBSheet>
     </SafeAreaView>
   );
 }

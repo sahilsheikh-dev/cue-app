@@ -1,3 +1,4 @@
+// ContactNumber.jsx (Demo with Dummy Data Object + Working State)
 import {
   Text,
   View,
@@ -14,59 +15,65 @@ import styles from "./contactNumberCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-
-// ✅ import Ionicons from expo vector icons
 import { Ionicons } from "@expo/vector-icons";
 
 export default function ContactNumber({ navigation }) {
   const role_ref = useRef();
 
-  // ✅ Hardcoded dummy country data
-  const all_countries = [
-    {
-      _id: "in",
-      name: "India",
-      code: "+91",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/in.svg",
-    },
-    {
-      _id: "us",
-      name: "United States",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/us.svg",
-    },
-    {
-      _id: "gb",
-      name: "United Kingdom",
-      code: "+44",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/gb.svg",
-    },
-    {
-      _id: "ca",
-      name: "Canada",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/ca.svg",
-    },
-    {
-      _id: "au",
-      name: "Australia",
-      code: "+61",
-      number_of_digit: "9",
-      img: "https://flagcdn.com/au.svg",
-    },
-  ];
+  // ✅ Dummy Data Object
+  const dummyData = {
+    title: "Verify Your Phone Number",
+    description:
+      "We will send you a One Time Password (OTP) on this mobile number",
+    loading: false,
+    send_otp_loading: false,
+    all_countries: [
+      {
+        _id: "in",
+        name: "India",
+        code: "+91",
+        number_of_digit: "10",
+        img: "https://flagcdn.com/w20/in.png", // ✅ use PNG not SVG for RN
+      },
+      {
+        _id: "us",
+        name: "United States",
+        code: "+1",
+        number_of_digit: "10",
+        img: "https://flagcdn.com/w20/us.png",
+      },
+      {
+        _id: "gb",
+        name: "United Kingdom",
+        code: "+44",
+        number_of_digit: "10",
+        img: "https://flagcdn.com/w20/gb.png",
+      },
+      {
+        _id: "ca",
+        name: "Canada",
+        code: "+1",
+        number_of_digit: "10",
+        img: "https://flagcdn.com/w20/ca.png",
+      },
+      {
+        _id: "au",
+        name: "Australia",
+        code: "+61",
+        number_of_digit: "9",
+        img: "https://flagcdn.com/w20/au.png",
+      },
+    ],
+  };
 
-  // ✅ Hardcoded selected country & phone number
-  const selected_country = all_countries[0]; // India
-  const mobileNumber = "9876543210"; // Dummy number
-  const loading = false;
-  const send_otp_loading = false;
+  // ✅ Local state for dummy interactivity
+  const [mobileNumber, setMobileNumber] = useState("9876543210");
+  const [selectedCountry, setSelectedCountry] = useState(
+    dummyData.all_countries[0]
+  );
+  const [sendOtpLoading, setSendOtpLoading] = useState(false);
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -75,18 +82,20 @@ export default function ContactNumber({ navigation }) {
       <LinearGradient
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
         style={styles.backgroundView}
-      ></LinearGradient>
-      {loading ? (
+      />
+
+      {dummyData.loading ? (
         <ActivityIndicator color={"#ffffff"} size={20} />
       ) : (
         <>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           >
             <ScrollView style={styles.main_scroll_view}>
               <View style={styles.top_portion1}></View>
+
+              {/* header */}
               <View style={styles.back_section}>
                 <View style={styles.bs_1}></View>
                 <View style={styles.bs_2}>
@@ -94,16 +103,18 @@ export default function ContactNumber({ navigation }) {
                 </View>
                 <View style={styles.bs_3}></View>
               </View>
+
               <View style={styles.top_portion}></View>
+
+              {/* title + description */}
               <View style={styles.welcome_view}>
-                <Text style={styles.welcome_text}>
-                  Verify Your Phone Number
-                </Text>
+                <Text style={styles.welcome_text}>{dummyData.title}</Text>
                 <Text style={styles.welcome_text_des}>
-                  We will send you a One Time Password (OTP) on this mobile
-                  number
+                  {dummyData.description}
                 </Text>
               </View>
+
+              {/* phone input */}
               <View style={styles.input_whole_section}>
                 <LinearGradient
                   colors={[
@@ -121,16 +132,13 @@ export default function ContactNumber({ navigation }) {
                     <View style={styles.svg_view}>
                       <Image
                         style={styles.flag}
-                        source={{ uri: selected_country.img }}
+                        source={{ uri: selectedCountry.img }}
                       />
                     </View>
                     <View style={styles.cc_view}>
-                      <Text style={styles.cc_text}>
-                        {selected_country.code}
-                      </Text>
+                      <Text style={styles.cc_text}>{selectedCountry.code}</Text>
                     </View>
                     <View style={styles.drop_down_section}>
-                      {/* ✅ Replaced SVG with Ionicons */}
                       <Ionicons
                         name="chevron-down"
                         size={20}
@@ -139,6 +147,7 @@ export default function ContactNumber({ navigation }) {
                       />
                     </View>
                   </TouchableOpacity>
+
                   <View style={styles.input_section}>
                     <TextInput
                       style={styles.input}
@@ -146,17 +155,17 @@ export default function ContactNumber({ navigation }) {
                       placeholderTextColor={"#ffffff90"}
                       keyboardType="phone-pad"
                       value={mobileNumber}
-                      editable={false} // hardcoded dummy
+                      onChangeText={setMobileNumber} // ✅ editable
                     />
                   </View>
                 </LinearGradient>
               </View>
             </ScrollView>
+
+            {/* Continue Button */}
             <TouchableOpacity
               style={styles.input_whole_section_btn}
-              onPress={() => {
-                navigation.navigate("OtpVerification");
-              }}
+              onPress={() => navigation.navigate("OtpVerification")}
             >
               <LinearGradient
                 colors={
@@ -166,7 +175,7 @@ export default function ContactNumber({ navigation }) {
                 }
                 style={styles.input_inner_section_btn}
               >
-                {send_otp_loading ? (
+                {sendOtpLoading ? (
                   <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
                 ) : (
                   <Text
@@ -182,79 +191,50 @@ export default function ContactNumber({ navigation }) {
               </LinearGradient>
             </TouchableOpacity>
           </KeyboardAvoidingView>
-          <RBSheet
-            ref={role_ref}
-            height={240}
-            useNativeDriver={false}
-            openDuration={500}
-            closeDuration={500}
-            draggable={true}
-            borderRadius={10}
-            customStyles={{
-              wrapper: {
-                backgroundColor: "transparent",
-              },
-              container: {
-                backgroundColor: "rgb(40, 57, 109)",
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-              },
-              draggableIcon: {
-                backgroundColor: "white",
-              },
-              borderRadius: 10,
-            }}
-            customModalProps={{
-              animationType: "slide",
-              statusBarTranslucent: true,
-            }}
-            customAvoidingViewProps={{
-              enabled: false,
-            }}
-          >
+
+          {/* BottomSheet for countries */}
+          <RBSheet ref={role_ref} height={300}>
             <LinearGradient
               style={styles.bs_whole_view}
               colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
             >
               <ScrollView style={styles.country_scroll}>
-                {all_countries.map((item) => {
-                  return (
-                    <TouchableOpacity
-                      key={item._id}
-                      style={styles.option_indi_whole}
-                      onPress={() => {
-                        role_ref.current.close();
-                      }}
+                {dummyData.all_countries.map((item) => (
+                  <TouchableOpacity
+                    key={item._id}
+                    style={styles.option_indi_whole}
+                    onPress={() => {
+                      setSelectedCountry(item); // ✅ updates selection
+                      role_ref.current.close();
+                    }}
+                  >
+                    <LinearGradient
+                      style={styles.option_indi}
+                      colors={[
+                        "rgba(255, 255, 255, 0.1)",
+                        "rgba(30, 53, 126, 0.1)",
+                      ]}
                     >
-                      <LinearGradient
-                        style={styles.option_indi}
-                        colors={[
-                          "rgba(255, 255, 255, 0.1)",
-                          "rgba(30, 53, 126, 0.1)",
-                        ]}
-                      >
-                        <View style={styles.oi_dot_section}>
-                          <View
-                            style={
-                              selected_country._id === item._id
-                                ? styles.oi_dot_active
-                                : styles.oi_dot
-                            }
-                          ></View>
-                        </View>
-                        <View style={styles.oi_text_section_flag}>
-                          <Image
-                            style={styles.flag}
-                            source={{ uri: item.img }}
-                          />
-                        </View>
-                        <View style={styles.oi_text_section}>
-                          <Text style={styles.oi_text}>{item.code}</Text>
-                        </View>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  );
-                })}
+                      <View style={styles.oi_dot_section}>
+                        <View
+                          style={
+                            selectedCountry._id === item._id
+                              ? styles.oi_dot_active
+                              : styles.oi_dot
+                          }
+                        />
+                      </View>
+                      <View style={styles.oi_text_section_flag}>
+                        <Image style={styles.flag} source={{ uri: item.img }} />
+                      </View>
+                      <View style={styles.oi_text_section}>
+                        <Text style={styles.oi_text}>
+                          {item.code} - {item.name}
+                        </Text>
+                      </View>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                ))}
                 <View style={styles.last_empty_space_rb}></View>
               </ScrollView>
             </LinearGradient>

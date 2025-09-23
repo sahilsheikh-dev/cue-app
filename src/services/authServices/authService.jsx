@@ -4,9 +4,9 @@
  * - All functions return booleans or normalized values and never throw
  */
 
-import put from '../../secureStore/put';
-import get from '../../secureStore/get';
-import remove from '../../secureStore/remove';
+import put from "../../secureStore/put";
+import get from "../../secureStore/get";
+import remove from "../../secureStore/remove";
 
 /**
  * Save auth token and role to secure storage
@@ -16,13 +16,10 @@ import remove from '../../secureStore/remove';
  */
 export async function saveAuthTokenAndRole(authToken, role) {
   try {
-    await Promise.all([
-      put('auth', authToken || ''),
-      put('role', role || ''),
-    ]);
+    await Promise.all([put("auth", authToken || ""), put("role", role || "")]);
     return true;
   } catch (err) {
-    console.error('authService.saveAuthTokenAndRole error:', err);
+    console.error("authService.saveAuthTokenAndRole error:", err);
     return false;
   }
 }
@@ -34,18 +31,18 @@ export async function saveAuthTokenAndRole(authToken, role) {
 export async function initializeAuth() {
   try {
     const [authTokenRaw, roleRaw, dfRaw] = await Promise.all([
-      get('auth'),
-      get('role'),
-      get('data_filled'),
+      get("auth"),
+      get("role"),
+      get("data_filled"),
     ]);
 
     return {
       authToken: authTokenRaw || null,
       role: roleRaw || null,
-      data_filled: dfRaw === 'true',
+      data_filled: dfRaw === "true",
     };
   } catch (err) {
-    console.error('authService.initializeAuth error:', err);
+    console.error("authService.initializeAuth error:", err);
     return { authToken: null, role: null, data_filled: false };
   }
 }
@@ -56,10 +53,10 @@ export async function initializeAuth() {
  */
 export async function checkedToday() {
   try {
-    await put('checked', new Date().toISOString());
+    await put("checked", new Date().toISOString());
     return true;
   } catch (err) {
-    console.error('authService.checkedToday error:', err);
+    console.error("authService.checkedToday error:", err);
     return false;
   }
 }
@@ -70,10 +67,10 @@ export async function checkedToday() {
  */
 export async function markDataFilled() {
   try {
-    await put('data_filled', 'true');
+    await put("data_filled", "true");
     return true;
   } catch (err) {
-    console.error('authService.markDataFilled error:', err);
+    console.error("authService.markDataFilled error:", err);
     return false;
   }
 }
@@ -84,14 +81,10 @@ export async function markDataFilled() {
  */
 export async function logout() {
   try {
-    await Promise.all([
-      remove('auth'),
-      remove('role'),
-      remove('data_filled'),
-    ]);
+    await Promise.all([remove("auth"), remove("role"), remove("data_filled")]);
     return true;
   } catch (err) {
-    console.error('authService.logout error:', err);
+    console.error("authService.logout error:", err);
     return false;
   }
 }

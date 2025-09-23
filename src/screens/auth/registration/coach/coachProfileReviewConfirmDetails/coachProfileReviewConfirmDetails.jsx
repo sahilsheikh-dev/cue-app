@@ -1,3 +1,4 @@
+// CoachProfileReviewConfirmDetails.jsx (Demo with Dummy Data Object)
 import {
   Text,
   View,
@@ -20,26 +21,20 @@ import { Ionicons } from "@expo/vector-icons";
 export default function CoachProfileReviewConfirmDetails({ navigation }) {
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Dummy hardcoded data for demo
-  const email = "demo@email.com";
-  const dob = "14-08-1999";
-  const gender = "Male";
-  const pin_code = "110001";
-  const country = { country: "India" };
-  const city = "New Delhi";
-  const address = "123 Demo Street, Demo Nagar";
-  const experience = { year: 3, months: 6 };
-  const category = [{ title: "Fitness" }, { title: "Yoga" }];
-  const languages = [{ name: "English" }, { name: "Hindi" }];
-  const client_gender = ["Male", "Female"];
-
-  const send_data = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert("Success", "Profile submitted (demo)");
-      navigation.navigate("Coach-verification");
-    }, 1500);
+  // 🔹 Dummy Data Object
+  const dummyData = {
+    email: "demo@email.com",
+    dob: "14-08-1999",
+    gender: "Male",
+    pin_code: "110001",
+    country: { country: "India" },
+    city: "New Delhi",
+    address: "123 Demo Street, Demo Nagar",
+    experience: { year: 3, months: 6 },
+    category: [{ title: "Fitness" }, { title: "Yoga" }],
+    languages: [{ name: "English" }, { name: "Hindi" }],
+    client_gender: ["Male", "Female"],
+    nextScreen: "CoachCreateServiceDetails", // demo next step
   };
 
   return (
@@ -50,7 +45,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
         style={styles.backgroundView}
       />
-      <View style={styles.top_portion1}></View>
+      <View style={styles.top_portion1} />
 
       {/* Header */}
       <View style={styles.back_section}>
@@ -72,7 +67,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
         <View style={styles.bs_2}>
           <Text style={styles.byp_text}>Review and Confirm</Text>
         </View>
-        <View style={styles.bs_3}></View>
+        <View style={styles.bs_3} />
       </View>
 
       {/* Content */}
@@ -89,31 +84,33 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
 
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Email ID : </Text>
-              <Text style={styles.bd_details_text}>{email}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.email}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Dob : </Text>
-              <Text style={styles.bd_details_text}>{dob}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.dob}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Gender : </Text>
-              <Text style={styles.bd_details_text}>{gender}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.gender}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Pin code : </Text>
-              <Text style={styles.bd_details_text}>{pin_code}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.pin_code}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Country : </Text>
-              <Text style={styles.bd_details_text}>{country.country}</Text>
+              <Text style={styles.bd_details_text}>
+                {dummyData.country.country}
+              </Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>City : </Text>
-              <Text style={styles.bd_details_text}>{city}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.city}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Address : </Text>
-              <Text style={styles.bd_details_text}>{address}</Text>
+              <Text style={styles.bd_details_text}>{dummyData.address}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -127,7 +124,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh_fc}>
               <Text style={styles.bd_details_text_label}>Category : </Text>
               <Text style={styles.bd_details_text_fc}>
-                {category.map((item, index) =>
+                {dummyData.category.map((item, index) =>
                   index === 0 ? item.title : `, ${item.title}`
                 )}
               </Text>
@@ -144,7 +141,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Languages : </Text>
               <Text style={styles.bd_details_text_fc}>
-                {languages.map((item, index) =>
+                {dummyData.languages.map((item, index) =>
                   index === 0 ? item.name : `, ${item.name}`
                 )}
               </Text>
@@ -161,7 +158,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Client Gender : </Text>
               <Text style={styles.bd_details_text}>
-                {client_gender.map((item, index) =>
+                {dummyData.client_gender.map((item, index) =>
                   index === 0 ? item : `, ${item}`
                 )}
               </Text>
@@ -178,9 +175,10 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Experience : </Text>
               <Text style={styles.bd_details_text}>
-                {experience.year} {experience.year === 1 ? "year" : "years"} -{" "}
-                {experience.months}{" "}
-                {experience.months === 1 ? "month" : "months"}
+                {dummyData.experience.year}{" "}
+                {dummyData.experience.year === 1 ? "year" : "years"} -{" "}
+                {dummyData.experience.months}{" "}
+                {dummyData.experience.months === 1 ? "month" : "months"}
               </Text>
             </View>
           </View>
@@ -191,7 +189,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
           style={styles.input_whole_section_btn}
           // onPress={send_data}
           onPress={() => {
-            navigation.navigate("CoachCreateServiceDetails");
+            navigation.navigate(dummyData.nextScreen);
           }}
         >
           <LinearGradient

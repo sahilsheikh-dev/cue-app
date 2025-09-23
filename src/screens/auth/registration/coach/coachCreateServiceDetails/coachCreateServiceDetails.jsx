@@ -1,3 +1,4 @@
+// CoachCreateServiceDetails.jsx (Demo with Dummy Data Object)
 import {
   Text,
   View,
@@ -14,11 +15,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, Feather, AntDesign } from "@expo/vector-icons";
 
 export default function CoachCreateServiceDetails({ navigation }) {
-  // 🔹 Dummy hardcoded data
-  const name = "John Doe";
-  const category = [{ title: "Fitness" }, { title: "Yoga" }];
-  const ex_year = 5;
-  const ex_months = 8;
+  // 🔹 Dummy Data Object
+  const dummyData = {
+    name: "John Doe",
+    category: [{ title: "Fitness" }, { title: "Yoga" }],
+    experience: { years: 5, months: 8 },
+    nextScreen: "CoachYourStoryDetails",
+  };
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -29,7 +32,7 @@ export default function CoachCreateServiceDetails({ navigation }) {
         style={styles.backgroundView}
       />
 
-      <View style={styles.top_portion1}></View>
+      <View style={styles.top_portion1} />
 
       {/* Header */}
       <View style={styles.back_section}>
@@ -44,7 +47,7 @@ export default function CoachCreateServiceDetails({ navigation }) {
               colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
             >
               <View style={styles.bs_1_circle_circle}>
-                <Feather name="more-horizontal" size={20} color="#fff" />
+                <Ionicons name="chevron-back" size={20} color="#fff" />
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -57,22 +60,8 @@ export default function CoachCreateServiceDetails({ navigation }) {
           </Text>
         </View>
 
-        {/* Left-side back button (optional) */}
-        <View style={styles.bs_1}>
-          {/* <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity> */}
-        </View>
+        {/* Left-side back button (optional, kept hidden for demo) */}
+        <View style={styles.bs_1}></View>
       </View>
 
       {/* Main content */}
@@ -82,27 +71,28 @@ export default function CoachCreateServiceDetails({ navigation }) {
           style={styles.subs_section}
         >
           <View style={styles.subs_inner}>
-            <Text style={styles.cue_text}>{name}</Text>
+            {/* Name */}
+            <Text style={styles.cue_text}>{dummyData.name}</Text>
 
+            {/* Category + Experience */}
             <View style={styles.cle_section}>
               <Text style={styles.cle_text}>
                 Category :{"  "}
-                {category.map((item, index) =>
+                {dummyData.category.map((item, index) =>
                   index === 0 ? item.title : `, ${item.title}`
                 )}
               </Text>
 
               <Text style={styles.cle_text}>
-                Experience : {ex_year} years {ex_months} months
+                Experience : {dummyData.experience.years} years{" "}
+                {dummyData.experience.months} months
               </Text>
             </View>
 
             {/* Create Schedule button */}
             <TouchableOpacity
               style={styles.main_pc_section}
-              onPress={() => {
-                navigation.navigate("CoachYourStoryDetails");
-              }}
+              onPress={() => navigation.navigate(dummyData.nextScreen)}
             >
               <View style={styles.mpc_circle}>
                 <AntDesign name="plus" size={14} color="#fff" />

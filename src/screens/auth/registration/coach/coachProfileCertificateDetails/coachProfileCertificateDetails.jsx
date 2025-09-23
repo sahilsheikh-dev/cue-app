@@ -1,3 +1,4 @@
+// CoachProfileCertificateDetails.jsx (Dummy with Gallery/Camera Image Picking, Max 5)
 import {
   Text,
   View,
@@ -21,7 +22,14 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CoachProfileCertificateDetails({ navigation }) {
-  const [img1, setImg] = useState("");
+  // ✅ Dummy Data Object
+  const dummyData = {
+    headerTitle: "Add Certificates",
+    nextScreen: "CoachProfileReviewConfirmDetails",
+    uploadText: "Upload a certificate",
+    uploadSubText: "It could be a course, or an award",
+  };
+
   const [all_certificates, setAll_certificates] = useState([]);
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -36,17 +44,32 @@ export default function CoachProfileCertificateDetails({ navigation }) {
     }
   }, []);
 
-  // ✅ Dummy Image Picker
-  const pickImage1 = async () => {
+  // ✅ Pick image from gallery
+  const pickImage = async () => {
+    if (all_certificates.length >= 5) {
+      Alert.alert("Limit Reached", "You can only upload up to 5 certificates.");
+      return;
+    }
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
+      quality: 1,
     });
-
     if (!result.canceled) {
-      let ac = all_certificates;
-      ac.push(result.assets[0].uri);
-      setAll_certificates([...ac]);
+      let newImage = result.assets[0].uri;
+      setAll_certificates([...all_certificates, newImage]);
+    }
+  };
+
+  // ✅ Capture photo from camera
+  const capturePhoto = async () => {
+    if (all_certificates.length >= 5) {
+      Alert.alert("Limit Reached", "You can only upload up to 5 certificates.");
+      return;
+    }
+    if (camera_ref.current) {
+      let photo = await camera_ref.current.takePictureAsync({ quality: 1 });
+      setAll_certificates([...all_certificates, photo.uri]);
+      setCameraOpen(false);
     }
   };
 
@@ -56,7 +79,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
     setTimeout(() => {
       setLoading(false);
       Alert.alert("Success", "Certificates saved (dummy)!");
-      navigation.navigate("Coach-review-confirm"); // dummy next screen
+      navigation.navigate(dummyData.nextScreen);
     }, 1500);
   };
 
@@ -96,16 +119,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
             </TouchableOpacity>
 
             {/* Capture */}
-            <TouchableOpacity
-              style={styles.co_large}
-              onPress={async () => {
-                const photo = await camera_ref.current.takePictureAsync();
-                let all_certi = all_certificates;
-                all_certi.push(photo.uri);
-                setAll_certificates([...all_certi]);
-                setCameraOpen(false);
-              }}
-            />
+            <TouchableOpacity style={styles.co_large} onPress={capturePhoto} />
 
             {/* Flip Camera */}
             <TouchableOpacity
@@ -124,7 +138,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
             colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
             style={styles.backgroundView}
           />
-          <View style={styles.top_portion1}></View>
+          <View style={styles.top_portion1} />
 
           {/* Header */}
           <View style={styles.back_section}>
@@ -145,10 +159,10 @@ export default function CoachProfileCertificateDetails({ navigation }) {
             </View>
             <View style={styles.bs_2}>
               <Text style={styles.bs_2_cue} numberOfLines={1}>
-                Add Certificates
+                {dummyData.headerTitle}
               </Text>
             </View>
-            <View style={styles.bs_3}></View>
+            <View style={styles.bs_3} />
           </View>
 
           {/* Open Camera Button */}
@@ -172,9 +186,9 @@ export default function CoachProfileCertificateDetails({ navigation }) {
                     <TouchableOpacity
                       style={styles.cross_btn}
                       onPress={() => {
-                        let all_certi = all_certificates;
-                        all_certi.splice(index, 1);
-                        setAll_certificates([...all_certi]);
+                        let updated = [...all_certificates];
+                        updated.splice(index, 1);
+                        setAll_certificates(updated);
                       }}
                     >
                       <Ionicons name="close-circle" size={22} color="#000" />
@@ -187,44 +201,31 @@ export default function CoachProfileCertificateDetails({ navigation }) {
             ))}
 
             {/* Upload Certificate */}
-            <TouchableOpacity onPress={pickImage1}>
-              <LinearGradient
-                style={styles.indi_up}
-                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-              >
-                <View style={styles.indi_up_inner}>
-                  {img1 === "" ? (
-                    <>
-                      <MaterialCommunityIcons
-                        name="file-upload-outline"
-                        size={28}
-                        color="rgba(255, 255, 255, 0.7)"
-                      />
-                      <Text style={styles.upy_text}>Upload a certificate</Text>
-                      <Text style={styles.mpp_text}>
-                        It could be a course, or an award
-                      </Text>
-                    </>
-                  ) : (
-                    <Image source={{ uri: img1 }} style={styles.profile_img} />
-                  )}
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+            {all_certificates.length < 5 && (
+              <TouchableOpacity onPress={pickImage}>
+                <LinearGradient
+                  style={styles.indi_up}
+                  colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+                >
+                  <View style={styles.indi_up_inner}>
+                    <MaterialCommunityIcons
+                      name="file-upload-outline"
+                      size={28}
+                      color="rgba(255, 255, 255, 0.7)"
+                    />
+                    <Text style={styles.upy_text}>{dummyData.uploadText}</Text>
+                    <Text style={styles.mpp_text}>
+                      {dummyData.uploadSubText}
+                    </Text>
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
 
             {/* Save Button */}
             <TouchableOpacity
               style={styles.input_whole_section_btn}
-              // onPress={() => {
-              //   if (all_certificates.length === 0) {
-              //     Alert.alert("Warning", "Please add at least 1 certificate");
-              //   } else {
-              //     save();
-              //   }
-              // }}
-              onPress={() => {
-                navigation.navigate("CoachProfileReviewConfirmDetails");
-              }}
+              onPress={save}
             >
               <LinearGradient
                 colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
@@ -238,7 +239,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
               </LinearGradient>
             </TouchableOpacity>
 
-            <View style={styles.empty_view}></View>
+            <View style={styles.empty_view} />
           </ScrollView>
         </>
       )}

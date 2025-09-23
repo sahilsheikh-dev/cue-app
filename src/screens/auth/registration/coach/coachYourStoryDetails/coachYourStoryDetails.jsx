@@ -1,3 +1,4 @@
+// CoachYourStoryDetails.jsx (Dummy with 500 Char Limit + Counter, Toolbar Removed)
 import {
   Text,
   View,
@@ -16,31 +17,45 @@ import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
-import {
-  actions,
-  RichEditor,
-  RichToolbar,
-} from "react-native-pell-rich-editor";
+import { RichEditor } from "react-native-pell-rich-editor"; // ✅ removed RichToolbar
 
 // ✅ Expo vector icons
 import { Ionicons } from "@expo/vector-icons";
 
+// ✅ Helper to strip HTML tags (for char count)
+const stripHtml = (html) => {
+  return html.replace(/<[^>]*>?/gm, "");
+};
+
 export default function CoachYourStoryDetails({ navigation }) {
-  const [story, setStory] = useState(
-    "<p>I’m a certified fitness coach with 5 years of experience helping clients achieve their health goals.</p>"
-  );
-  const [loading, setLoading] = useState(false);
+  // 🔹 Dummy Data Object
+  const dummyData = {
+    story:
+      "<p>I’m a certified fitness coach with 5 years of experience helping clients achieve their health goals.</p>",
+    loading: false,
+    nextScreen: "CoachVirtualPricingDetails",
+  };
+
+  const [story, setStory] = useState(dummyData.story);
+  const [loading, setLoading] = useState(dummyData.loading);
+  const richText = useRef(null);
+
+  // ✅ Max character limit
+  const maxChars = 500;
+  const plainText = stripHtml(story);
+  const remainingChars = `${plainText.length}/${maxChars}`;
 
   const saveStory = () => {
+    if (plainText.length > maxChars) {
+      alert("Story cannot exceed 500 characters.");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // ✅ Demo navigation (dummy, for testing flow)
-      navigation.navigate("Coach-add-picture");
+      navigation.navigate(dummyData.nextScreen); // controlled by dummyData
     }, 1000);
   };
-
-  const richText = useRef(null);
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -115,22 +130,19 @@ export default function CoachYourStoryDetails({ navigation }) {
                   placeholderColor: "#ffffff70",
                 }}
               />
-              <RichToolbar
-                editor={richText}
-                style={styles.rich_toolbar}
-                iconTint="#FFFFFF"
-                actions={[actions.setBold]}
-              />
             </LinearGradient>
+
+            {/* Character Counter */}
+            <Text style={{ color: "#ffffff70", marginTop: 5, fontSize: 12 }}>
+              {remainingChars}
+            </Text>
 
             <View style={styles.empty_space}></View>
 
             {/* Next Button */}
             <TouchableOpacity
               style={styles.input_whole_section_btn}
-              onPress={() => {
-                navigation.navigate("CoachVirtualPricingDetails");
-              }}
+              onPress={saveStory}
             >
               <LinearGradient
                 colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}

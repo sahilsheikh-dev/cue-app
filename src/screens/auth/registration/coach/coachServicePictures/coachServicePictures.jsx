@@ -1,3 +1,4 @@
+// CoachServicePictures.jsx (Dummy with Real Image/Video Picker, Max 3 Slots)
 import {
   Text,
   View,
@@ -6,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import styles from "./coachServicePicturesCss";
 import { StatusBar } from "expo-status-bar";
@@ -19,46 +21,51 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 
 export default function CoachServicePictures({ navigation }) {
-  const [img1, setImg1] = useState("");
-  const [img2, setImg2] = useState({ type: "", content: "" });
-  const [img3, setImg3] = useState({ type: "", content: "" });
-  const [loading, setLoading] = useState(false);
+  // 🔹 Dummy data object
+  const dummyData = {
+    img1: { type: "", content: "" }, // must be image
+    img2: { type: "", content: "" }, // image or video
+    img3: { type: "", content: "" }, // image or video
+    loading: false,
+    nextScreen: "CoachAccountDetails",
+  };
+
+  // Local state (uses dummyData as initial)
+  const [img1, setImg1] = useState(dummyData.img1);
+  const [img2, setImg2] = useState(dummyData.img2);
+  const [img3, setImg3] = useState(dummyData.img3);
+  const [loading, setLoading] = useState(dummyData.loading);
+
   const video_1_ref = useRef(null);
   const video_2_ref = useRef(null);
-  const [loading1, setLoading1] = useState(false);
-  const [loading2, setLoading2] = useState(false);
 
-  // Dummy pickers just to simulate image/video selection
-  const pickImage1 = async () => {
-    setImg1("https://via.placeholder.com/150");
-  };
+  // ✅ Pick media function
+  const pickMedia = async (slot, typeRequired = null) => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All, // allow both
+      allowsEditing: true,
+      quality: 1,
+      videoMaxDuration: 90, // 90 sec limit
+    });
 
-  const pickImage2 = async () => {
-    setLoading1(true);
-    setTimeout(() => {
-      setImg2({ type: "image", content: "https://via.placeholder.com/200" });
-      setLoading1(false);
-    }, 1000);
-  };
+    if (!result.canceled) {
+      let asset = result.assets[0];
 
-  const pickImage3 = async () => {
-    setLoading2(true);
-    setTimeout(() => {
-      setImg3({
-        type: "video",
-        content: "https://www.w3schools.com/html/mov_bbb.mp4",
-      });
-      setLoading2(false);
-    }, 1000);
-  };
+      // if slot 1, enforce image only
+      if (slot === 1 && asset.type !== "image") {
+        Alert.alert("Invalid Selection", "Profile picture must be an image.");
+        return;
+      }
 
-  const save_images = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert("Demo: Images saved successfully!");
-      navigation.navigate("Coach-agreement"); // still navigates in demo
-    }, 1000);
+      let newData = {
+        type: asset.type, // "image" or "video"
+        content: asset.uri,
+      };
+
+      if (slot === 1) setImg1(newData);
+      if (slot === 2) setImg2(newData);
+      if (slot === 3) setImg3(newData);
+    }
   };
 
   return (
@@ -103,14 +110,14 @@ export default function CoachServicePictures({ navigation }) {
           or interests.
         </Text>
 
-        {/* Profile picture */}
-        <TouchableOpacity onPress={pickImage1}>
+        {/* Profile picture (must be image) */}
+        <TouchableOpacity onPress={() => pickMedia(1, "image")}>
           <LinearGradient
             style={styles.indi_up}
             colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
           >
             <View style={styles.indi_up_inner}>
-              {img1 == "" ? (
+              {img1.content === "" ? (
                 <>
                   <MaterialIcons
                     name="add-a-photo"
@@ -123,148 +130,102 @@ export default function CoachServicePictures({ navigation }) {
                   <Text style={styles.mpp_text}>mandatory profile picture</Text>
                 </>
               ) : (
-                <Image source={{ uri: img1 }} style={styles.profile_img} />
+                <Image
+                  source={{ uri: img1.content }}
+                  style={styles.profile_img}
+                />
               )}
             </View>
           </LinearGradient>
         </TouchableOpacity>
 
         {/* Work picture/video #2 */}
-        {img2.type == "" || img2.type == "image" ? (
-          <TouchableOpacity onPress={pickImage2}>
-            <LinearGradient
-              style={styles.indi_up}
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-            >
-              {loading1 ? (
-                <ActivityIndicator size={20} color={"white"} />
+        <TouchableOpacity onPress={() => pickMedia(2)}>
+          <LinearGradient
+            style={styles.indi_up}
+            colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+          >
+            <View style={styles.indi_up_inner}>
+              {img2.content === "" ? (
+                <>
+                  <MaterialIcons
+                    name="add-photo-alternate"
+                    size={28}
+                    color="rgba(255, 255, 255, 0.5)"
+                  />
+                  <Text style={styles.upy_text}>
+                    Upload a picture or video of your work
+                  </Text>
+                  <Text style={styles.mpp_text}>
+                    permits upto 90 seconds video
+                  </Text>
+                </>
+              ) : img2.type === "image" ? (
+                <Image
+                  source={{ uri: img2.content }}
+                  style={styles.profile_img}
+                />
               ) : (
-                <View style={styles.indi_up_inner}>
-                  {img2.type == "" ? (
-                    <>
-                      <MaterialIcons
-                        name="add-photo-alternate"
-                        size={28}
-                        color="rgba(255, 255, 255, 0.5)"
-                      />
-                      <Text style={styles.upy_text}>
-                        Upload a picture or video of your work
-                      </Text>
-                      <Text style={styles.mpp_text}>
-                        permits upto 90 seconds video
-                      </Text>
-                    </>
-                  ) : img2.type == "image" ? (
-                    <Image
-                      source={{ uri: img2.content }}
-                      style={styles.profile_img}
-                    />
-                  ) : null}
-                </View>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-        ) : img2.type == "video" ? (
-          <View>
-            <LinearGradient
-              style={styles.indi_up}
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-            >
-              <View style={styles.indi_up_inner}>
-                <TouchableOpacity
-                  style={styles.cut_circle}
-                  onPress={() => setImg2({ type: "", content: "" })}
-                >
-                  <Feather name="x" size={20} color="#000" />
-                </TouchableOpacity>
                 <Video
                   source={{ uri: img2.content }}
                   ref={video_1_ref}
-                  rate={1.0}
-                  volume={1.0}
-                  isMuted={true}
                   resizeMode="cover"
                   shouldPlay
                   isLooping
                   style={{ width: "100%", height: "100%" }}
                   useNativeControls
                 />
-              </View>
-            </LinearGradient>
-          </View>
-        ) : null}
+              )}
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
 
         {/* Work picture/video #3 */}
-        {img3.type == "" || img3.type == "image" ? (
-          <TouchableOpacity onPress={pickImage3}>
-            <LinearGradient
-              style={styles.indi_up}
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-            >
-              {loading2 ? (
-                <ActivityIndicator size={20} color={"white"} />
-              ) : (
-                <View style={styles.indi_up_inner}>
-                  {img3.type == "" ? (
-                    <>
-                      <MaterialIcons
-                        name="collections"
-                        size={28}
-                        color="rgba(255, 255, 255, 0.5)"
-                      />
-                      <Text style={styles.upy_text}>
-                        Upload a picture or video of your work
-                      </Text>
-                      <Text style={styles.mpp_text}>
-                        permits upto 90 seconds video
-                      </Text>
-                    </>
-                  ) : img3.type == "image" ? (
-                    <Image
-                      source={{ uri: img3.content }}
-                      style={styles.profile_img}
-                    />
-                  ) : null}
-                </View>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-        ) : img3.type == "video" ? (
-          <View>
-            <LinearGradient
-              style={styles.indi_up}
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-            >
-              <View style={styles.indi_up_inner}>
-                <TouchableOpacity
-                  style={styles.cut_circle}
-                  onPress={() => setImg3({ type: "", content: "" })}
-                >
-                  <Feather name="x" size={20} color="#000" />
-                </TouchableOpacity>
-                <Video
-                  ref={video_2_ref}
+        <TouchableOpacity onPress={() => pickMedia(3)}>
+          <LinearGradient
+            style={styles.indi_up}
+            colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+          >
+            <View style={styles.indi_up_inner}>
+              {img3.content === "" ? (
+                <>
+                  <MaterialIcons
+                    name="collections"
+                    size={28}
+                    color="rgba(255, 255, 255, 0.5)"
+                  />
+                  <Text style={styles.upy_text}>
+                    Upload a picture or video of your work
+                  </Text>
+                  <Text style={styles.mpp_text}>
+                    permits upto 90 seconds video
+                  </Text>
+                </>
+              ) : img3.type === "image" ? (
+                <Image
                   source={{ uri: img3.content }}
-                  rate={1.0}
-                  volume={1.0}
-                  isMuted={true}
+                  style={styles.profile_img}
+                />
+              ) : (
+                <Video
+                  source={{ uri: img3.content }}
+                  ref={video_2_ref}
                   resizeMode="cover"
                   shouldPlay
                   isLooping
                   style={{ width: "100%", height: "100%" }}
                   useNativeControls
                 />
-              </View>
-            </LinearGradient>
-          </View>
-        ) : null}
+              )}
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
 
         {/* Save / Next */}
         <TouchableOpacity
           style={styles.input_whole_section_btn}
-          // onPress={save_images}
           onPress={() => {
-            navigation.navigate("CoachAccountDetails");
+            navigation.navigate(dummyData.nextScreen);
           }}
         >
           <LinearGradient

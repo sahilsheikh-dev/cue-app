@@ -1,24 +1,46 @@
+// AccountVerificationStatus.jsx (Demo with Dummy Object + Dynamic Status)
 import {
   Text,
   View,
   SafeAreaView,
   Image,
   TouchableOpacity,
-  ActivityIndicator, // <<-- important import
 } from "react-native";
 import styles from "./accountVerificationStatusCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-
-// ✅ Import vector icons
-import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useRoute } from "@react-navigation/native"; // ✅ to read params
 
 export default function AccountVerificationStatus({ navigation }) {
-  const [loading, setLoading] = useState(false);
+  const route = useRoute();
+  const { status = "inprogress" } = route.params || {}; // default to "inprogress"
 
-  // helper to reset navigation stack safely
+  // ✅ Dummy object for all statuses
+  const dummyData = {
+    inprogress: {
+      title: "Verification In Progress",
+      description:
+        "Thank you for your application! Once your details have been verified, someone from our team will get in touch with you to finalize the details before we go live.",
+      icon: require("../../../../../../assets/images/verification-icon.png"),
+    },
+    approved: {
+      title: "Verification Approved!",
+      description:
+        "Congratulations! Your details have been verified successfully. You can now access all the features and start your journey with us.",
+      icon: require("../../../../../../assets/images/verification-icon.png"),
+    },
+    failed: {
+      title: "Verification Failed",
+      description:
+        "Unfortunately, your verification could not be completed. Please re-submit your details or contact support for assistance.",
+      icon: require("../../../../../../assets/images/verification-icon.png"),
+    },
+  };
+
+  const currentStatus = dummyData[status] || dummyData.inprogress;
+
+  // ✅ helper to reset navigation stack safely
   const safeResetTo = (routeName, params = {}) => {
     try {
       if (navigation && typeof navigation.reset === "function") {
@@ -27,13 +49,9 @@ export default function AccountVerificationStatus({ navigation }) {
           routes: [{ name: routeName, params }],
         });
       } else if (navigation && typeof navigation.navigate === "function") {
-        // fallback to navigate if reset isn't available
         navigation.navigate(routeName, params);
       } else {
-        console.warn(
-          "Navigation object not available to redirect to:",
-          routeName
-        );
+        console.warn("Navigation object not available for:", routeName);
       }
     } catch (err) {
       console.warn("Navigation reset failed for", routeName, err);
@@ -51,68 +69,21 @@ export default function AccountVerificationStatus({ navigation }) {
 
       <View style={styles.main_scroll_view}>
         <View style={styles.img_section}>
-          <Image
-            source={require("../../../../../../assets/images/verification-icon.png")}
-          />
+          <Image source={currentStatus.icon} />
         </View>
         <Text style={styles.title} numberOfLines={1}>
-          Verification In Progress..
+          {currentStatus.title}
         </Text>
         <Text style={styles.des} numberOfLines={5}>
-          Thank you for your application ! Once your details have been verified,
-          someone from our team will get in touch with you to finalize the
-          details before we go live.
+          {currentStatus.description}
         </Text>
       </View>
 
-      {/* Get started: reset stack and go to CoachIntroduction */}
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={() => {
-          // reset navigation so user can't go back to verification screens
-          safeResetTo("CoachIntroduction");
-        }}
-      >
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
-        >
-          <Text style={styles.login_text}>Get started</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-
-      {/* Next button: go to Login screen (reset stack) */}
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={() => {
-          // optionally show a loading indicator briefly
-          setLoading(true);
-          setTimeout(() => {
-            setLoading(false);
-            safeResetTo("Login");
-          }, 600);
-        }}
-      >
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
-        >
-          {loading ? (
-            <ActivityIndicator color={"rgba(51, 80, 148, 1)"} size={20} />
-          ) : (
-            <Text style={styles.login_text}>Next</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-
-      {/* Hardcoded footer */}
+      {/* Footer - support */}
       <View style={styles.nhcs_section}>
         <TouchableOpacity
           style={styles.nh_cs}
-          onPress={() => {
-            // example support handler — replace with a real screen if you have one
-            safeResetTo("Support"); // or navigation.navigate('Support') if preferred
-          }}
+          onPress={() => safeResetTo("Support")}
         >
           <Text style={styles.need_help}>
             Need Help? <Text style={styles.cs}>Contact Support</Text>

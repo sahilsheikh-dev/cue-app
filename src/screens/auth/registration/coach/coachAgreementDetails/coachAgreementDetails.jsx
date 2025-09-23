@@ -1,3 +1,4 @@
+// CoachAgreementDetails.jsx (Demo with Dynamic Sections)
 import {
   Text,
   View,
@@ -12,7 +13,6 @@ import {
 } from "react-native";
 import styles from "./coachAgreementDetailsCss";
 import { StatusBar } from "expo-status-bar";
-// keep the same asset require you had (ensure the file exists at this path)
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
@@ -21,51 +21,57 @@ import { useState } from "react";
 import { Ionicons, Feather } from "@expo/vector-icons";
 
 export default function CoachAgreementDetails({ navigation }) {
-  // ✅ Dummy state for demo
-  const [loading, setLoading] = useState(false);
-  const [agreement_term, setAgreement_term] = useState([
-    { type: "paragraph", content: "This is a sample paragraph." },
-  ]);
-  const [title, setTitle] = useState("My Agreement Title");
+  // 🔹 Dummy Data Object
+  const dummyData = {
+    title: "My Agreement Title",
+    agreement_term: [
+      { type: "paragraph", content: "This is a sample paragraph." },
+      { type: "bullet", content: "Provide quality coaching." },
+      { type: "title", content: "Coach Commitments" },
+    ],
+  };
 
+  // 🔹 Local states
+  const [loading, setLoading] = useState(false);
+  const [agreement_term, setAgreement_term] = useState(
+    dummyData.agreement_term
+  );
+  const [title, setTitle] = useState(dummyData.title);
+
+  // 🔹 Save handler
   const save_agreement = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // Safely navigate — check existence to avoid web white-screen if route missing
-      try {
-        if (navigation && typeof navigation.navigate === "function") {
-          navigation.navigate("Coach-review-confirm", {
-            // ✅ Dummy hardcoded values for demo
-            category: "Fitness",
-            level: "Intermediate",
-            experience: "5 years",
-            address: "123 Demo Street",
-            city: "Demo City",
-            country: "DemoLand",
-            pin_code: "123456",
-            email: "demo@email.com",
-            dob: "01-01-1990",
-            gender: "Male",
-            coach_share: 70,
-            cue_share: 30,
-            card_holder_name: "John Doe",
-            card_number: "1234 5678 9876 5432",
-            expiry_date: "12-25",
-            cvv: "123",
-            client_gender: "Any",
-            languages: ["English", "Spanish"],
-          });
-        } else {
-          console.warn(
-            "navigation.navigate not available — would have navigated to Coach-review-confirm"
-          );
-        }
-      } catch (err) {
-        // prevent crash on web if the route isn't registered
-        console.warn("Navigation failed:", err);
-      }
-    }, 1500); // fake loading
+      const agreementJSON = {
+        title,
+        terms: agreement_term,
+      };
+      console.log("Saved Agreement JSON:", agreementJSON);
+      navigation.navigate("AccountVerificationStatus", {
+        status: "inprogress",
+        data: agreementJSON,
+      });
+    }, 1500);
+  };
+
+  // 🔹 Add section
+  const addSection = (type) => {
+    setAgreement_term([...agreement_term, { type, content: "" }]);
+  };
+
+  // 🔹 Remove section
+  const removeSection = (index) => {
+    let all = [...agreement_term];
+    all.splice(index, 1);
+    setAgreement_term(all);
+  };
+
+  // 🔹 Update section
+  const updateSection = (index, text) => {
+    let all = [...agreement_term];
+    all[index] = { ...all[index], content: text };
+    setAgreement_term(all);
   };
 
   return (
@@ -83,17 +89,7 @@ export default function CoachAgreementDetails({ navigation }) {
         <View style={styles.bs_1}>
           <TouchableOpacity
             style={styles.bs_1_circle}
-            onPress={() => {
-              try {
-                if (navigation && typeof navigation.goBack === "function") {
-                  navigation.goBack();
-                } else {
-                  console.warn("navigation.goBack not available");
-                }
-              } catch (err) {
-                console.warn("goBack failed:", err);
-              }
-            }}
+            onPress={() => navigation.goBack()}
           >
             <LinearGradient
               style={styles.bs_1_stroke_circle}
@@ -133,129 +129,44 @@ export default function CoachAgreementDetails({ navigation }) {
             </View>
           </LinearGradient>
 
-          {/* Agreement Terms */}
-          {agreement_term.map((item, index) => {
-            if (item.type === "paragraph") {
-              return (
-                <View key={index}>
-                  <Text style={styles.label}>Paragraph</Text>
-                  <LinearGradient
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0)",
-                    ]}
-                    style={styles.main_agreement_section_content}
-                  >
-                    <TouchableOpacity
-                      style={styles.cut_circle}
-                      onPress={() => {
-                        let all = [...agreement_term];
-                        all.splice(index, 1);
-                        setAgreement_term(all);
-                      }}
-                    >
-                      <Feather name="x" size={15} color="#000" />
-                    </TouchableOpacity>
-                    <TextInput
-                      style={styles.mas_input}
-                      placeholder="Paragraph here..."
-                      multiline
-                      placeholderTextColor={"#ffffff90"}
-                      value={item.content}
-                      onChangeText={(text) => {
-                        let all = [...agreement_term];
-                        all[index] = { type: "paragraph", content: text };
-                        setAgreement_term(all);
-                      }}
-                    />
-                  </LinearGradient>
-                </View>
-              );
-            } else if (item.type === "title") {
-              return (
-                <View key={index}>
-                  <Text style={styles.label}>Title</Text>
-                  <LinearGradient
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0)",
-                    ]}
-                    style={styles.main_agreement_section_content_title}
-                  >
-                    <TouchableOpacity
-                      style={styles.cut_circle}
-                      onPress={() => {
-                        let all = [...agreement_term];
-                        all.splice(index, 1);
-                        setAgreement_term(all);
-                      }}
-                    >
-                      <Feather name="x" size={15} color="#000" />
-                    </TouchableOpacity>
-                    <TextInput
-                      style={styles.mas_input_title}
-                      placeholder="Title here..."
-                      multiline
-                      placeholderTextColor={"#ffffff90"}
-                      value={item.content}
-                      onChangeText={(text) => {
-                        let all = [...agreement_term];
-                        all[index] = { type: "title", content: text };
-                        setAgreement_term(all);
-                      }}
-                    />
-                  </LinearGradient>
-                </View>
-              );
-            } else if (item.type === "bullet") {
-              return (
-                <View key={index}>
-                  <Text style={styles.label}>Bullet Points</Text>
-                  <LinearGradient
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0)",
-                    ]}
-                    style={styles.main_agreement_section_content_title}
-                  >
-                    <TouchableOpacity
-                      style={styles.cut_circle}
-                      onPress={() => {
-                        let all = [...agreement_term];
-                        all.splice(index, 1);
-                        setAgreement_term(all);
-                      }}
-                    >
-                      <Feather name="x" size={15} color="#000" />
-                    </TouchableOpacity>
-                    <TextInput
-                      style={styles.mas_input_title}
-                      placeholder="Bullet point here..."
-                      multiline
-                      placeholderTextColor={"#ffffff90"}
-                      value={item.content}
-                      onChangeText={(text) => {
-                        let all = [...agreement_term];
-                        all[index] = { type: "bullet", content: text };
-                        setAgreement_term(all);
-                      }}
-                    />
-                  </LinearGradient>
-                </View>
-              );
-            }
-          })}
+          {/* Agreement Terms Sections */}
+          {agreement_term.map((item, index) => (
+            <View key={index}>
+              <Text style={styles.label}>
+                {item.type === "title"
+                  ? "Title"
+                  : item.type === "paragraph"
+                  ? "Paragraph"
+                  : "Bullet Point"}
+              </Text>
+              <LinearGradient
+                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+                style={styles.main_agreement_section_content}
+              >
+                {/* Remove Button */}
+                <TouchableOpacity
+                  style={styles.cut_circle}
+                  onPress={() => removeSection(index)}
+                >
+                  <Feather name="x" size={15} color="#000" />
+                </TouchableOpacity>
+
+                {/* Editable Input */}
+                <TextInput
+                  style={styles.mas_input}
+                  placeholder={`Enter ${item.type} here...`}
+                  multiline
+                  placeholderTextColor={"#ffffff90"}
+                  value={item.content}
+                  onChangeText={(text) => updateSection(index, text)}
+                />
+              </LinearGradient>
+            </View>
+          ))}
 
           {/* Add Buttons */}
           <View style={styles.add_btn_view}>
-            <TouchableOpacity
-              onPress={() =>
-                setAgreement_term([
-                  ...agreement_term,
-                  { type: "title", content: "" },
-                ])
-              }
-            >
+            <TouchableOpacity onPress={() => addSection("title")}>
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
                 style={styles.add_btn}
@@ -263,14 +174,7 @@ export default function CoachAgreementDetails({ navigation }) {
                 <Text style={styles.add_btn_text}>Add Title</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                setAgreement_term([
-                  ...agreement_term,
-                  { type: "paragraph", content: "" },
-                ])
-              }
-            >
+            <TouchableOpacity onPress={() => addSection("paragraph")}>
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
                 style={styles.add_btn}
@@ -278,25 +182,14 @@ export default function CoachAgreementDetails({ navigation }) {
                 <Text style={styles.add_btn_text}>Add Paragraph</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                setAgreement_term([
-                  ...agreement_term,
-                  { type: "bullet", content: "" },
-                ])
-              }
-            >
+            <TouchableOpacity onPress={() => addSection("bullet")}>
               <LinearGradient
                 colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
                 style={styles.add_btn}
               >
-                <Text style={styles.add_btn_text}>Add Bullet Points</Text>
+                <Text style={styles.add_btn_text}>Add Bullet Point</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
-
-          <View style={styles.main_recommend_section}>
-            {/* ✅ Sample agreement text unchanged */}
           </View>
 
           <View style={styles.empty_space}></View>
@@ -306,13 +199,7 @@ export default function CoachAgreementDetails({ navigation }) {
       {/* Confirm Button */}
       <TouchableOpacity
         style={styles.input_whole_section_btn}
-        onPress={() => {
-          // for demo navigation fallback: try real save first, otherwise safe navigate
-          // save_agreement();
-          () => {
-            navigation.navigate("AccountVerificationStatus");
-          };
-        }}
+        onPress={save_agreement}
       >
         <LinearGradient
           colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
