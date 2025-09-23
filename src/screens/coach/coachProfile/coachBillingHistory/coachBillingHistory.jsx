@@ -11,11 +11,11 @@ import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "./CoachBillingHistoryCss";
 import { Ionicons } from "@expo/vector-icons";
-import "./CoachBillingHistoryCss";
+import "./coachBillingHistoryCss";
 
 const background = require("../../../../../assets/images/background.png");
 
-export default function BillingHistory({ navigation }) {
+export default function CoachBillingHistory({ navigation }) {
   // Dummy Data Object
   const dummyData = {
     bills: [

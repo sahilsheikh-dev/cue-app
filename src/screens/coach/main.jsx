@@ -1,7 +1,7 @@
 import CoachDashboard from "./coachDashboard/coachDashboard";
 import CoachProfile from "./coachProfile/coachProfile";
 import CoachPersonalInformation from "./coachProfile/coachPersonalInformation/coachPersonalInformation";
-import CoachBillingHistory from "./coachProfile/coachBillingHistory/CoachBillingHistory";
+import CoachBillingHistory from "./coachProfile/coachBillingHistory/coachBillingHistory";
 import CoachCommissionStructure from "./coachProfile/coachCommissionStructure/coachCommissionStructure";
 
 export const CoachScreens = (Stack) => [
