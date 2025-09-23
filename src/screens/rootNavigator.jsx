@@ -13,7 +13,7 @@ export default function RootNavigator({ initialRole }) {
 
   // Decide default screen
   let initialRouteName = "Signup"; // 👈 force Signup as entrypoint
-  if (initialRole === "auth") initialRouteName = "Login";
+  if (initialRole === "auth") initialRouteName = "Signup";
   if (initialRole === "client") initialRouteName = "ClientHome";
   if (initialRole === "coach") initialRouteName = "CoachDashboard";
   if (initialRole === "eventOrganizer") initialRouteName = "EventOrganizerDashboard";

@@ -1,4 +1,3 @@
-// CoachDashboard.jsx (Demo with Dummy Data Object)
 import React, { useState } from "react";
 import {
   Text,
@@ -14,33 +13,32 @@ import styles from "./coachDashboardCss";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CoachDashboard({ navigation }) {
-  // ✅ Dummy data object
-  const dummyData = {
-    headerTitle: "Dashboard",
-    options: [
-      {
-        id: "eventOrganizer",
-        title: "Event",
-        icon: "megaphone-outline",
-        screen: "Login",
-      },
-      {
-        id: "productCompany",
-        title: "Product",
-        icon: "cart-outline",
-        screen: "Login",
-      },
-      {
-        id: "profile",
-        title: "Profile",
-        icon: "person-circle-outline",
-        screen: "CoachProfile",
-      },
-    ],
-  };
-
-  // state to allow toggling demo values (kept for interactivity)
-  const [options] = useState(dummyData.options);
+  const options = [
+    {
+      id: "eventOrganizer",
+      title: "Event",
+      icon: "megaphone-outline",
+      screen: "Login",
+    },
+    {
+      id: "productCompany",
+      title: "Product",
+      icon: "cart-outline",
+      screen: "Login",
+    },
+    {
+      id: "chat",
+      title: "Chat",
+      icon: "chatbox-outline",
+      screen: "CoachChat",
+    },
+    {
+      id: "profile",
+      title: "Profile",
+      icon: "person-circle-outline",
+      screen: "CoachProfile",
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -58,25 +56,25 @@ export default function CoachDashboard({ navigation }) {
 
         {/* ✅ Header with Back Button */}
         <View style={styles.back_section}>
-          <View style={styles.bs_1}>
+          <View style={styles.bs_1}></View>
+          <View style={styles.bs_2}>
+            <Text style={styles.bs_2_cue}>Dashboard</Text>
+          </View>
+          <View style={styles.bs_3}>
             <TouchableOpacity
               style={styles.bs_1_circle}
-              onPress={() => navigation.goBack()}
+              onPress={() => alert("Chat/Help clicked")}
             >
               <LinearGradient
                 style={styles.bs_1_stroke_circle}
                 colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
               >
                 <View style={styles.bs_1_circle_circle}>
-                  <Ionicons name="chevron-back" size={20} color="#fff" />
+                  <Ionicons name="chatbox-outline" size={20} color="white" />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
           </View>
-          <View style={styles.bs_2}>
-            <Text style={styles.bs_2_cue}>{dummyData.headerTitle}</Text>
-          </View>
-          <View style={styles.bs_3} />
         </View>
 
         {/* Render options in pairs (2 per row) */}

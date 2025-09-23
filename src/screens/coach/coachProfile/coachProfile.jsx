@@ -6,18 +6,20 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "./coachProfileCss";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import { DataContext } from "../../../context/dataContext";
+import { deleteCoachAccount } from "../../../services/coachServices/coachService";
 
 const background = require("../../../../assets/images/background.png");
 
 export default function CoachProfile({ navigation }) {
-  const optionsData = [
+  const options = [
     {
       id: "personal",
       title: "Personal Information",
@@ -34,11 +36,6 @@ export default function CoachProfile({ navigation }) {
       screen: "CoachCommissionStructure",
     },
     {
-      id: "guideline",
-      title: "Cue Guideline",
-      screen: "CueGuideline",
-    },
-    {
       id: "coachTerms",
       title: "Coach Agreement Terms",
       screen: "CoachAgreementDetails",
@@ -48,16 +45,70 @@ export default function CoachProfile({ navigation }) {
       title: "Cue Terms & Conditions",
       screen: "TermsAndConditions",
     },
+    {
+      id: "guideline",
+      title: "Cue Guideline",
+      screen: "CueGuideline",
+    },
   ];
-
-  // keep options editable in state for interactivity if needed
-  const [options] = useState(optionsData);
 
   // get logout from context
   const { logout, data } = useContext(DataContext);
   const userName = data.user?.name || "Coach"; // fallback if missing
   const userImage =
-    data.user?.image || require("../../../../assets/images/dummy_profile.png");
+    data.user?.profilePicture ||
+    require("../../../../assets/images/dummy_profile.png");
+  const [loading, setLoading] = useState(false);
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes, Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              const coachId = data.user?._id;
+              const token = data.token;
+
+              if (!coachId || !token) {
+                alert("Missing coach ID or token!");
+                setLoading(false);
+                return;
+              }
+
+              const result = await deleteCoachAccount(coachId, token);
+
+              alert(result.message || "Account deleted successfully");
+
+              await logout();
+              navigation.replace("Signup");
+            } catch (err) {
+              alert("Failed to delete account. Please try again.");
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await logout();
+      navigation.replace("Signup");
+    } catch (err) {
+      alert("Failed to log out. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -89,7 +140,21 @@ export default function CoachProfile({ navigation }) {
         <View style={styles.bs_2}>
           <Text style={styles.bs_2_cue}>My Profile</Text>
         </View>
-        <View style={styles.bs_3} />
+        <View style={styles.bs_3}>
+          <TouchableOpacity
+            style={styles.bs_1_circle}
+            onPress={() => alert("Chat/Help clicked")}
+          >
+            <LinearGradient
+              style={styles.bs_1_stroke_circle}
+              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
+            >
+              <View style={styles.bs_1_circle_circle}>
+                <Ionicons name="chatbox-outline" size={20} color="white" />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.sv}>
@@ -127,6 +192,27 @@ export default function CoachProfile({ navigation }) {
           </TouchableOpacity>
         ))}
 
+        {/* Delete Account */}
+        <TouchableOpacity
+          style={styles.indi_options}
+          onPress={handleDeleteAccount}
+        >
+          <View style={styles.io_name_section}>
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                title="Deleting Account"
+                color="#fff"
+              />
+            ) : (
+              <Text style={styles.io_name}>Delete Account</Text>
+            )}
+          </View>
+          <View style={styles.indi_option_svg_section}>
+            {!loading && <MaterialIcons name="delete" size={26} color="#fff" />}
+          </View>
+        </TouchableOpacity>
+
         {/* Logout */}
         <TouchableOpacity
           style={styles.indi_options}
@@ -136,10 +222,20 @@ export default function CoachProfile({ navigation }) {
           }}
         >
           <View style={styles.io_name_section}>
-            <Text style={styles.io_name}>Log Out</Text>
+            {loggingOut ? (
+              <ActivityIndicator
+                size="small"
+                title="Logging Out"
+                color="#fff"
+              />
+            ) : (
+              <Text style={styles.io_name}>Log Out</Text>
+            )}
           </View>
           <View style={styles.indi_option_svg_section}>
-            <Ionicons name="log-out-outline" size={26} color="#fff" />
+            {!loggingOut && (
+              <Ionicons name="log-out-outline" size={26} color="#fff" />
+            )}
           </View>
         </TouchableOpacity>
 

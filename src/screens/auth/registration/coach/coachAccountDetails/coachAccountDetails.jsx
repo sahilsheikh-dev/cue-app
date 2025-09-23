@@ -56,14 +56,7 @@ export default function CoachAccountDetails({ navigation }) {
   };
 
   const send_data = () => {
-    navigation.navigate("Coach-Add-Agreement", {
-      coach_share,
-      cue_share,
-      card_holder_name: chn,
-      card_number: chnumber,
-      expiry_date: ed,
-      cvv,
-    });
+    navigation.navigate("CoachAgreementDetailsAgreement");
   };
 
   return (

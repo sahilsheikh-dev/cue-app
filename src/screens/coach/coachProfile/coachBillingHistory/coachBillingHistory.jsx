@@ -5,7 +5,6 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,35 +15,8 @@ import "./coachBillingHistoryCss";
 const background = require("../../../../../assets/images/background.png");
 
 export default function CoachBillingHistory({ navigation }) {
-  // Dummy Data Object
-  const dummyData = {
-    bills: [
-      {
-        status: "Booked",
-        date: "Nov 16, 2024",
-        service: "Alternative Therapies",
-        client: "John Abraham",
-        sessions: 3,
-        amount: "180 AED",
-      },
-      {
-        status: "Booked",
-        date: "Dec 05, 2024",
-        service: "Physiotherapy",
-        client: "Sarah Wilson",
-        sessions: 5,
-        amount: "300 AED",
-      },
-      {
-        status: "Booked",
-        date: "Jan 02, 2025",
-        service: "Yoga Classes",
-        client: "Michael Chen",
-        sessions: 10,
-        amount: "500 AED",
-      },
-    ],
-  };
+  // Replace dummyData with actual billing history data
+  const billingHistoryData = null; // Or fetch from API later
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -80,11 +52,18 @@ export default function CoachBillingHistory({ navigation }) {
       </View>
 
       {/* Billing List */}
-      <ScrollView style={styles.main_sv}>
-        {dummyData.bills.length === 0 ? (
-          <Text style={styles.nobill}>No bills to show</Text>
+      <ScrollView
+        style={styles.main_sv}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        {!billingHistoryData?.bills || billingHistoryData.bills.length === 0 ? (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text style={styles.nobill}>No Billing History</Text>
+          </View>
         ) : (
-          dummyData.bills.map((bill, index) => (
+          billingHistoryData.bills.map((bill, index) => (
             <LinearGradient
               key={index}
               style={styles.indi_billing}
