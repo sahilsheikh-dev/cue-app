@@ -20,6 +20,10 @@ import { Alert } from "react-native";
 
 import { loginWithApi } from "../../../services/authServices/authService";
 import { DataContext } from "../../../context/dataContext";
+import ButtonLink from "../../../components/common/buttonLink/buttonLink";
+import Dropdown from "../../../components/common/dropdown/dropdown";
+import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
+import InputField from "../../../components/common/inputField/inputField";
 
 const background = require("../../../../assets/images/background.png");
 
@@ -72,9 +76,6 @@ export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [agree_tc, setAgree_tc] = useState(false);
 
-  const role_ref = useRef();
-  const country_ref = useRef();
-
   const handleLogin = async () => {
     // Terms and conditions check
     if (!agree_tc) {
@@ -118,11 +119,7 @@ export default function Login({ navigation }) {
     // If all good → continue
     setLoading(true);
     try {
-      const mobileToSend = `${selected_country.code}${mobileNumber.replace(
-        /^0+/,
-        ""
-      )}`;
-      const res = await loginWithApi(mobileToSend, password, role);
+      const res = await loginWithApi(mobileNumber, password, role);
 
       if (res.ok) {
         await login(res.token, role, res.user);
@@ -138,299 +135,144 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
+    <ScreenLayout>
+      <ScrollView style={styles.main_scroll_view}>
+        <Text style={styles.welcome_text}>Welcome to Cue!</Text>
+        <Text style={styles.pda_text}>Personal Development App</Text>
 
-      <View style={styles.top_portion1}></View>
+        {/* Role Dropdown */}
+        <Dropdown
+          label="Login As"
+          data={["client", "coach", "eventOrganizer", "productCompany"]}
+          selected={role}
+          onSelect={(val) => setRole(val)}
+          renderLabel={(item) =>
+            item === "client"
+              ? "Client"
+              : item === "coach"
+              ? "Coach"
+              : item === "eventOrganizer"
+              ? "Event Organizer"
+              : "Product Company"
+          }
+          dotSelect
+          icon="person-outline"
+          containerStyle={{ width: "85%", alignSelf: "center" }}
+        />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-      >
-        <ScrollView style={styles.main_scroll_view}>
-          <Text style={styles.welcome_text}>Welcome to Cue!</Text>
-          <Text style={styles.pda_text}>Personal Development App</Text>
-
-          {/* Role Dropdown */}
-          <TouchableOpacity
-            onPress={() => role_ref.current.open()}
-            style={styles.input_whole_section}
+        {/* Country + Phone */}
+        <View style={styles.input_whole_section}>
+          <LinearGradient
+            colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+            style={styles.input_inner_section}
           >
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <View style={styles.svg_circle}>
-                <Ionicons name="person-outline" size={20} color="#fff" />
-              </View>
-              <View style={styles.input_section_text}>
-                <Text
-                  style={
-                    role === "" ? styles.input_text : styles.input_text_active
-                  }
-                >
-                  {role === ""
-                    ? "Login As"
-                    : role === "client"
-                    ? "Client"
-                    : role === "coach"
-                    ? "Coach"
-                    : role === "eventOrganizer"
-                    ? "Event Organizer"
-                    : role === "productCompany"
-                    ? "Product Company"
-                    : "ERROR"}
-                </Text>
-              </View>
-              <View style={styles.svg_circle_eye}>
-                <Ionicons name="chevron-down" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
+            <Dropdown
+              label="Country"
+              data={countries}
+              selected={selected_country}
+              onSelect={(item) => {
+                setSelected_country(item);
+                setMobileNumber("");
+              }}
+              withFlag
+              renderLabel={(item) => item.code}
+              containerStyle={{ width: "30%", marginBottom: 0 }}
+            />
 
-          {/* Country + Phone */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity
-                style={styles.svg_circle_}
-                onPress={() => country_ref.current.open()}
-              >
-                <View style={styles.svg_view}>
-                  <Image
-                    style={styles.flag}
-                    source={{ uri: selected_country.img }}
-                  />
-                </View>
-                <View style={styles.cc_view}>
-                  <Text style={styles.cc_text}>{selected_country.code}</Text>
-                </View>
-                <View style={styles.drop_down_section}>
-                  <Ionicons name="chevron-down" size={20} color="#fff" />
-                </View>
-              </TouchableOpacity>
-
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Your phone number"
-                  placeholderTextColor={"#ffffff90"}
-                  keyboardType="phone-pad"
-                  value={mobileNumber}
-                  onChangeText={(text) => {
-                    const limit = parseInt(selected_country.number_of_digit);
-                    if (text.length <= limit) setMobileNumber(text);
-                  }}
-                />
-              </View>
-            </LinearGradient>
-          </View>
-
-          {/* Password */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity style={styles.svg_circle}>
-                <Ionicons name="lock-closed-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={!password_show}
-                  value={password}
-                  onChangeText={setPassword}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.svg_circle_eye}
-                onPress={() => setPassword_show(!password_show)}
-              >
-                <Ionicons
-                  name={password_show ? "eye" : "eye-off"}
-                  size={20}
-                  color="#fff"
-                />
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Agree Section */}
-          <View
-            style={[
-              styles.fp_whole_,
-              {
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              },
-            ]}
-          >
-            <TouchableOpacity style={{ flex: 1 }}>
-              <Text style={styles.fp_text_center}>
-                I agree to the Apps{" "}
-                <Text
-                  style={styles.fp_inner_text}
-                  onPress={() =>
-                    navigation.navigate("TermsAndConditions", { role })
-                  }
-                >
-                  Terms & Conditions
-                </Text>{" "}
-                and{" "}
-                <Text
-                  style={styles.fp_inner_text}
-                  onPress={() => navigation.navigate("PrivacyPolicy")}
-                >
-                  Privacy Policy
-                </Text>
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ paddingLeft: 10 }}
-              onPress={() => setAgree_tc(!agree_tc)}
-            >
-              <MaterialCommunityIcons
-                name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={20}
-                color="#fff"
+            <View style={styles.input_section}>
+              <TextInput
+                style={styles.input}
+                placeholder="Your phone number"
+                placeholderTextColor={"#ffffff90"}
+                keyboardType="phone-pad"
+                value={mobileNumber}
+                onChangeText={(text) => {
+                  const limit = parseInt(selected_country.number_of_digit);
+                  if (text.length <= limit) setMobileNumber(text);
+                }}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </LinearGradient>
+        </View>
 
-          <TouchableOpacity style={styles.fp_text_section}>
-            <Text style={styles.fp_text}>Forgot Password?</Text>
-          </TouchableOpacity>
+        {/* Password */}
+        <InputField
+          placeholder="Enter Password"
+          value={password}
+          onChangeText={setPassword}
+          type="password"
+          icon="lock-closed-outline"
+        />
 
-          {/* Log In button */}
-          <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={handleLogin}
-          >
-            <LinearGradient
-              colors={["rgb(255,255,255)", "rgb(181,195,227)"]}
-              style={styles.input_inner_section_btn}
-            >
-              {loading ? (
-                <ActivityIndicator size={20} color={"#0F1C4E"} />
-              ) : (
-                <Text style={styles.login_text}>Log In</Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.su_text_section}
-            onPress={() => navigation.replace("Signup")}
-          >
-            <Text style={styles.su_text}>
-              Don't have an account ? <Text style={styles.su}>Sign-up</Text>
+        {/* Agree Section */}
+        <View
+          style={[
+            styles.fp_whole_,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            },
+          ]}
+        >
+          <TouchableOpacity style={{ flex: 1 }}>
+            <Text style={styles.fp_text_center}>
+              I agree to the Apps{" "}
+              <Text
+                style={styles.fp_inner_text}
+                onPress={() =>
+                  navigation.navigate("TermsAndConditions", { role })
+                }
+              >
+                Terms & Conditions
+              </Text>{" "}
+              and{" "}
+              <Text
+                style={styles.fp_inner_text}
+                onPress={() => navigation.navigate("PrivacyPolicy")}
+              >
+                Privacy Policy
+              </Text>
             </Text>
           </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          <TouchableOpacity
+            style={{ paddingLeft: 10 }}
+            onPress={() => setAgree_tc(!agree_tc)}
+          >
+            <MaterialCommunityIcons
+              name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
+              size={20}
+              color="#fff"
+            />
+          </TouchableOpacity>
+        </View>
 
-      {/* Country picker sheet */}
-      <RBSheet ref={country_ref} height={300}>
-        <LinearGradient
-          style={styles.bs_whole_view}
-          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
-        >
-          <ScrollView style={styles.country_scroll}>
-            <View style={{ height: 10 }} />
-            {countries.map((item) => (
-              <TouchableOpacity
-                key={item._id}
-                style={styles.option_indi_whole}
-                onPress={() => {
-                  setSelected_country(item);
-                  setMobileNumber("");
-                  country_ref.current.close();
-                }}
-              >
-                <LinearGradient
-                  style={styles.option_indi}
-                  colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-                >
-                  <View style={styles.oi_dot_section}>
-                    <View
-                      style={
-                        selected_country._id === item._id
-                          ? styles.oi_dot_active
-                          : styles.oi_dot
-                      }
-                    />
-                  </View>
-                  <View style={styles.oi_text_section_flag}>
-                    <Image style={styles.flag} source={{ uri: item.img }} />
-                  </View>
-                  <View style={styles.oi_text_section}>
-                    <Text style={styles.oi_text}>
-                      {item.code} - {item.name}
-                    </Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-            <View style={styles.last_empty_space_rb}></View>
-          </ScrollView>
-        </LinearGradient>
-      </RBSheet>
+        <ButtonLink highlightText="Forgot Password?" />
 
-      {/* Role picker sheet */}
-      <RBSheet ref={role_ref} height={320}>
-        <LinearGradient
-          style={styles.bs_whole_view}
-          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
+        {/* Log In button */}
+        <TouchableOpacity
+          style={styles.input_whole_section_btn}
+          onPress={handleLogin}
         >
-          <View style={{ height: 10 }} />
-          {["client", "coach", "eventOrganizer", "productCompany"].map((r) => (
-            <TouchableOpacity
-              key={r}
-              style={styles.option_indi_whole}
-              onPress={() => {
-                setRole(r);
-                role_ref.current.close();
-              }}
-            >
-              <LinearGradient
-                style={styles.option_indi}
-                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              >
-                <View style={styles.oi_dot_section}>
-                  <View
-                    style={role === r ? styles.oi_dot_active : styles.oi_dot}
-                  />
-                </View>
-                <View style={styles.oi_text_section}>
-                  <Text style={styles.oi_text}>
-                    {r === "client"
-                      ? "Client"
-                      : r === "coach"
-                      ? "Coach"
-                      : r === "eventOrganizer"
-                      ? "Event Organizer"
-                      : "Product Company"}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
-        </LinearGradient>
-      </RBSheet>
-    </SafeAreaView>
+          <LinearGradient
+            colors={["rgb(255,255,255)", "rgb(181,195,227)"]}
+            style={styles.input_inner_section_btn}
+          >
+            {loading ? (
+              <ActivityIndicator size={20} color={"#0F1C4E"} />
+            ) : (
+              <Text style={styles.login_text}>Log In</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <ButtonLink
+          text="Don't have an account ?"
+          highlightText="Sign-up"
+          onPress={() => navigation.replace("Signup")}
+          center
+        />
+      </ScrollView>
+    </ScreenLayout>
   );
 }

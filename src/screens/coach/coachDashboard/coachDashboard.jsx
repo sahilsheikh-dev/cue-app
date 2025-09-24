@@ -60,21 +60,7 @@ export default function CoachDashboard({ navigation }) {
           <View style={styles.bs_2}>
             <Text style={styles.bs_2_cue}>Dashboard</Text>
           </View>
-          <View style={styles.bs_3}>
-            <TouchableOpacity
-              style={styles.bs_1_circle}
-              onPress={() => alert("Chat/Help clicked")}
-            >
-              <LinearGradient
-                style={styles.bs_1_stroke_circle}
-                colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-              >
-                <View style={styles.bs_1_circle_circle}>
-                  <Ionicons name="chatbox-outline" size={20} color="white" />
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          <View style={styles.bs_3}></View>
         </View>
 
         {/* Render options in pairs (2 per row) */}

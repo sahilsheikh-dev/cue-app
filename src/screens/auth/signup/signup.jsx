@@ -1,50 +1,31 @@
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  BackHandler,
-} from "react-native";
+import React, { useRef, useState, useCallback } from "react";
+import { Text, View, TouchableOpacity, Alert, BackHandler } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useCallback, useState } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import styles from "./signupCss";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 
-const background = require("../../../../assets/images/background.png");
+import styles from "./signupCss";
+import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
+import Header from "../../../components/common/header/header";
+import Dropdown from "../../../components/common/dropdown/dropdown";
+import InputField from "../../../components/common/inputField/inputField";
+import Button from "../../../components/common/button/button";
+import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 
-function Signup({ navigation }) {
+export default function Signup({ navigation }) {
   const role_ref = useRef();
 
-  const dummyData = {
-    role: "client",
-    firstName: "John",
-    lastName: "Doe",
-    password: "password123",
-    confirmPassword: "password123",
-    agree_tc: true,
-  };
-
-  // Local states for interactivity
   const [role, setRole] = useState("");
-  const [firstName, setFirstName] = useState(dummyData.firstName);
-  const [lastName, setLastName] = useState(dummyData.lastName);
-  const [password, setPassword] = useState(dummyData.password);
-  const [confirmPassword, setConfirmPassword] = useState(
-    dummyData.confirmPassword
-  );
-  const [agree_tc, setAgree_tc] = useState(dummyData.agree_tc);
-  const [password_show, setPassword_show] = useState(false);
-  const [confirmPassword_show, setConfirmPassword_show] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agree_tc, setAgree_tc] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // ✅ Handle hardware back press → exit app
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -59,289 +40,204 @@ function Signup({ navigation }) {
     }, [])
   );
 
+  const validateAndSignup = async () => {
+    // Role
+    if (!role) return Alert.alert("Validation Error", "Please select a role");
+
+    // First Name
+    if (!firstName.trim())
+      return Alert.alert("Validation Error", "First name is required");
+    if (!/^[a-zA-Z\s]+$/.test(firstName))
+      return Alert.alert(
+        "Validation Error",
+        "First name must contain only letters"
+      );
+
+    // Last Name
+    if (!lastName.trim())
+      return Alert.alert("Validation Error", "Last name is required");
+    if (!/^[a-zA-Z\s]+$/.test(lastName))
+      return Alert.alert(
+        "Validation Error",
+        "Last name must contain only letters"
+      );
+
+    // Email
+    if (!email.trim())
+      return Alert.alert("Validation Error", "Email is required");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email))
+      return Alert.alert("Validation Error", "Enter a valid email address");
+
+    // Password
+    if (!password)
+      return Alert.alert("Validation Error", "Password is required");
+    if (password.length < 6)
+      return Alert.alert(
+        "Validation Error",
+        "Password must be at least 6 characters long"
+      );
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+    if (!strongPasswordRegex.test(password))
+      return Alert.alert(
+        "Validation Error",
+        "Password must include letters, numbers, and a special character"
+      );
+
+    // Confirm Password
+    if (!confirmPassword)
+      return Alert.alert("Validation Error", "Confirm password is required");
+    if (password !== confirmPassword)
+      return Alert.alert(
+        "Validation Error",
+        "Password and Confirm Password do not match"
+      );
+
+    // Terms & Conditions
+    if (!agree_tc)
+      return Alert.alert(
+        "Validation Error",
+        "Please agree to Terms & Conditions"
+      );
+
+    // ✅ If all validations pass
+    setLoading(true);
+    try {
+      // TODO: Replace with API call (signup service)
+      setTimeout(() => {
+        setLoading(false);
+        Alert.alert("Success", "Account created successfully!");
+        navigation.replace("Login");
+      }, 1200);
+    } catch (err) {
+      setLoading(false);
+      Alert.alert("Signup Failed", "Something went wrong, please try again.");
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
+    <>
+      <ScreenLayout>
+        {/* ✅ Page Header */}
+        <Header title="Welcome to CUE Wellness" />
+
+        {/* title */}
+        <View style={styles.welcome_view}>
+          <Text style={styles.welcome_text}>Create a Profile</Text>
+        </View>
+
+        {/* ✅ Role Dropdown */}
+        <Dropdown
+          label="Join As"
+          data={["client", "coach", "eventOrganizer", "productCompany"]}
+          selected={role}
+          onSelect={(val) => setRole(val)}
+          renderLabel={(item) =>
+            item === "client"
+              ? "Client"
+              : item === "coach"
+              ? "Coach"
+              : item === "eventOrganizer"
+              ? "Event Organizer"
+              : "Product Company"
+          }
+          dotSelect
+          icon="person-outline"
+          containerStyle={{ width: "85%", alignSelf: "center" }}
+        />
+
+        {/* ✅ Inputs */}
+        <InputField
+          placeholder="Enter First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+          type="text"
+          icon="person-outline"
+        />
+        <InputField
+          placeholder="Enter Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+          type="text"
+          icon="person-outline"
+        />
+        <InputField
+          placeholder="Enter Email"
+          value={email}
+          onChangeText={setEmail}
+          type="email"
+          icon="mail-outline"
+        />
+        <InputField
+          placeholder="Enter Password"
+          value={password}
+          onChangeText={setPassword}
+          type="password"
+          icon="lock-closed-outline"
+        />
+        <InputField
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          type="password"
+          icon="lock-closed-outline"
+        />
+
+        {/* ✅ Agree Section */}
+        <View
+          style={[
+            styles.fp_whole_,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            },
+          ]}
+        >
+          <Text style={styles.fp_text_center}>
+            I agree to the Apps{" "}
+            <Text
+              style={styles.fp_inner_text}
+              onPress={() =>
+                navigation.navigate("TermsAndConditions", { role })
+              }
+            >
+              Terms & Conditions
+            </Text>{" "}
+            and{" "}
+            <Text
+              style={styles.fp_inner_text}
+              onPress={() => navigation.navigate("PrivacyPolicy")}
+            >
+              Privacy Policy
+            </Text>
+          </Text>
+          <TouchableOpacity
+            style={{ paddingLeft: 10 }}
+            onPress={() => setAgree_tc(!agree_tc)}
+          >
+            <MaterialCommunityIcons
+              name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
+              size={20}
+              color="#fff"
+            />
+          </TouchableOpacity>
+        </View>
+      </ScreenLayout>
+
+      {/* ✅ Signup Button */}
+      <Button
+        text={loading ? "Creating..." : "Get Started"}
+        onPress={validateAndSignup}
       />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <ScrollView style={styles.main_scroll_view}>
-          {/* header */}
-          <View style={styles.back_section}>
-            <View style={styles.bs_1} />
-            <View style={styles.bs_2}>
-              <Text style={styles.bs_2_cue_}>CUE</Text>
-            </View>
-            <View style={styles.bs_3} />
-          </View>
-
-          {/* title */}
-          <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>Create a Profile</Text>
-          </View>
-
-          {/* Role */}
-          <TouchableOpacity
-            onPress={() => role_ref.current.open()}
-            style={styles.input_whole_section}
-          >
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <View style={styles.svg_circle}>
-                <Ionicons name="person-outline" size={20} color="#fff" />
-              </View>
-              <View style={styles.input_section_text}>
-                <Text
-                  style={
-                    role === "" ? styles.input_text : styles.input_text_active
-                  }
-                >
-                  {role === ""
-                    ? "Join As"
-                    : role === "client"
-                    ? "Client"
-                    : role === "coach"
-                    ? "Coach"
-                    : role === "eventOrganizer"
-                    ? "Event Organizer"
-                    : role === "productCompany"
-                    ? "Product Company"
-                    : "ERROR"}
-                </Text>
-              </View>
-              <View style={styles.svg_circle_eye}>
-                <Ionicons name="chevron-down" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* First Name */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity style={styles.svg_circle}>
-                <Ionicons name="person-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter First Name"
-                  placeholderTextColor={"#ffffff90"}
-                  value={firstName}
-                  onChangeText={setFirstName}
-                />
-              </View>
-            </LinearGradient>
-          </View>
-
-          {/* Last Name */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity style={styles.svg_circle}>
-                <Ionicons name="person-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter Last Name"
-                  placeholderTextColor={"#ffffff90"}
-                  value={lastName}
-                  onChangeText={setLastName}
-                />
-              </View>
-            </LinearGradient>
-          </View>
-
-          {/* Password */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity style={styles.svg_circle}>
-                <Ionicons name="lock-closed-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input_password}
-                  placeholder="Enter Password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={!password_show}
-                  value={password}
-                  onChangeText={setPassword}
-                />
-              </View>
-              <TouchableOpacity
-                style={styles.svg_circle_eye}
-                onPress={() => setPassword_show(!password_show)}
-              >
-                <Ionicons
-                  name={password_show ? "eye" : "eye-off"}
-                  size={20}
-                  color="#fff"
-                />
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Confirm Password */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <TouchableOpacity style={styles.svg_circle}>
-                <Ionicons name="lock-closed-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input_password}
-                  placeholder="Confirm Password"
-                  placeholderTextColor={"#ffffff90"}
-                  secureTextEntry={!confirmPassword_show}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                />
-              </View>
-              <TouchableOpacity
-                style={styles.svg_circle_eye}
-                onPress={() => setConfirmPassword_show(!confirmPassword_show)}
-              >
-                <Ionicons
-                  name={confirmPassword_show ? "eye" : "eye-off"}
-                  size={20}
-                  color="#fff"
-                />
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Agree section */}
-          <View
-            style={[
-              styles.fp_whole_,
-              {
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              },
-            ]}
-          >
-            <TouchableOpacity style={{ flex: 1 }}>
-              <Text style={styles.fp_text_center}>
-                I agree to the Apps{" "}
-                <Text
-                  style={styles.fp_inner_text}
-                  onPress={() =>
-                    navigation.navigate("TermsAndConditions", { role })
-                  }
-                >
-                  Terms & Conditions
-                </Text>{" "}
-                and{" "}
-                <Text
-                  style={styles.fp_inner_text}
-                  onPress={() => navigation.navigate("PrivacyPolicy")}
-                >
-                  Privacy Policy
-                </Text>
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{ paddingLeft: 10 }}
-              onPress={() => setAgree_tc(!agree_tc)}
-            >
-              <MaterialCommunityIcons
-                name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={20}
-                color="#fff"
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Get Started */}
-          <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={() => navigation.navigate("ContactNumber")}
-          >
-            <LinearGradient
-              colors={["rgb(255,255,255)", "rgb(181,195,227)"]}
-              style={styles.input_inner_section_btn}
-            >
-              <Text style={styles.login_text}>Get started</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Login */}
-          <TouchableOpacity
-            style={styles.login_text_section}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Text style={styles.login_text_tl}>Login?</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </KeyboardAvoidingView>
-
-      {/* Role picker sheet */}
-      <RBSheet ref={role_ref} height={320}>
-        <LinearGradient
-          style={styles.bs_whole_view}
-          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
-        >
-          {/* Spacer at top */}
-          <View style={{ height: 10 }} />
-
-          {["client", "coach", "eventOrganizer", "productCompany"].map((r) => (
-            <TouchableOpacity
-              key={r}
-              style={styles.option_indi_whole}
-              onPress={() => {
-                setRole(r);
-                role_ref.current.close();
-              }}
-            >
-              <LinearGradient
-                style={styles.option_indi}
-                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              >
-                <View style={styles.oi_dot_section}>
-                  <View
-                    style={role === r ? styles.oi_dot_active : styles.oi_dot}
-                  />
-                </View>
-                <View style={styles.oi_text_section}>
-                  <Text style={styles.oi_text}>
-                    {r === "client"
-                      ? "Client"
-                      : r === "coach"
-                      ? "Coach"
-                      : r === "eventOrganizer"
-                      ? "Event Organizer"
-                      : "Product Company"}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
-        </LinearGradient>
-      </RBSheet>
-    </SafeAreaView>
+      {/* ✅ Login Redirect */}
+      <ButtonLink
+        text="Already have an account ?"
+        highlightText="Login"
+        onPress={() => navigation.replace("Login")}
+        center
+      />
+    </>
   );
 }
-
-export default Signup;

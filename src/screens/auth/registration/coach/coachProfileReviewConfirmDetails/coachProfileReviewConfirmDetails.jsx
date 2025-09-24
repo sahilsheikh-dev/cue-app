@@ -184,9 +184,8 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
       {/* Next button */}
       <TouchableOpacity
         style={styles.input_whole_section_btn}
-        // onPress={send_data}
         onPress={() => {
-          navigation.navigate(screenData.nextScreen);
+          navigation.navigate("CoachCreateServiceDetails");
         }}
       >
         <LinearGradient

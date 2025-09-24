@@ -16,6 +16,10 @@ const background = require("../../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { useRef, useState } from "react";
+import Button from "../../../../../../components/common/button/button";
+import ButtonLink from "../../../../../../components/common/buttonLink/buttonLink";
+import Header from "../../../../../../components/common/header/header";
+import ScreenLayout from "../../../../../../components/common/screenLayout/screenLayout";
 
 export default function OtpVerification({ navigation }) {
   // Dummy screen data
@@ -55,32 +59,12 @@ export default function OtpVerification({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        {/* Main content */}
+    <>
+      <ScreenLayout>
         <ScrollView style={styles.main_scroll_view}>
           <View style={styles.top_portion1}></View>
 
-          {/* ✅ Header with Go Back */}
-          <View style={styles.back_section}>
-            <View style={styles.bs_1}></View>
-            <View style={styles.bs_2}>
-              <Text style={styles.bs_2_cue}>CUE</Text>
-            </View>
-            <View style={styles.bs_3}></View>
-          </View>
-
-          <View style={styles.top_portion}></View>
+          <Header title={"CUE"} />
 
           {/* Title + description */}
           <View style={styles.welcome_view}>
@@ -113,40 +97,21 @@ export default function OtpVerification({ navigation }) {
             ))}
           </View>
         </ScrollView>
+      </ScreenLayout>
 
-        {/* ✅ Bottom Section stays clickable */}
-        <View style={{ paddingBottom: Platform.OS === "android" ? 30 : 20 }}>
-          {/* Verify Button */}
-          <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={() => navigation.navigate("CoachIntroduction")}
-          >
-            <LinearGradient
-              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-              style={styles.input_inner_section_btn}
-            >
-              {loading ? (
-                <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
-              ) : (
-                <Text style={styles.login_text}>Verify</Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+      {/* ✅ Bottom Section stays clickable */}
+      <View style={{ paddingBottom: Platform.OS === "android" ? 30 : 20 }}>
+        <Button
+          text={loading ? "Loading..." : "Verify"}
+          onPress={() => navigation.navigate("OtpVerification")}
+        />
 
-          {/* Resend Section */}
-          <View style={[styles.fp_whole, { marginBottom: 10, marginTop: 15 }]}>
-            <TouchableOpacity style={styles.fp_inner}>
-              <Text style={styles.fp_text_center}>
-                {screenData.resendText}{" "}
-                <Text style={styles.su_text}>
-                  {screenData.resendActionText}
-                </Text>{" "}
-                <Feather name="refresh-ccw" size={16} color="#fff" />
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <ButtonLink
+          text="Didn't Receive Anything?"
+          highlightText="Resend Code"
+          center
+        />
+      </View>
+    </>
   );
 }

@@ -17,11 +17,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
+import ScreenLayout from "../../../../../../components/common/screenLayout/screenLayout";
+import Button from "../../../../../../components/common/button/button";
+import Header from "../../../../../../components/common/header/header";
+import Dropdown from "../../../../../../components/common/dropdown/dropdown";
 
 export default function ContactNumber({ navigation }) {
   const role_ref = useRef();
 
-  const all_countries = [
+  const countries = [
     {
       _id: "in",
       name: "India",
@@ -60,33 +64,14 @@ export default function ContactNumber({ navigation }) {
   ];
 
   const [mobileNumber, setMobileNumber] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState(all_countries[0]);
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+    <>
+      <ScreenLayout>
         <ScrollView style={styles.main_scroll_view}>
-          <View style={styles.top_portion1}></View>
-
-          {/* ✅ Header with Go Back */}
-          <View style={styles.back_section}>
-            <View style={styles.bs_1}></View>
-            <View style={styles.bs_2}>
-              <Text style={styles.bs_2_cue}>cue</Text>
-            </View>
-            <View style={styles.bs_3}></View>
-          </View>
+          <Header title={"CUE"} />
 
           <View style={styles.top_portion}></View>
 
@@ -98,36 +83,24 @@ export default function ContactNumber({ navigation }) {
             </Text>
           </View>
 
-          {/* phone input */}
+          {/* Country + Phone */}
           <View style={styles.input_whole_section}>
             <LinearGradient
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
+              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
               style={styles.input_inner_section}
             >
-              <TouchableOpacity
-                style={styles.svg_circle}
-                onPress={() => {
-                  role_ref.current.open();
+              <Dropdown
+                label="Country"
+                data={countries}
+                selected={selectedCountry}
+                onSelect={(item) => {
+                  setSelectedCountry(item);
+                  setMobileNumber("");
                 }}
-              >
-                <View style={styles.svg_view}>
-                  <Image
-                    style={styles.flag}
-                    source={{ uri: selectedCountry.img }}
-                  />
-                </View>
-                <View style={styles.cc_view}>
-                  <Text style={styles.cc_text}>{selectedCountry.code}</Text>
-                </View>
-                <View style={styles.drop_down_section}>
-                  <Ionicons
-                    name="chevron-down"
-                    size={20}
-                    color="#fff"
-                    style={styles.dd_svg}
-                  />
-                </View>
-              </TouchableOpacity>
+                withFlag
+                renderLabel={(item) => item.code}
+                containerStyle={{ width: "30%", marginBottom: 0 }}
+              />
 
               <View style={styles.input_section}>
                 <TextInput
@@ -136,92 +109,21 @@ export default function ContactNumber({ navigation }) {
                   placeholderTextColor={"#ffffff90"}
                   keyboardType="phone-pad"
                   value={mobileNumber}
-                  onChangeText={setMobileNumber}
+                  onChangeText={(text) => {
+                    const limit = parseInt(selectedCountry.number_of_digit);
+                    if (text.length <= limit) setMobileNumber(text);
+                  }}
                 />
               </View>
             </LinearGradient>
           </View>
         </ScrollView>
+      </ScreenLayout>
 
-        {/* Continue Button */}
-        <TouchableOpacity
-          style={styles.input_whole_section_btn}
-          onPress={() => navigation.navigate("OtpVerification")}
-        >
-          <LinearGradient
-            colors={
-              mobileNumber === ""
-                ? ["rgba(244, 244, 244, 0.1)", "rgba(244, 244, 244, 0.1)"]
-                : ["rgb(255, 255, 255)", "rgb(181, 195, 227)"]
-            }
-            style={styles.input_inner_section_btn}
-          >
-            {loading ? (
-              <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
-            ) : (
-              <Text
-                style={
-                  mobileNumber === ""
-                    ? styles.login_text_fade
-                    : styles.login_text
-                }
-              >
-                Continue
-              </Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-
-      {/* ✅ BottomSheet for countries with top spacer */}
-      <RBSheet ref={role_ref} height={300}>
-        <LinearGradient
-          style={styles.bs_whole_view}
-          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
-        >
-          <ScrollView style={styles.country_scroll}>
-            <View style={{ height: 10 }} />
-
-            {all_countries.map((item) => (
-              <TouchableOpacity
-                key={item._id}
-                style={styles.option_indi_whole}
-                onPress={() => {
-                  setSelectedCountry(item);
-                  role_ref.current.close();
-                }}
-              >
-                <LinearGradient
-                  style={styles.option_indi}
-                  colors={[
-                    "rgba(255, 255, 255, 0.1)",
-                    "rgba(30, 53, 126, 0.1)",
-                  ]}
-                >
-                  <View style={styles.oi_dot_section}>
-                    <View
-                      style={
-                        selectedCountry._id === item._id
-                          ? styles.oi_dot_active
-                          : styles.oi_dot
-                      }
-                    />
-                  </View>
-                  <View style={styles.oi_text_section_flag}>
-                    <Image style={styles.flag} source={{ uri: item.img }} />
-                  </View>
-                  <View style={styles.oi_text_section}>
-                    <Text style={styles.oi_text}>
-                      {item.code} - {item.name}
-                    </Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-            <View style={styles.last_empty_space_rb}></View>
-          </ScrollView>
-        </LinearGradient>
-      </RBSheet>
-    </SafeAreaView>
+      <Button
+        text={loading ? "Loading..." : "Continue"}
+        onPress={() => navigation.navigate("OtpVerification")}
+      />
+    </>
   );
 }

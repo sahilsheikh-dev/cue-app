@@ -24,9 +24,10 @@ const styles = StyleSheet.create({
     opacity: 0.25,
   },
   main_scroll_view: {
-    // height: "fit-content",
-    // width: "fit-content",
+    height: "100%",
+    width: "100%",
     zIndex: 10,
+    // backgroundColor: "red",
   },
   top_portion1: {
     height: 20 + sb.currentHeight,
