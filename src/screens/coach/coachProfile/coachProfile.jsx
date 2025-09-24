@@ -199,11 +199,7 @@ export default function CoachProfile({ navigation }) {
         >
           <View style={styles.io_name_section}>
             {loading ? (
-              <ActivityIndicator
-                size="small"
-                title="Deleting Account"
-                color="#fff"
-              />
+              <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text style={styles.io_name}>Delete Account</Text>
             )}
@@ -214,26 +210,16 @@ export default function CoachProfile({ navigation }) {
         </TouchableOpacity>
 
         {/* Logout */}
-        <TouchableOpacity
-          style={styles.indi_options}
-          onPress={async () => {
-            await logout();
-            navigation.replace("Signup");
-          }}
-        >
+        <TouchableOpacity style={styles.indi_options} onPress={handleLogout}>
           <View style={styles.io_name_section}>
-            {loggingOut ? (
-              <ActivityIndicator
-                size="small"
-                title="Logging Out"
-                color="#fff"
-              />
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text style={styles.io_name}>Log Out</Text>
             )}
           </View>
           <View style={styles.indi_option_svg_section}>
-            {!loggingOut && (
+            {!loading && (
               <Ionicons name="log-out-outline" size={26} color="#fff" />
             )}
           </View>

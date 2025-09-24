@@ -1,4 +1,3 @@
-// CoachProfileBasicDetails.jsx (Demo with Dummy Data Object + Working Inputs)
 import {
   Text,
   View,
@@ -7,27 +6,24 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Platform,
   KeyboardAvoidingView,
+  Platform,
+  BackHandler,
 } from "react-native";
-import styles from "./coachProfileBasicDetailsCss";
 import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import RBSheet from "react-native-raw-bottom-sheet";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-// ✅ Import vector icons
-import {
-  Ionicons,
-  MaterialIcons,
-  Feather,
-  FontAwesome5,
-} from "@expo/vector-icons";
+import styles from "./coachProfileBasicDetailsCss";
+const background = require("../../../../../../assets/images/background.png");
 
 export default function CoachProfileBasicDetails({ navigation }) {
-  // ✅ Dummy Data Object
-  const dummyData = {
-    headerTitle: "Build Your Profile",
+  const gender_ref = useRef();
+
+  const screenData = {
+    headerTitle: "Your Profile Basic Details",
     agreements: [
       "I possess the necessary qualifications and licenses.",
       "I possess the necessary talent and experience.",
@@ -40,14 +36,15 @@ export default function CoachProfileBasicDetails({ navigation }) {
     },
   };
 
-  // ✅ Local state for interactivity
+  // ✅ Local state for dummy interactivity
   const [email, setEmail] = useState("demo@example.com");
   const [dob, setDob] = useState("01-01-1990");
-  const [gender, setGender] = useState("Male");
+  const [gender, setGender] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [checked, setChecked] = useState(
-    Array(dummyData.agreements.length).fill(false)
+    Array(screenData.agreements.length).fill(false)
   );
+  const [loading, setLoading] = useState(false);
 
   const toggleCheck = (idx) => {
     const newChecked = [...checked];
@@ -66,13 +63,12 @@ export default function CoachProfileBasicDetails({ navigation }) {
         style={styles.backgroundView}
       />
 
-      {/* Header */}
-      <View style={styles.top_portion1} />
+      {/* ✅ Header with Go Back (reference from ContactNumber) */}
       <View style={styles.back_section}>
         <View style={styles.bs_1}>
           <TouchableOpacity
             style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()} // ✅ working back button
+            onPress={() => navigation.goBack()}
           >
             <LinearGradient
               style={styles.bs_1_stroke_circle}
@@ -85,24 +81,14 @@ export default function CoachProfileBasicDetails({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.bs_2}>
-          <Text style={styles.byp_text}>{dummyData.headerTitle}</Text>
+          <Text style={styles.bs_2_cue}>CUE</Text>
         </View>
-        <View style={styles.bs_3}>
-          <TouchableOpacity style={styles.bs_1_circle}>
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={20}
-                  color="#fff"
-                />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.bs_3}></View>
+      </View>
+
+      {/* title + description */}
+      <View style={styles.welcome_view}>
+        <Text style={styles.welcome_text}>{screenData.headerTitle}</Text>
       </View>
 
       {/* Content */}
@@ -128,13 +114,13 @@ export default function CoachProfileBasicDetails({ navigation }) {
                   placeholder="Enter Email"
                   placeholderTextColor={"#ffffff90"}
                   value={email}
-                  onChangeText={setEmail} // ✅ editable
+                  onChangeText={setEmail}
                 />
               </View>
             </LinearGradient>
           </View>
 
-          {/* Date of Birth (simple editable for demo) */}
+          {/* Date of Birth */}
           <View style={styles.input_whole_section}>
             <LinearGradient
               colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
@@ -147,7 +133,7 @@ export default function CoachProfileBasicDetails({ navigation }) {
                 <TextInput
                   style={styles.input}
                   value={dob}
-                  onChangeText={setDob} // ✅ editable
+                  onChangeText={setDob}
                   placeholder="DD-MM-YYYY"
                   placeholderTextColor={"#ffffff90"}
                 />
@@ -157,28 +143,40 @@ export default function CoachProfileBasicDetails({ navigation }) {
 
           {/* Gender dropdown */}
           <TouchableOpacity
+            onPress={() => gender_ref.current.open()}
             style={styles.input_whole_section}
-            onPress={() => setDropdownOpen(!dropdownOpen)}
           >
             <LinearGradient
-              colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
+              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
               style={styles.input_inner_section}
             >
               <View style={styles.svg_circle}>
-                <FontAwesome5 name="venus-mars" size={20} color="#fff" />
+                <Ionicons name="male-female" size={20} color="#fff" />
               </View>
               <View style={styles.input_section_text}>
-                <Text style={styles.input_text_active}>{gender}</Text>
+                <Text
+                  style={
+                    gender === "" ? styles.input_text : styles.input_text_active
+                  }
+                >
+                  {gender === ""
+                    ? "Select Gender"
+                    : gender === "male"
+                    ? "Male"
+                    : gender === "female"
+                    ? "Female"
+                    : "Other"}
+                </Text>
               </View>
               <View style={styles.svg_circle_eye}>
-                <Feather name="chevron-down" size={22} color="#fff" />
+                <Ionicons name="chevron-down" size={20} color="#fff" />
               </View>
             </LinearGradient>
           </TouchableOpacity>
 
           {dropdownOpen && (
             <View style={{ marginLeft: 50 }}>
-              {dummyData.genders.map((g) => (
+              {screenData.genders.map((g) => (
                 <TouchableOpacity
                   key={g}
                   onPress={() => {
@@ -192,12 +190,12 @@ export default function CoachProfileBasicDetails({ navigation }) {
             </View>
           )}
 
-          {/* Agreements (checkboxes) */}
-          {dummyData.agreements.map((item, idx) => (
+          {/* Agreements */}
+          {screenData.agreements.map((item, idx) => (
             <TouchableOpacity
               key={idx}
               style={styles.input_whole_section_dot_text}
-              onPress={() => toggleCheck(idx)} // ✅ toggle
+              onPress={() => toggleCheck(idx)}
             >
               <View
                 style={checked[idx] ? styles.dot_active : styles.dot}
@@ -207,21 +205,67 @@ export default function CoachProfileBasicDetails({ navigation }) {
               </View>
             </TouchableOpacity>
           ))}
-
-          {/* Next button */}
-          <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={() => navigation.navigate(dummyData.nextButton.nextScreen)}
-          >
-            <LinearGradient
-              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-              style={styles.input_inner_section_btn}
-            >
-              <Text style={styles.login_text}>{dummyData.nextButton.text}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
         </ScrollView>
+
+        {/* Continue Button */}
+        <TouchableOpacity
+          style={styles.input_whole_section_btn}
+          onPress={() => navigation.navigate(screenData.nextButton.nextScreen)}
+        >
+          <LinearGradient
+            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+            style={styles.input_inner_section_btn}
+          >
+            {loading ? (
+              <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
+            ) : (
+              <Text style={styles.login_text}>Continue</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
+
+      {/* gender picker sheet */}
+      <RBSheet ref={gender_ref} height={320}>
+        <LinearGradient
+          style={styles.bs_whole_view}
+          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
+        >
+          {/* Spacer at top */}
+          <View style={{ height: 10 }} />
+
+          {["male", "female", "other"].map((g) => (
+            <TouchableOpacity
+              key={g}
+              style={styles.option_indi_whole}
+              onPress={() => {
+                setGender(g);
+                gender_ref.current.close();
+              }}
+            >
+              <LinearGradient
+                style={styles.option_indi}
+                colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+              >
+                <View style={styles.oi_dot_section}>
+                  <View
+                    style={gender === g ? styles.oi_dot_active : styles.oi_dot}
+                  />
+                </View>
+                <View style={styles.oi_text_section}>
+                  <Text style={styles.oi_text}>
+                    {g === "male"
+                      ? "Male"
+                      : g === "female"
+                      ? "Female"
+                      : "Other"}
+                  </Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </LinearGradient>
+      </RBSheet>
     </SafeAreaView>
   );
 }

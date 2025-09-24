@@ -1,4 +1,3 @@
-// OtpVerification.jsx (Demo with Dummy Data Object + Working OTP Inputs)
 import {
   Text,
   View,
@@ -19,18 +18,17 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 
 export default function OtpVerification({ navigation }) {
-  // ✅ Dummy object for all values
-  const dummyData = {
+  // Dummy screen data
+  const screenData = {
     title: "OTP Verification",
     description: "Enter the code from the SMS we sent you",
-    loading: false,
     resendText: "Didn't Receive Anything?",
-    resendAction: "Resend Code",
-    otpLength: 5, // configurable length
+    resendActionText: "Resend Code",
+    otpLength: 5,
   };
 
-  // ✅ Local state for OTP inputs
-  const [otp, setOtp] = useState(Array(dummyData.otpLength).fill(""));
+  const [otp, setOtp] = useState(Array(screenData.otpLength).fill(""));
+  const [loading, setLoading] = useState(false);
   const inputsRef = useRef([]);
 
   const handleChange = (text, index) => {
@@ -40,7 +38,7 @@ export default function OtpVerification({ navigation }) {
       setOtp(newOtp);
 
       // move to next input
-      if (index < dummyData.otpLength - 1) {
+      if (index < screenData.otpLength - 1) {
         inputsRef.current[index + 1].focus();
       }
     }
@@ -69,83 +67,99 @@ export default function OtpVerification({ navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "space-between",
-          }}
-          style={styles.main_scroll_view}
-        >
-          <View>
-            {/* Back button */}
-            <View style={[styles.top_portion, { marginTop: 10 }]}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="chevron-back" size={28} color="#fff" />
+        {/* Main content */}
+        <ScrollView style={styles.main_scroll_view}>
+          <View style={styles.top_portion1}></View>
+
+          {/* ✅ Header with Go Back */}
+          <View style={styles.back_section}>
+            <View style={styles.bs_1}>
+              <TouchableOpacity
+                style={styles.bs_1_circle}
+                onPress={() => navigation.goBack()}
+              >
+                <LinearGradient
+                  style={styles.bs_1_stroke_circle}
+                  colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
+                >
+                  <View style={styles.bs_1_circle_circle}>
+                    <Ionicons name="chevron-back" size={20} color="#fff" />
+                  </View>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-
-            {/* Title + description */}
-            <View style={styles.welcome_view}>
-              <Text style={styles.welcome_text}>{dummyData.title}</Text>
-              <Text style={styles.welcome_des}>{dummyData.description}</Text>
+            <View style={styles.bs_2}>
+              <Text style={styles.bs_2_cue}>{screenData.title}</Text>
             </View>
-
-            {/* OTP Inputs */}
-            <View style={styles.otp_whole_section}>
-              {otp.map((val, index) => (
-                <View key={index} style={styles.otp_indi}>
-                  <LinearGradient
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0.1)",
-                    ]}
-                    style={styles.oi_lg}
-                  >
-                    <TextInput
-                      style={styles.oi_input}
-                      value={val}
-                      onChangeText={(text) => handleChange(text, index)}
-                      onKeyPress={(e) => handleKeyPress(e, index)}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      ref={(ref) => (inputsRef.current[index] = ref)}
-                    />
-                  </LinearGradient>
-                </View>
-              ))}
-            </View>
+            <View style={styles.bs_3}></View>
           </View>
 
-          <View>
-            {/* Verify Button */}
-            <TouchableOpacity
-              style={styles.input_whole_section_btn}
-              onPress={() => navigation.navigate("CoachIntroduction")}
-            >
-              <LinearGradient
-                colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-                style={styles.input_inner_section_btn}
-              >
-                {dummyData.loading ? (
-                  <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
-                ) : (
-                  <Text style={styles.login_text}>Verify</Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
+          <View style={styles.top_portion}></View>
 
-            {/* Resend Section */}
-            <View style={[styles.fp_whole, { marginBottom: 20 }]}>
-              <TouchableOpacity style={styles.fp_inner}>
-                <Text style={styles.fp_text_center}>
-                  {dummyData.resendText}{" "}
-                  <Text style={styles.su_text}>{dummyData.resendAction}</Text>{" "}
-                  <Feather name="refresh-ccw" size={16} color="#fff" />
-                </Text>
-              </TouchableOpacity>
-            </View>
+          {/* Title + description */}
+          <View style={styles.welcome_view}>
+            <Text style={styles.welcome_text}>{screenData.title}</Text>
+            <Text style={styles.welcome_des}>{screenData.description}</Text>
+          </View>
+
+          {/* OTP Inputs */}
+          <View style={styles.otp_whole_section}>
+            {otp.map((val, index) => (
+              <View key={index} style={styles.otp_indi}>
+                <LinearGradient
+                  colors={[
+                    "rgba(255, 255, 255, 0.1)",
+                    "rgba(30, 53, 126, 0.1)",
+                  ]}
+                  style={styles.oi_lg}
+                >
+                  <TextInput
+                    style={styles.oi_input}
+                    value={val}
+                    onChangeText={(text) => handleChange(text, index)}
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    ref={(ref) => (inputsRef.current[index] = ref)}
+                  />
+                </LinearGradient>
+              </View>
+            ))}
           </View>
         </ScrollView>
+
+        {/* ✅ Bottom Section stays clickable */}
+        <View style={{ paddingBottom: Platform.OS === "android" ? 30 : 20 }}>
+          {/* Verify Button */}
+          <TouchableOpacity
+            style={styles.input_whole_section_btn}
+            onPress={() => navigation.navigate("CoachIntroduction")}
+          >
+            <LinearGradient
+              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+              style={styles.input_inner_section_btn}
+            >
+              {loading ? (
+                <ActivityIndicator size={20} color={"rgb(40, 57, 109)"} />
+              ) : (
+                <Text style={styles.login_text}>Verify</Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Resend Section */}
+          <View style={[styles.fp_whole, { marginBottom: 10, marginTop: 15 }]}>
+            <TouchableOpacity style={styles.fp_inner}>
+              <Text style={styles.fp_text_center}>
+                {screenData.resendText}{" "}
+                <Text style={styles.su_text}>
+                  {screenData.resendActionText}
+                </Text>{" "}
+                <Feather name="refresh-ccw" size={16} color="#fff" />
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
