@@ -38,7 +38,7 @@ export default function CoachIntroduction({ navigation }) {
         <ScrollView style={styles.main_scroll_view}>
           <View style={styles.top_portion1}></View>
 
-          {/* ✅ Header with Go Back */}
+          {/* ✅ Header */}
           <View style={styles.back_section}>
             <View style={styles.bs_1}>
               <TouchableOpacity
@@ -56,7 +56,7 @@ export default function CoachIntroduction({ navigation }) {
               </TouchableOpacity>
             </View>
             <View style={styles.bs_2}>
-              <Text style={styles.bs_2_cue}>cue</Text>
+              <Text style={styles.bs_2_cue}>CUE</Text>
             </View>
             <View style={styles.bs_3}></View>
           </View>
@@ -65,6 +65,7 @@ export default function CoachIntroduction({ navigation }) {
 
           {/* ✅ Content */}
           <View style={styles.welcome_view}>
+            <Text style={styles.welcome_text}>Welcome to Cue Wellness</Text>
             <Text style={styles.welcome_text_des}>{screenData.content}</Text>
           </View>
         </ScrollView>

@@ -1,4 +1,3 @@
-// CoachProfileReviewConfirmDetails.jsx (Demo with Dummy Data Object)
 import {
   Text,
   View,
@@ -15,14 +14,12 @@ const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 
-// ✅ Expo vector icons
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CoachProfileReviewConfirmDetails({ navigation }) {
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Dummy Data Object
-  const dummyData = {
+  const screenData = {
     email: "demo@email.com",
     dob: "14-08-1999",
     gender: "Male",
@@ -84,33 +81,33 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
 
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Email ID : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.email}</Text>
+              <Text style={styles.bd_details_text}>{screenData.email}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Dob : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.dob}</Text>
+              <Text style={styles.bd_details_text}>{screenData.dob}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Gender : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.gender}</Text>
+              <Text style={styles.bd_details_text}>{screenData.gender}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Pin code : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.pin_code}</Text>
+              <Text style={styles.bd_details_text}>{screenData.pin_code}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Country : </Text>
               <Text style={styles.bd_details_text}>
-                {dummyData.country.country}
+                {screenData.country.country}
               </Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>City : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.city}</Text>
+              <Text style={styles.bd_details_text}>{screenData.city}</Text>
             </View>
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Address : </Text>
-              <Text style={styles.bd_details_text}>{dummyData.address}</Text>
+              <Text style={styles.bd_details_text}>{screenData.address}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -124,7 +121,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh_fc}>
               <Text style={styles.bd_details_text_label}>Category : </Text>
               <Text style={styles.bd_details_text_fc}>
-                {dummyData.category.map((item, index) =>
+                {screenData.category.map((item, index) =>
                   index === 0 ? item.title : `, ${item.title}`
                 )}
               </Text>
@@ -141,7 +138,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Languages : </Text>
               <Text style={styles.bd_details_text_fc}>
-                {dummyData.languages.map((item, index) =>
+                {screenData.languages.map((item, index) =>
                   index === 0 ? item.name : `, ${item.name}`
                 )}
               </Text>
@@ -158,7 +155,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Client Gender : </Text>
               <Text style={styles.bd_details_text}>
-                {dummyData.client_gender.map((item, index) =>
+                {screenData.client_gender.map((item, index) =>
                   index === 0 ? item : `, ${item}`
                 )}
               </Text>
@@ -175,35 +172,34 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             <View style={styles.bd_details_text_view_nh}>
               <Text style={styles.bd_details_text_label}>Experience : </Text>
               <Text style={styles.bd_details_text}>
-                {dummyData.experience.year}{" "}
-                {dummyData.experience.year === 1 ? "year" : "years"} -{" "}
-                {dummyData.experience.months}{" "}
-                {dummyData.experience.months === 1 ? "month" : "months"}
+                {screenData.experience.year}{" "}
+                {screenData.experience.year === 1 ? "year" : "years"} -{" "}
+                {screenData.experience.months}{" "}
+                {screenData.experience.months === 1 ? "month" : "months"}
               </Text>
             </View>
           </View>
         </LinearGradient>
-
-        {/* Next button */}
-        <TouchableOpacity
-          style={styles.input_whole_section_btn}
-          // onPress={send_data}
-          onPress={() => {
-            navigation.navigate(dummyData.nextScreen);
-          }}
-        >
-          <LinearGradient
-            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-            style={styles.input_inner_section_btn}
-          >
-            {loading ? (
-              <ActivityIndicator color={"rgba(51, 80, 148, 1)"} size={20} />
-            ) : (
-              <Text style={styles.login_text}>Next</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
       </ScrollView>
+      {/* Next button */}
+      <TouchableOpacity
+        style={styles.input_whole_section_btn}
+        // onPress={send_data}
+        onPress={() => {
+          navigation.navigate(screenData.nextScreen);
+        }}
+      >
+        <LinearGradient
+          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+          style={styles.input_inner_section_btn}
+        >
+          {loading ? (
+            <ActivityIndicator color={"rgba(51, 80, 148, 1)"} size={20} />
+          ) : (
+            <Text style={styles.login_text}>Next</Text>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

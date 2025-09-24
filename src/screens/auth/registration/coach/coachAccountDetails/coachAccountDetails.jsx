@@ -18,8 +18,8 @@ import { useState } from "react";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CoachAccountDetails({ navigation }) {
-  const [coach_share] = useState(dummyData.coach_share);
-  const [cue_share] = useState(dummyData.cue_share);
+  const [coach_share] = useState(80);
+  const [cue_share] = useState(20);
 
   return (
     <SafeAreaView style={styles.sav}>
@@ -53,25 +53,7 @@ export default function CoachAccountDetails({ navigation }) {
           <Text style={styles.byp_text}>Accounting Information</Text>
         </View>
 
-        <View style={styles.bs_3}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <MaterialCommunityIcons
-                  name="message-processing"
-                  size={20}
-                  color="#fff"
-                />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.bs_3}></View>
       </View>
 
       <KeyboardAvoidingView
@@ -106,22 +88,22 @@ export default function CoachAccountDetails({ navigation }) {
               </View>
             </View>
           </LinearGradient>
-
-          {/* Next Button */}
-          <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={() => {
-              navigation.navigate("CoachAgreementDetails");
-            }}
-          >
-            <LinearGradient
-              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-              style={styles.input_inner_section_btn}
-            >
-              <Text style={styles.login_text}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
         </ScrollView>
+
+        {/* Next Button */}
+        <TouchableOpacity
+          style={styles.input_whole_section_btn}
+          onPress={() => {
+            navigation.navigate("CoachAgreementDetails");
+          }}
+        >
+          <LinearGradient
+            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+            style={styles.input_inner_section_btn}
+          >
+            <Text style={styles.login_text}>Next</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

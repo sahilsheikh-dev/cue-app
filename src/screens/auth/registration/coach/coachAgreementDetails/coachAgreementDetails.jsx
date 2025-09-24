@@ -47,13 +47,6 @@ export default function CoachAgreementDetails({ navigation }) {
     }, 1200);
   };
 
-  // Delete
-  const delete_agreement = () => {
-    setTitle("");
-    setAgreement_term([]);
-    setEditMode(false);
-  };
-
   // Add Section
   const addSection = (type) => {
     setAgreement_term([...agreement_term, { type, content: "" }]);
@@ -235,20 +228,17 @@ export default function CoachAgreementDetails({ navigation }) {
 
       {/* Action Buttons */}
       {editMode ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            padding: 10,
-          }}
-        >
-          <TouchableOpacity onPress={delete_agreement}>
-            <Text style={{ color: "red" }}>Delete</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={save_agreement}>
+        <TouchableOpacity onPress={save_agreement}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              padding: 10,
+            }}
+          >
             <Text style={{ color: "white" }}>Save</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       ) : (
         (title || agreement_term.length > 0) && (
           <TouchableOpacity

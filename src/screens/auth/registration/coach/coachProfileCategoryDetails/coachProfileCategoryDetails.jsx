@@ -1,4 +1,3 @@
-// CoachProfileCategoryDetails.jsx (Dummy with Infinite Dropdowns Working)
 import {
   Text,
   View,
@@ -15,16 +14,12 @@ const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-
-// ✅ Vector icons
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CoachProfileCategoryDetails({ navigation }) {
   const category_ref = useRef();
-  const [openIndex, setOpenIndex] = useState(null); // which dropdown is open
 
-  // ✅ Dummy Data Object
-  const dummyData = {
+  const screenData = {
     headerTitle: "Choose Category",
     all_connections: {
       Fitness: {
@@ -60,31 +55,37 @@ export default function CoachProfileCategoryDetails({ navigation }) {
       Nutrition: {
         _id: "3",
         title: "Nutrition",
-        sub: {}, // no suboptions → stops chain
+        sub: {},
       },
     },
     nextButton: {
-      text: "Next",
+      text: "Continue",
       nextScreen: "CoachProfileExperienceDetails",
     },
   };
 
-  // ✅ Track selected path (array of selections)
+  // ✅ Track selected categories in path
   const [selections, setSelections] = useState([]);
+  const [currentOptions, setCurrentOptions] = useState(
+    screenData.all_connections
+  );
+  const [selectedKey, setSelectedKey] = useState(null);
 
-  const handleSelect = (levelIndex, optionKey) => {
-    const newSelections = [...selections.slice(0, levelIndex), optionKey];
-    setSelections(newSelections);
-    setOpenIndex(null); // close dropdown after selection
-  };
+  // ✅ Handle category selection
+  const handleCategorySelect = (key) => {
+    const chosen = currentOptions[key];
+    setSelections((prev) => [...prev, chosen.title]);
+    setSelectedKey(key);
 
-  // ✅ Get available options at a given level
-  const getOptionsAtLevel = (levelIndex) => {
-    let options = dummyData.all_connections;
-    for (let i = 0; i < levelIndex; i++) {
-      options = options[selections[i]].sub;
+    if (chosen.sub && Object.keys(chosen.sub).length > 0) {
+      // move deeper into tree
+      setCurrentOptions(chosen.sub);
+      category_ref.current.close();
+      setTimeout(() => category_ref.current.open(), 300); // reopen with suboptions
+    } else {
+      // reached leaf
+      category_ref.current.close();
     }
-    return options;
   };
 
   return (
@@ -96,147 +97,127 @@ export default function CoachProfileCategoryDetails({ navigation }) {
         style={styles.backgroundView}
       />
 
-      {/* Header */}
-      <View style={styles.top_portion1} />
-      <View style={styles.back_section}>
-        {/* Back button */}
-        <View style={styles.bs_1}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Title */}
-        <View style={styles.bs_2}>
-          <Text style={styles.byp_text}>{dummyData.headerTitle}</Text>
-        </View>
-
-        {/* Options icon */}
-        <View style={styles.bs_3}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={20}
-                  color="#fff"
-                />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView style={styles.main_scroll_view}>
-          <View style={styles.top_empty_section} />
+          <View style={styles.top_portion1}></View>
 
-          {/* Render dropdowns dynamically */}
-          {Array.from({ length: selections.length + 1 }).map(
-            (_, levelIndex) => {
-              const options = getOptionsAtLevel(levelIndex);
-              if (!options || Object.keys(options).length === 0) return null;
-
-              const selectedKey = selections[levelIndex] || null;
-
-              return (
-                <TouchableOpacity
-                  key={levelIndex}
-                  onPress={() => setOpenIndex(levelIndex)}
-                  style={styles.input_whole_section}
+          {/* Header with back */}
+          <View style={styles.back_section}>
+            <View style={styles.bs_1}>
+              <TouchableOpacity
+                style={styles.bs_1_circle}
+                onPress={() => navigation.goBack()}
+              >
+                <LinearGradient
+                  style={styles.bs_1_stroke_circle}
+                  colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
                 >
-                  <LinearGradient
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0.1)",
-                    ]}
-                    style={styles.input_inner_section}
-                  >
-                    <View style={styles.input_section_text_nsvg}>
-                      <Text
-                        style={
-                          selectedKey
-                            ? styles.input_text_active
-                            : styles.input_text
-                        }
-                      >
-                        {selectedKey
-                          ? options[selectedKey].title
-                          : "Choose Option"}
-                      </Text>
-                    </View>
-                    <View style={styles.svg_circle_eye}>
-                      <Feather name="chevron-down" size={22} color="#fff" />
-                    </View>
-                  </LinearGradient>
+                  <View style={styles.bs_1_circle_circle}>
+                    <Ionicons name="chevron-back" size={20} color="#fff" />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.bs_2}>
+              <Text style={styles.bs_2_cue}>CUE</Text>
+            </View>
+            <View style={styles.bs_3}></View>
+          </View>
 
-                  {/* Dropdown list */}
-                  {openIndex === levelIndex && (
-                    <View style={{ marginLeft: 30, marginTop: 5 }}>
-                      {Object.keys(options).map((key) => (
-                        <TouchableOpacity
-                          key={options[key]._id}
-                          onPress={() => handleSelect(levelIndex, key)}
-                          style={{ padding: 8 }}
-                        >
-                          <Text style={{ color: "#fff" }}>
-                            {options[key].title}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            }
-          )}
+          {/* Title */}
+          <View style={styles.welcome_view}>
+            <Text style={styles.welcome_text}>{screenData.headerTitle}</Text>
+          </View>
 
-          {/* Next button */}
+          {/* Category Dropdown (same as Role UI) */}
           <TouchableOpacity
-            style={styles.input_whole_section_btn}
-            onPress={() => navigation.navigate(dummyData.nextButton.nextScreen)}
+            onPress={() => {
+              setCurrentOptions(screenData.all_connections);
+              category_ref.current.open();
+            }}
+            style={styles.input_whole_section}
           >
             <LinearGradient
-              colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-              style={styles.input_inner_section_btn}
+              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+              style={styles.input_inner_section}
             >
-              <Text style={styles.login_text}>{dummyData.nextButton.text}</Text>
+              <View style={styles.svg_circle}>
+                <Ionicons name="list" size={20} color="#fff" />
+              </View>
+              <View style={styles.input_section_text}>
+                <Text
+                  style={
+                    selections.length === 0
+                      ? styles.input_text
+                      : styles.input_text_active
+                  }
+                >
+                  {selections.length === 0
+                    ? "Choose Category"
+                    : selections.join(" → ")}
+                </Text>
+              </View>
+              <View style={styles.svg_circle_eye}>
+                <Ionicons name="chevron-down" size={20} color="#fff" />
+              </View>
             </LinearGradient>
           </TouchableOpacity>
-
-          {/* Selected path preview */}
-          {selections.length > 0 && (
-            <View style={{ marginTop: 20, padding: 10 }}>
-              <Text style={{ color: "#fff" }}>
-                Selected Path:{" "}
-                {selections
-                  .map((key, i) => getOptionsAtLevel(i)[key].title)
-                  .join(" → ")}
-              </Text>
-            </View>
-          )}
         </ScrollView>
+
+        {/* Next button */}
+        <TouchableOpacity
+          style={styles.input_whole_section_btn}
+          onPress={() => navigation.navigate(screenData.nextButton.nextScreen)}
+        >
+          <LinearGradient
+            colors={["rgb(255,255,255)", "rgb(181,195,227)"]}
+            style={styles.input_inner_section_btn}
+          >
+            <Text style={styles.login_text}>{screenData.nextButton.text}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
+
+      {/* Category picker sheet (same style as Role) */}
+      <RBSheet ref={category_ref} height={320}>
+        <LinearGradient
+          style={styles.bs_whole_view}
+          colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
+        >
+          <View style={{ height: 10 }} />
+          {Object.keys(currentOptions).map((key) => {
+            const item = currentOptions[key];
+            return (
+              <TouchableOpacity
+                key={item._id}
+                style={styles.option_indi_whole}
+                onPress={() => handleCategorySelect(key)}
+              >
+                <LinearGradient
+                  style={styles.option_indi}
+                  colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+                >
+                  <View style={styles.oi_dot_section}>
+                    <View
+                      style={
+                        selectedKey === key
+                          ? styles.oi_dot_active
+                          : styles.oi_dot
+                      }
+                    />
+                  </View>
+                  <View style={styles.oi_text_section}>
+                    <Text style={styles.oi_text}>{item.title}</Text>
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            );
+          })}
+        </LinearGradient>
+      </RBSheet>
     </SafeAreaView>
   );
 }

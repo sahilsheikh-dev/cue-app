@@ -1,4 +1,3 @@
-// CoachProfileCertificateDetails.jsx (Dummy with Gallery/Camera Image Picking, Max 5)
 import {
   Text,
   View,
@@ -22,8 +21,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function CoachProfileCertificateDetails({ navigation }) {
-  // ✅ Dummy Data Object
-  const dummyData = {
+  const screenData = {
     headerTitle: "Add Certificates",
     nextScreen: "CoachProfileReviewConfirmDetails",
     uploadText: "Upload a certificate",
@@ -79,7 +77,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
     setTimeout(() => {
       setLoading(false);
       Alert.alert("Success", "Certificates saved (dummy)!");
-      navigation.navigate(dummyData.nextScreen);
+      navigation.navigate(screenData.nextScreen);
     }, 1500);
   };
 
@@ -159,10 +157,15 @@ export default function CoachProfileCertificateDetails({ navigation }) {
             </View>
             <View style={styles.bs_2}>
               <Text style={styles.bs_2_cue} numberOfLines={1}>
-                {dummyData.headerTitle}
+                CUE
               </Text>
             </View>
             <View style={styles.bs_3} />
+          </View>
+
+          {/* title + description */}
+          <View style={styles.welcome_view}>
+            <Text style={styles.welcome_text}>{screenData.headerTitle}</Text>
           </View>
 
           {/* Open Camera Button */}
@@ -213,36 +216,33 @@ export default function CoachProfileCertificateDetails({ navigation }) {
                       size={28}
                       color="rgba(255, 255, 255, 0.7)"
                     />
-                    <Text style={styles.upy_text}>{dummyData.uploadText}</Text>
+                    <Text style={styles.upy_text}>{screenData.uploadText}</Text>
                     <Text style={styles.mpp_text}>
-                      {dummyData.uploadSubText}
+                      {screenData.uploadSubText}
                     </Text>
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
             )}
-
-            {/* Save Button */}
-            <TouchableOpacity
-              style={styles.input_whole_section_btn}
-              onPress={save}
-            >
-              <LinearGradient
-                colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-                style={styles.input_inner_section_btn}
-              >
-                {loading ? (
-                  <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
-                ) : (
-                  <Text style={styles.login_text}>Save</Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <View style={styles.empty_view} />
           </ScrollView>
         </>
       )}
+
+      {/* Save Button */}
+      <TouchableOpacity style={styles.input_whole_section_btn} onPress={save}>
+        <LinearGradient
+          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+          style={styles.input_inner_section_btn}
+        >
+          {loading ? (
+            <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
+          ) : (
+            <Text style={styles.login_text}>Save</Text>
+          )}
+        </LinearGradient>
+      </TouchableOpacity>
+
+      <View style={styles.empty_view} />
     </SafeAreaView>
   );
 }

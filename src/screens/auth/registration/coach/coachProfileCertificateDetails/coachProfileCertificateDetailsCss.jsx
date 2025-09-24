@@ -61,8 +61,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    // backgroundColor: "red",
-    zIndex: 10,
   },
   bs_1: {
     height: "100%",
@@ -77,7 +75,6 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "red",
   },
   bs_3: {
     height: "100%",
@@ -87,8 +84,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bs_1_circle: {
-    height: 40,
-    width: 40,
+    height: 55,
+    width: 55,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 50,
     display: "flex",
@@ -114,8 +111,9 @@ const styles = StyleSheet.create({
   },
   bs_2_cue: {
     textAlign: "center",
-    fontSize: 16,
-    color: "white",
+    fontSize: 20,
+    color: "#ffffff90",
+    fontWeight: 400,
     letterSpacing: 0.7,
     fontFamily: "Poppins-Regular",
   },
@@ -157,8 +155,9 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 45,
+    // marginTop: 370,
+    zIndex: 10,
   },
   input_inner_section_btn: {
     height: "100%",
@@ -183,7 +182,7 @@ const styles = StyleSheet.create({
     objectFit: "cover",
   },
   empty_view: {
-    height: 400,
+    height: 200,
     width: "100%",
   },
   cross_btn: {
@@ -262,15 +261,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  input_whole_section_btn: {
-    height: 60,
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-    marginTop: 20,
-  },
   input_inner_section_btn: {
     height: "100%",
     width: "85%",
@@ -286,6 +276,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#0F1C4E",
     fontFamily: "Poppins-Regular",
+  },
+  welcome_view: {
+    // height: "fit-content",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  welcome_text: {
+    fontSize: 24,
+    color: "white",
+    fontWeight: "400",
+    letterSpacing: 0.7,
+    fontFamily: "Poppins-ThinItalic",
+    textAlign: "center",
+    width: "100%",
+  },
+  welcome_des: {
+    width: "100%",
+    fontSize: 18,
+    color: "#ffffffa1",
+    fontSize: 16,
+    fontWeight: "300",
+    marginTop: 5,
+    textAlign: "center",
   },
 });
 export default styles;

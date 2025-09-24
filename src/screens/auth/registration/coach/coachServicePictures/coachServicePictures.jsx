@@ -220,26 +220,22 @@ export default function CoachServicePictures({ navigation }) {
             </View>
           </LinearGradient>
         </TouchableOpacity>
-
-        {/* Save / Next */}
-        <TouchableOpacity
-          style={styles.input_whole_section_btn}
-          onPress={() => {
-            navigation.navigate(dummyData.nextScreen);
-          }}
-        >
-          <LinearGradient
-            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-            style={styles.input_inner_section_btn}
-          >
-            {loading ? (
-              <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
-            ) : (
-              <Text style={styles.login_text}>Next</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
       </ScrollView>
+
+      {/* Save / Next */}
+      <TouchableOpacity
+        style={styles.input_whole_section_btn}
+        onPress={() => {
+          navigation.navigate("CoachAccountDetails");
+        }}
+      >
+        <LinearGradient
+          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+          style={styles.input_inner_section_btn}
+        >
+          <Text style={styles.login_text}>Next</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

@@ -1,4 +1,3 @@
-// CoachYourStoryDetails.jsx (Dummy with 500 Char Limit + Counter, Toolbar Removed)
 import {
   Text,
   View,
@@ -138,25 +137,25 @@ export default function CoachYourStoryDetails({ navigation }) {
             </Text>
 
             <View style={styles.empty_space}></View>
-
-            {/* Next Button */}
-            <TouchableOpacity
-              style={styles.input_whole_section_btn}
-              onPress={saveStory}
-            >
-              <LinearGradient
-                colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-                style={styles.input_inner_section_btn}
-              >
-                {loading ? (
-                  <ActivityIndicator size={20} color={"#1E3F8E"} />
-                ) : (
-                  <Text style={styles.login_text}>Next</Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>
+
+        {/* Next Button */}
+        <TouchableOpacity
+          style={styles.input_whole_section_btn}
+          onPress={saveStory}
+        >
+          <LinearGradient
+            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
+            style={styles.input_inner_section_btn}
+          >
+            {loading ? (
+              <ActivityIndicator size={20} color={"#1E3F8E"} />
+            ) : (
+              <Text style={styles.login_text}>Next</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
