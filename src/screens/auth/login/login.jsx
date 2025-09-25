@@ -73,14 +73,14 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState();
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
-  const [agreeTc, setAgreeTc] = useState(false);
+  // const [agreeTc, setAgreeTc] = useState(false);
 
   const handleLogin = async () => {
     // Terms and conditions check
-    if (!agreeTc) {
-      Alert.alert("Validation Error", "Please agree to Terms & Conditions");
-      return;
-    }
+    // if (!agreeTc) {
+    //   Alert.alert("Validation Error", "Please agree to Terms & Conditions");
+    //   return;
+    // }
 
     // Role check
     if (!role) {
