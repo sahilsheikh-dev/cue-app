@@ -130,11 +130,12 @@ export default function Signup({ navigation }) {
 
           {/* ✅ Role Dropdown */}
           <Dropdown
-            label="Join As"
+            label="Login As"
             data={["client", "coach", "eventOrganizer", "productCompany"]}
             selected={role}
             onSelect={(val) => setRole(val)}
-            renderLabel={(item) =>
+            dotSelect
+            renderSelected={(item) =>
               item === "client"
                 ? "Client"
                 : item === "coach"
@@ -143,7 +144,17 @@ export default function Signup({ navigation }) {
                 ? "Event Organizer"
                 : "Product Company"
             }
-            dotSelect
+            renderOption={(item) => (
+              <Text style={{ color: "#fff" }}>
+                {item === "client"
+                  ? "Client"
+                  : item === "coach"
+                  ? "Coach"
+                  : item === "eventOrganizer"
+                  ? "Event Organizer"
+                  : "Product Company"}
+              </Text>
+            )}
             icon="person-outline"
             containerStyle={{ width: "85%", alignSelf: "center" }}
           />

@@ -93,13 +93,31 @@ export default function ContactNumber({ navigation }) {
                 label="Country"
                 data={countries}
                 selected={selectedCountry}
-                onSelect={(item) => {
-                  setSelectedCountry(item);
-                  setMobileNumber("");
-                }}
-                withFlag
-                renderLabel={(item) => item.code}
-                containerStyle={{ width: "30%", marginBottom: 0 }}
+                onSelect={(item) => setSelectedCountry(item)}
+                dotSelect
+                searchable
+                searchPlaceholder="Search country..."
+                renderTrigger={(item) => (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={{ uri: item.img }}
+                      style={{ width: 20, height: 14, marginRight: 6 }}
+                    />
+                    <Text style={{ color: "#fff" }}>{item.code}</Text>
+                  </View>
+                )}
+                renderOption={(item, selected) => (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={{ uri: item.img }}
+                      style={{ width: 20, height: 14, marginRight: 8 }}
+                    />
+                    <Text
+                      style={{ color: "#fff" }}
+                    >{`${item.code} ${item.name}`}</Text>
+                  </View>
+                )}
+                containerStyle={{ width: "25%" }}
               />
 
               <View style={styles.input_section}>

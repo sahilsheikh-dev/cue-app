@@ -22,7 +22,6 @@ import Header from "../../../../../../components/common/header/header";
 import ScreenLayout from "../../../../../../components/common/screenLayout/screenLayout";
 
 export default function OtpVerification({ navigation }) {
-  // Dummy screen data
   const screenData = {
     title: "OTP Verification",
     description: "Enter the code from the SMS we sent you",
@@ -36,25 +35,33 @@ export default function OtpVerification({ navigation }) {
   const inputsRef = useRef([]);
 
   const handleChange = (text, index) => {
-    if (/^[0-9]$/.test(text)) {
-      const newOtp = [...otp];
-      newOtp[index] = text;
-      setOtp(newOtp);
+    const newOtp = [...otp];
 
-      // move to next input
-      if (index < screenData.otpLength - 1) {
-        inputsRef.current[index + 1].focus();
-      }
+    // ✅ Allow overwrite: update current index
+    newOtp[index] = text;
+
+    setOtp(newOtp);
+
+    if (text && index < screenData.otpLength - 1) {
+      // ✅ Move to next if digit entered
+      inputsRef.current[index + 1].focus();
     }
   };
 
   const handleKeyPress = ({ nativeEvent }, index) => {
-    if (nativeEvent.key === "Backspace" && otp[index] === "" && index > 0) {
-      // move back on backspace
-      inputsRef.current[index - 1].focus();
+    if (nativeEvent.key === "Backspace") {
       const newOtp = [...otp];
-      newOtp[index - 1] = "";
-      setOtp(newOtp);
+
+      if (otp[index] !== "") {
+        // ✅ Clear current digit, stay in same input
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        // ✅ If current empty → move back
+        inputsRef.current[index - 1].focus();
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+      }
     }
   };
 

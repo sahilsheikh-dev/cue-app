@@ -145,7 +145,8 @@ export default function Login({ navigation }) {
           data={["client", "coach", "eventOrganizer", "productCompany"]}
           selected={role}
           onSelect={(val) => setRole(val)}
-          renderLabel={(item) =>
+          dotSelect
+          renderSelected={(item) =>
             item === "client"
               ? "Client"
               : item === "coach"
@@ -154,7 +155,17 @@ export default function Login({ navigation }) {
               ? "Event Organizer"
               : "Product Company"
           }
-          dotSelect
+          renderOption={(item) => (
+            <Text style={{ color: "#fff" }}>
+              {item === "client"
+                ? "Client"
+                : item === "coach"
+                ? "Coach"
+                : item === "eventOrganizer"
+                ? "Event Organizer"
+                : "Product Company"}
+            </Text>
+          )}
           icon="person-outline"
           containerStyle={{ width: "85%", alignSelf: "center" }}
         />
@@ -169,13 +180,31 @@ export default function Login({ navigation }) {
               label="Country"
               data={countries}
               selected={selectedCountry}
-              onSelect={(item) => {
-                setSelectedCountry(item);
-                setMobileNumber("");
-              }}
-              withFlag
-              renderLabel={(item) => item.code}
-              containerStyle={{ width: "30%", marginBottom: 0 }}
+              onSelect={(item) => setSelectedCountry(item)}
+              dotSelect
+              searchable
+              searchPlaceholder="Search country..."
+              renderTrigger={(item) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={{ uri: item.img }}
+                    style={{ width: 20, height: 14, marginRight: 6 }}
+                  />
+                  <Text style={{ color: "#fff" }}>{item.code}</Text>
+                </View>
+              )}
+              renderOption={(item, selected) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={{ uri: item.img }}
+                    style={{ width: 20, height: 14, marginRight: 8 }}
+                  />
+                  <Text
+                    style={{ color: "#fff" }}
+                  >{`${item.code} ${item.name}`}</Text>
+                </View>
+              )}
+              containerStyle={{ width: "25%" }}
             />
 
             <View style={styles.input_section}>
@@ -202,49 +231,6 @@ export default function Login({ navigation }) {
           type="password"
           icon="lock-closed-outline"
         />
-
-        {/* Agree Section */}
-        {/* <View
-          style={[
-            styles.fp_whole_,
-            {
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            },
-          ]}
-        >
-          <TouchableOpacity style={{ flex: 1 }}>
-            <Text style={styles.fp_text_center}>
-              I agree to the Apps{" "}
-              <Text
-                style={styles.fp_inner_text}
-                onPress={() =>
-                  navigation.navigate("TermsAndConditions", { role })
-                }
-              >
-                Terms & Conditions
-              </Text>{" "}
-              and{" "}
-              <Text
-                style={styles.fp_inner_text}
-                onPress={() => navigation.navigate("PrivacyPolicy")}
-              >
-                Privacy Policy
-              </Text>
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ paddingLeft: 10 }}
-            onPress={() => setAgreeTc(!agreeTc)}
-          >
-            <MaterialCommunityIcons
-              name={agreeTc ? "checkbox-marked" : "checkbox-blank-outline"}
-              size={20}
-              color="#fff"
-            />
-          </TouchableOpacity>
-        </View> */}
 
         <View style={{ width: "85%", alignSelf: "center" }}>
           <ButtonLink
