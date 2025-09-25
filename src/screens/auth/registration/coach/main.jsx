@@ -2,9 +2,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 
 import CoachIntroduction from "./coachIntroduction/coachIntroduction";
-import CoachProfileBasicDetails from "./coachProfileBasicDetails/coachProfileBasicDetails";
-import CoachProfileCategoryDetails from "./coachProfileCategoryDetails/coachProfileCategoryDetails";
-import CoachProfileExperienceDetails from "./coachProfileExperienceDetails/coachProfileExperienceDetails";
+import CoachPersonalProfileDetails from "./coachPersonalProfileDetails/coachPersonalProfileDetails";
+import CoachClientAcceptanceDetails from "./coachClientAcceptanceDetails/coachClientAcceptanceDetails";
 import CoachProfileCertificateDetails from "./coachProfileCertificateDetails/coachProfileCertificateDetails";
 import CoachProfileReviewConfirmDetails from "./coachProfileReviewConfirmDetails/coachProfileReviewConfirmDetails";
 import CoachCreateServiceDetails from "./coachCreateServiceDetails/coachCreateServiceDetails";
@@ -23,18 +22,13 @@ export const CoachRegistrationScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
   <Stack.Screen
-    name="CoachProfileBasicDetails"
-    component={CoachProfileBasicDetails}
+    name="CoachPersonalProfileDetails"
+    component={CoachPersonalProfileDetails}
     options={{ headerShown: false }}
   />,
   <Stack.Screen
-    name="CoachProfileCategoryDetails"
-    component={CoachProfileCategoryDetails}
-    options={{ headerShown: false }}
-  />,
-  <Stack.Screen
-    name="CoachProfileExperienceDetails"
-    component={CoachProfileExperienceDetails}
+    name="CoachClientAcceptanceDetails"
+    component={CoachClientAcceptanceDetails}
     options={{ headerShown: false }}
   />,
   <Stack.Screen

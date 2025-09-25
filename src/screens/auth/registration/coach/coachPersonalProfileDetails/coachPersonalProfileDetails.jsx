@@ -8,51 +8,48 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from "react-native";
-
-import styles from "./coachProfileExperienceDetailsCss";
 import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-import {
-  Ionicons,
-  Feather,
-  MaterialIcons,
-  MaterialCommunityIcons,
-  Entypo,
-} from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
+import styles from "./coachPersonalProfileDetailsCss";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
-import DatePickerField from "../../../../../components/common/datePickerField/datePickerField";
-import Dropdown from "../../../../../components/common/dropdown/dropdown";
 import InputField from "../../../../../components/common/inputField/inputField";
+import Dropdown from "../../../../../components/common/dropdown/dropdown";
+import DatePickerField from "../../../../../components/common/datePickerField/datePickerField";
+const background = require("../../../../../../assets/images/background.png");
 
-export default function CoachProfileExperienceDetails({ navigation }) {
-  const screenData = {
-    genderOptions: ["Male", "Female", "Other"],
-    yearOptions: ["1 year", "2 years", "3 years", "4 years", "5+ years"],
-    monthOptions: ["1 month", "3 months", "6 months", "9 months"],
-    countryOptions: ["India", "USA", "UK", "Australia", "Canada"],
-  };
+export default function CoachPersonalProfileDetails({ navigation }) {
+  const agreements = [
+    "I possess the necessary qualifications and licenses.",
+    "I possess the necessary talent and experience.",
+    "I agree to a refund if the client is unhappy with my service.",
+  ];
 
-  // ✅ Local state
+  const countryOptions = ["India", "USA", "UK", "Australia", "Canada"];
+
+  const [email, setEmail] = useState("");
+  const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [language, setLanguage] = useState("");
-  const [experienceDate, setExperienceDate] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
+  const [checked, setChecked] = useState(Array(agreements.length).fill(false));
+  const [loading, setLoading] = useState(false);
   const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
+  const [experienceDate, setExperienceDate] = useState("");
 
-  // ✅ BottomSheet refs
-  const genderRef = useRef();
-  const languageRef = useRef();
-  const yearsRef = useRef();
-  const monthsRef = useRef();
-  const countryRef = useRef();
+  const toggleCheck = (idx) => {
+    const newChecked = [...checked];
+    newChecked[idx] = !newChecked[idx];
+    setChecked(newChecked);
+  };
 
   return (
     <>
@@ -63,12 +60,29 @@ export default function CoachProfileExperienceDetails({ navigation }) {
           onBackPress={() => navigation.goBack()}
         />
 
-        {/* Title */}
+        {/* title + description */}
         <View style={styles.welcome_view}>
-          <Text style={styles.welcome_text}>Build Your Profile</Text>
+          <Text style={styles.welcome_text}>Your Personal Profile Details</Text>
         </View>
 
-        {/* Gender Dropdown */}
+        {/* Email */}
+        <InputField
+          placeholder="Enter Email"
+          value={email}
+          onChangeText={setEmail}
+          type="email"
+          icon="mail-outline"
+        />
+
+        {/* Date of Birth */}
+        <DatePickerField
+          placeholder="Select Date of Birth"
+          value={dob ? new Date(dob) : null}
+          onChange={(date) => setDob(date)}
+          icon="calendar-outline"
+        />
+
+        {/* Gender dropdown */}
         <Dropdown
           label="Select Your Gender"
           data={["male", "female", "other"]}
@@ -88,17 +102,6 @@ export default function CoachProfileExperienceDetails({ navigation }) {
             </Text>
           )}
           icon="person-outline"
-          containerStyle={{ width: "85%", alignSelf: "center" }}
-        />
-
-        {/* Language Dropdown */}
-        <Dropdown
-          label="Select Languages"
-          data={["English", "Hindi", "Marathi", "Gujarati"]}
-          selected={language}
-          onSelect={(val) => setLanguage(val)}
-          dotSelect
-          icon="language"
           containerStyle={{ width: "85%", alignSelf: "center" }}
         />
 
@@ -147,12 +150,26 @@ export default function CoachProfileExperienceDetails({ navigation }) {
           type="text"
           icon="pin"
         />
-      </ScreenLayout>
 
-      <Button
-        text={"Next"}
-        onPress={() => navigation.navigate("CoachProfileCertificateDetails")}
-      />
+        {/* Agreements */}
+        {agreements.map((item, idx) => (
+          <TouchableOpacity
+            key={idx}
+            style={styles.input_whole_section_dot_text}
+            onPress={() => toggleCheck(idx)}
+          >
+            <View style={checked[idx] ? styles.dot_active : styles.dot}></View>
+            <View>
+              <Text style={styles.dot_text}>{item}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+
+        <Button
+          text={loading ? "Loading..." : "Next"}
+          onPress={() => navigation.navigate("CoachClientAcceptanceDetails")}
+        />
+      </ScreenLayout>
     </>
   );
 }

@@ -73,7 +73,7 @@ export default function CoachAgreementDetails({ navigation }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"Coach's Agreement Terms"}
+          title={"Agreement Terms"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
           rightIcon={"eye"}

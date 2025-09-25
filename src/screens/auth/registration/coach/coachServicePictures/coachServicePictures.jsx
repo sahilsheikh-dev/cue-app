@@ -199,12 +199,12 @@ export default function CoachServicePictures({ navigation }) {
             </View>
           </LinearGradient>
         </TouchableOpacity>
-      </ScreenLayout>
 
-      <Button
-        text={"Next"}
-        onPress={() => navigation.navigate("CoachVirtualPricingDetails")}
-      />
+        <Button
+          text={"Next"}
+          onPress={() => navigation.navigate("CoachVirtualPricingDetails")}
+        />
+      </ScreenLayout>
     </>
   );
 }

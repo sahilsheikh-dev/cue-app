@@ -31,7 +31,7 @@ export default function CoachIntroduction({ navigation }) {
 
       <Button
         text={"Next"}
-        onPress={() => navigation.navigate("CoachProfileBasicDetails")}
+        onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
       />
     </>
   );

@@ -8,7 +8,7 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import styles from "./coachProfileCategoryDetailsCss";
+import styles from "./coachClientAcceptanceDetailsCss";
 import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,8 +18,9 @@ import { Ionicons } from "@expo/vector-icons";
 import Button from "../../../../../components/common/button/button";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
+import Dropdown from "../../../../../components/common/dropdown/dropdown";
 
-export default function CoachProfileCategoryDetails({ navigation }) {
+export default function CoachClientAcceptanceDetails({ navigation }) {
   const category_ref = useRef();
 
   const screenData = {
@@ -69,6 +70,8 @@ export default function CoachProfileCategoryDetails({ navigation }) {
   );
   const [selectedKey, setSelectedKey] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [gender, setGender] = useState("");
+  const [language, setLanguage] = useState("");
 
   // ✅ Handle category selection
   const handleCategorySelect = (key) => {
@@ -97,6 +100,44 @@ export default function CoachProfileCategoryDetails({ navigation }) {
         />
 
         {/* Title */}
+        <View style={styles.welcome_view}>
+          <Text style={styles.welcome_text}>Client's Acceptance Details</Text>
+        </View>
+
+        {/* Gender Dropdown */}
+        <Dropdown
+          label="Select Your Gender"
+          data={["male", "female", "other"]}
+          selected={gender}
+          onSelect={(val) => setGender(val)}
+          dotSelect
+          renderSelected={(item) =>
+            item === "male" ? "Male" : item === "female" ? "Female" : "Other"
+          }
+          renderOption={(item) => (
+            <Text style={{ color: "#fff" }}>
+              {item === "male"
+                ? "Male"
+                : item === "female"
+                ? "Female"
+                : "Other"}
+            </Text>
+          )}
+          icon="person-outline"
+          containerStyle={{ width: "85%", alignSelf: "center" }}
+        />
+
+        {/* Language Dropdown */}
+        <Dropdown
+          label="Select Languages"
+          data={["English", "Hindi", "Marathi", "Gujarati"]}
+          selected={language}
+          onSelect={(val) => setLanguage(val)}
+          dotSelect
+          icon="language"
+          containerStyle={{ width: "85%", alignSelf: "center" }}
+        />
+
         <View style={styles.welcome_view}>
           <Text style={styles.welcome_text}>Choose Category</Text>
         </View>
@@ -137,7 +178,7 @@ export default function CoachProfileCategoryDetails({ navigation }) {
       </ScreenLayout>
       <Button
         text={loading ? "Loading..." : "Next"}
-        onPress={() => navigation.navigate("CoachProfileExperienceDetails")}
+        onPress={() => navigation.navigate("CoachProfileCertificateDetails")}
       />
     </>
   );
