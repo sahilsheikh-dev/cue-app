@@ -223,21 +223,20 @@ export default function Signup({ navigation }) {
             />
           </TouchableOpacity>
         </View>
+        {/* ✅ Signup Button */}
+        <Button
+          text={loading ? "Creating..." : "Get Started"}
+          onPress={validateAndSignup}
+        />
+
+        {/* ✅ Login Redirect */}
+        <ButtonLink
+          text="Already have an account ?"
+          highlightText="Login"
+          onPress={() => navigation.replace("Login")}
+          center
+        />
       </ScreenLayout>
-
-      {/* ✅ Signup Button */}
-      <Button
-        text={loading ? "Creating..." : "Get Started"}
-        onPress={validateAndSignup}
-      />
-
-      {/* ✅ Login Redirect */}
-      <ButtonLink
-        text="Already have an account ?"
-        highlightText="Login"
-        onPress={() => navigation.replace("Login")}
-        center
-      />
     </>
   );
 }

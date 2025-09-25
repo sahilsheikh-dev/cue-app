@@ -4,12 +4,12 @@ const styles = StyleSheet.create({
   triggerWrapper: {
     height: 60,
     justifyContent: "center",
-    alignItems: "center", // ✅ centers inside parent
+    alignItems: "center",
     marginBottom: 12,
   },
   triggerInner: {
     height: "100%",
-    width: "100%", // ✅ takes parent width (from containerStyle)
+    width: "100%",
     borderRadius: 100,
     borderWidth: 1.2,
     borderColor: "#ffffff17",
@@ -33,17 +33,15 @@ const styles = StyleSheet.create({
   },
   sheetContainer: {
     height: "100%",
-    alignItems: "center",
     paddingVertical: 10,
   },
   optionWrapper: {
     width: "100%",
-    alignItems: "center",
     marginBottom: 10,
   },
   optionInner: {
     height: 55,
-    width: "85%",
+    width: "100%", // ✅ full width
     borderRadius: 50,
     borderWidth: 1.2,
     borderColor: "#ffffff17",
@@ -80,5 +78,3 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 });
-
-export default styles;
