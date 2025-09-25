@@ -247,7 +247,14 @@ export default function Login({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <ButtonLink highlightText="Forgot Password?" />
+        <View style={{ width: "85%", alignSelf: "center" }}>
+          <ButtonLink
+            highlightText="Forgot Password?"
+            onPress={() => console.log("Pressed")}
+            align="right"
+            highlightColor="fade"
+          />
+        </View>
 
         {/* Log In button */}
         <TouchableOpacity
@@ -270,7 +277,8 @@ export default function Login({ navigation }) {
           text="Don't have an account ?"
           highlightText="Sign-up"
           onPress={() => navigation.replace("Signup")}
-          center
+          align="center"
+          highlightColor="white"
         />
       </ScrollView>
     </ScreenLayout>

@@ -33,15 +33,17 @@ const styles = StyleSheet.create({
   },
   sheetContainer: {
     height: "100%",
+    alignItems: "center",
     paddingVertical: 10,
   },
   optionWrapper: {
     width: "100%",
+    alignItems: "center",
     marginBottom: 10,
   },
   optionInner: {
     height: 55,
-    width: "100%", // ✅ full width
+    width: "95%",
     borderRadius: 50,
     borderWidth: 1.2,
     borderColor: "#ffffff17",
@@ -78,3 +80,5 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 });
+
+export default styles;

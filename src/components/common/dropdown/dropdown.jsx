@@ -60,8 +60,9 @@ const Dropdown = ({
           style={styles.sheetContainer}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
-          <ScrollView>
-            <View style={{ height: 10 }} />
+          <ScrollView style={{ height: 10, width: "100%" }}>
+            <View style={{ height: 10, width: "100%" }} />
+
             {data.map((item) => (
               <TouchableOpacity
                 key={item._id || item}
