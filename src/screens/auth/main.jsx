@@ -1,6 +1,5 @@
 import Signup from "./signup/signup";
 import Login from "./login/login";
-import { RegistrationScreens } from "./registration/main";
 
 export const AuthScreens = (Stack) => [
   <Stack.Screen
@@ -15,6 +14,4 @@ export const AuthScreens = (Stack) => [
     component={Login}
     options={{ headerShown: false }}
   />,
-
-  ...RegistrationScreens(Stack),
 ];

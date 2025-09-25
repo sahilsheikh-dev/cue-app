@@ -15,6 +15,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 
 import { Ionicons } from "@expo/vector-icons";
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import Header from "../../../../../components/common/header/header";
+import Button from "../../../../../components/common/button/button";
 
 export default function CoachProfileReviewConfirmDetails({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -34,41 +37,18 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-      <View style={styles.top_portion1} />
+    <>
+      <ScreenLayout scrollable withPadding>
+        <Header
+          title={"CUE"}
+          showBack={true}
+          onBackPress={() => navigation.goBack()}
+        />
 
-      {/* Header */}
-      <View style={styles.back_section}>
-        <View style={styles.bs_1}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.bs_2}>
-          <Text style={styles.byp_text}>Review and Confirm</Text>
-        </View>
-        <View style={styles.bs_3} />
-      </View>
+        <Text style={{ fontSize: 24, color: "white", textAlign: "center" }}>
+          Review and Submit
+        </Text>
 
-      {/* Content */}
-      <ScrollView style={styles.main_scroll_view}>
-        {/* Personal Information */}
         <LinearGradient
           style={styles.bankdetail_section}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
@@ -179,26 +159,13 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             </View>
           </View>
         </LinearGradient>
-      </ScrollView>
+      </ScreenLayout>
 
       {/* Next button */}
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={() => {
-          navigation.navigate("CoachCreateServiceDetails");
-        }}
-      >
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
-        >
-          {loading ? (
-            <ActivityIndicator color={"rgba(51, 80, 148, 1)"} size={20} />
-          ) : (
-            <Text style={styles.login_text}>Next</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-    </SafeAreaView>
+      <Button
+        text={"Submit"}
+        onPress={() => navigation.navigate("CoachCreateServiceDetails")}
+      />
+    </>
   );
 }

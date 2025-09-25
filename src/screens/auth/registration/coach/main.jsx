@@ -13,6 +13,7 @@ import CoachVirtualPricingDetails from "./coachVirtualPricingDetails/coachVirtua
 import CoachInPersonPricingDetails from "./coachInPersonPricingDetails/coachInPersonPricingDetails";
 import CoachServicePictures from "./coachServicePictures/coachServicePictures";
 import CoachAccountDetails from "./coachAccountDetails/coachAccountDetails";
+import CoachAgreementDetails from "./coachAgreementDetails/coachAgreementDetails";
 
 export const CoachRegistrationScreens = (Stack) => [
   //   COACH - UNVERIFIED ACCESS
@@ -60,6 +61,12 @@ export const CoachRegistrationScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
 
+  <Stack.Screen
+    name="CoachServicePictures"
+    component={CoachServicePictures}
+    options={{ headerShown: false }}
+  />,
+
   //   PENDING
   <Stack.Screen
     name="CoachVirtualPricingDetails"
@@ -74,8 +81,8 @@ export const CoachRegistrationScreens = (Stack) => [
   //   PENDING
 
   <Stack.Screen
-    name="CoachServicePictures"
-    component={CoachServicePictures}
+    name="CoachAgreementDetails"
+    component={CoachAgreementDetails}
     options={{ headerShown: false }}
   />,
   <Stack.Screen

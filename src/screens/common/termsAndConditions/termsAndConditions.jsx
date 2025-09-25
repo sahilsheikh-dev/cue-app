@@ -13,6 +13,8 @@ import { StatusBar } from "expo-status-bar";
 import { WebView } from "react-native-webview";
 import styles from "./termsAndConditionsCss";
 import { Ionicons } from "@expo/vector-icons";
+import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
+import Header from "../../../components/common/header/header";
 
 const background = require("../../../../assets/images/background.png");
 
@@ -40,84 +42,42 @@ export default function TermsAndConditions({ route }) {
   const safeRole = roleUrls[role] ? role : "client";
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar style="light" />
-
-      {/* Background */}
-      <Image
-        source={background}
-        style={[styles.backgroundImage, { position: "absolute" }]}
+    <ScreenLayout scrollable withPadding>
+      <Header
+        title={roleLabels[safeRole] + "'s Terms & Conditions"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
       />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={[styles.backgroundView, { position: "absolute" }]}
-      />
-
-      {/* Header with Back Option */}
-      <View style={styles.top_portion1}>
-        <View style={styles.bs_1}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
+      <WebView
+        style={{ flex: 1 }}
+        source={{ uri: roleUrls[safeRole] }}
+        startInLoadingState={true}
+        renderLoading={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator
+              size="large"
+              color="white"
+              accessibilityLabel="Loading Terms & Conditions"
+            />
+          </View>
+        )}
+        onError={() => (
+          <ButtonLink
+            text={
+              "Failed to load Terms and Conditions. Please try again later. "
+            }
+            highlightText={"Go Back!"}
             onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.bs_2}>
-          <Text
-            style={styles.bs_2_cue_}
-            numberOfLines={1}
-            accessibilityRole="header"
-          >
-            {roleLabels[safeRole]}'s Terms & Conditions
-          </Text>
-        </View>
-        <View style={styles.bs_3} />
-      </View>
-
-      {/* WebView */}
-      <View style={{ flex: 1 }}>
-        <WebView
-          style={{ flex: 1 }}
-          source={{ uri: roleUrls[safeRole] }}
-          startInLoadingState={true}
-          renderLoading={() => (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <ActivityIndicator
-                size="large"
-                color="white"
-                accessibilityLabel="Loading Terms & Conditions"
-              />
-            </View>
-          )}
-          onError={() => (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "white" }}>
-                Failed to load Terms and Conditions. Please try again later.
-              </Text>
-            </View>
-          )}
-        />
-      </View>
-    </SafeAreaView>
+            align="center"
+          />
+        )}
+      />
+    </ScreenLayout>
   );
 }

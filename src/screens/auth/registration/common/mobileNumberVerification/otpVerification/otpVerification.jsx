@@ -67,41 +67,36 @@ export default function OtpVerification({ navigation }) {
 
   return (
     <>
-      <ScreenLayout>
-        <ScrollView style={styles.main_scroll_view}>
-          <Header title={"CUE"} />
+      <ScreenLayout scrollable withPadding>
+        <Header title={"CUE"} />
 
-          {/* Title + description */}
-          <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>{screenData.title}</Text>
-            <Text style={styles.welcome_des}>{screenData.description}</Text>
-          </View>
+        {/* Title + description */}
+        <View style={styles.welcome_view}>
+          <Text style={styles.welcome_text}>{screenData.title}</Text>
+          <Text style={styles.welcome_des}>{screenData.description}</Text>
+        </View>
 
-          {/* OTP Inputs */}
-          <View style={styles.otp_whole_section}>
-            {otp.map((val, index) => (
-              <View key={index} style={styles.otp_indi}>
-                <LinearGradient
-                  colors={[
-                    "rgba(255, 255, 255, 0.1)",
-                    "rgba(30, 53, 126, 0.1)",
-                  ]}
-                  style={styles.oi_lg}
-                >
-                  <TextInput
-                    style={styles.oi_input}
-                    value={val}
-                    onChangeText={(text) => handleChange(text, index)}
-                    onKeyPress={(e) => handleKeyPress(e, index)}
-                    keyboardType="number-pad"
-                    maxLength={1}
-                    ref={(ref) => (inputsRef.current[index] = ref)}
-                  />
-                </LinearGradient>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
+        {/* OTP Inputs */}
+        <View style={styles.otp_whole_section}>
+          {otp.map((val, index) => (
+            <View key={index} style={styles.otp_indi}>
+              <LinearGradient
+                colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0.1)"]}
+                style={styles.oi_lg}
+              >
+                <TextInput
+                  style={styles.oi_input}
+                  value={val}
+                  onChangeText={(text) => handleChange(text, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  ref={(ref) => (inputsRef.current[index] = ref)}
+                />
+              </LinearGradient>
+            </View>
+          ))}
+        </View>
       </ScreenLayout>
 
       {/* ✅ Bottom Section stays clickable */}

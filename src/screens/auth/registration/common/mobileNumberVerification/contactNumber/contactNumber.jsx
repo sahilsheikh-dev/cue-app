@@ -69,73 +69,69 @@ export default function ContactNumber({ navigation }) {
 
   return (
     <>
-      <ScreenLayout>
-        <ScrollView style={styles.main_scroll_view}>
-          <Header title={"CUE"} />
+      <ScreenLayout scrollable withPadding>
+        <Header title={"CUE"} />
 
-          <View style={styles.top_portion}></View>
+        {/* title + description */}
+        <View style={styles.welcome_view}>
+          <Text style={styles.welcome_text}>Verify Your Phone Number</Text>
+          <Text style={styles.welcome_text_des}>
+            We will send you a One Time Password (OTP) on this mobile number
+          </Text>
+        </View>
 
-          {/* title + description */}
-          <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>Verify Your Phone Number</Text>
-            <Text style={styles.welcome_text_des}>
-              We will send you a One Time Password (OTP) on this mobile number
-            </Text>
-          </View>
+        {/* Country + Phone */}
+        <View style={styles.input_whole_section}>
+          <LinearGradient
+            colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+            style={styles.input_inner_section}
+          >
+            <Dropdown
+              label="Country"
+              data={countries}
+              selected={selectedCountry}
+              onSelect={(item) => setSelectedCountry(item)}
+              dotSelect
+              searchable
+              searchPlaceholder="Search Country"
+              renderTrigger={(item) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={{ uri: item.img }}
+                    style={{ width: 20, height: 14, marginRight: 6 }}
+                  />
+                  <Text style={{ color: "#fff" }}>{item.code}</Text>
+                </View>
+              )}
+              renderOption={(item, selected) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={{ uri: item.img }}
+                    style={{ width: 20, height: 14, marginRight: 8 }}
+                  />
+                  <Text
+                    style={{ color: "#fff" }}
+                  >{`${item.code} ${item.name}`}</Text>
+                </View>
+              )}
+              containerStyle={{ width: "30%" }}
+            />
 
-          {/* Country + Phone */}
-          <View style={styles.input_whole_section}>
-            <LinearGradient
-              colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-              style={styles.input_inner_section}
-            >
-              <Dropdown
-                label="Country"
-                data={countries}
-                selected={selectedCountry}
-                onSelect={(item) => setSelectedCountry(item)}
-                dotSelect
-                searchable
-                searchPlaceholder="Search Country"
-                renderTrigger={(item) => (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={{ uri: item.img }}
-                      style={{ width: 20, height: 14, marginRight: 6 }}
-                    />
-                    <Text style={{ color: "#fff" }}>{item.code}</Text>
-                  </View>
-                )}
-                renderOption={(item, selected) => (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={{ uri: item.img }}
-                      style={{ width: 20, height: 14, marginRight: 8 }}
-                    />
-                    <Text
-                      style={{ color: "#fff" }}
-                    >{`${item.code} ${item.name}`}</Text>
-                  </View>
-                )}
-                containerStyle={{ width: "30%" }}
+            <View style={styles.input_section}>
+              <TextInput
+                style={styles.input}
+                placeholder="Your phone number"
+                placeholderTextColor={"#ffffff90"}
+                keyboardType="phone-pad"
+                value={mobileNumber}
+                onChangeText={(text) => {
+                  const limit = parseInt(selectedCountry.number_of_digit);
+                  if (text.length <= limit) setMobileNumber(text);
+                }}
               />
-
-              <View style={styles.input_section}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Your phone number"
-                  placeholderTextColor={"#ffffff90"}
-                  keyboardType="phone-pad"
-                  value={mobileNumber}
-                  onChangeText={(text) => {
-                    const limit = parseInt(selectedCountry.number_of_digit);
-                    if (text.length <= limit) setMobileNumber(text);
-                  }}
-                />
-              </View>
-            </LinearGradient>
-          </View>
-        </ScrollView>
+            </View>
+          </LinearGradient>
+        </View>
       </ScreenLayout>
 
       <Button

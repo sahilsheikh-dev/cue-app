@@ -19,11 +19,13 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 
 // ✅ Expo vector icons
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import Header from "../../../../../components/common/header/header";
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import Button from "../../../../../components/common/button/button";
 
 export default function CoachProfileCertificateDetails({ navigation }) {
   const screenData = {
     headerTitle: "Add Certificates",
-    nextScreen: "CoachProfileReviewConfirmDetails",
     uploadText: "Upload a certificate",
     uploadSubText: "It could be a course, or an award",
   };
@@ -71,113 +73,79 @@ export default function CoachProfileCertificateDetails({ navigation }) {
     }
   };
 
-  // ✅ Dummy Save
-  const save = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert("Success", "Certificates saved (dummy)!");
-      navigation.navigate(screenData.nextScreen);
-    }, 1500);
-  };
-
   return (
-    <SafeAreaView style={styles.sav}>
-      {cameraOpen ? (
-        <View style={styles.whole_camera_section}>
-          {/* Close Camera */}
-          <TouchableOpacity
-            style={styles.camera_cross_section}
-            onPress={() => setCameraOpen(false)}
-          >
-            <Ionicons name="close" size={22} color="#000" />
-          </TouchableOpacity>
-
-          {/* Camera */}
-          <CameraView
-            style={styles.camera}
-            ratio="4:3"
-            enableTorch={flashOn}
-            facing={camera_back ? "back" : "front"}
-            ref={camera_ref}
-          />
-
-          {/* Camera Options */}
-          <View style={styles.camera_options}>
-            {/* Flash */}
+    <>
+      <ScreenLayout scrollable withPadding>
+        {cameraOpen ? (
+          <View style={styles.whole_camera_section}>
+            {/* Close Camera */}
             <TouchableOpacity
-              style={styles.co_small}
-              onPress={() => setFlashOn(!flashOn)}
+              style={styles.camera_cross_section}
+              onPress={() => setCameraOpen(false)}
             >
-              {flashOn ? (
-                <Ionicons name="flash" size={22} color="#fff" />
-              ) : (
-                <Ionicons name="flash-off" size={22} color="#fff" />
-              )}
+              <Ionicons name="close" size={22} color="#000" />
             </TouchableOpacity>
 
-            {/* Capture */}
-            <TouchableOpacity style={styles.co_large} onPress={capturePhoto} />
+            {/* Camera */}
+            <CameraView
+              style={styles.camera}
+              ratio="4:3"
+              enableTorch={flashOn}
+              facing={camera_back ? "back" : "front"}
+              ref={camera_ref}
+            />
 
-            {/* Flip Camera */}
-            <TouchableOpacity
-              style={styles.co_small}
-              onPress={() => setCameraBack(!camera_back)}
-            >
-              <Ionicons name="camera-reverse" size={22} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) : (
-        <>
-          <StatusBar style="light" />
-          <Image source={background} style={styles.backgroundImage} />
-          <LinearGradient
-            colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-            style={styles.backgroundView}
-          />
-          <View style={styles.top_portion1} />
-
-          {/* Header */}
-          <View style={styles.back_section}>
-            <View style={styles.bs_1}>
+            {/* Camera Options */}
+            <View style={styles.camera_options}>
+              {/* Flash */}
               <TouchableOpacity
-                style={styles.bs_1_circle}
-                onPress={() => navigation.goBack()}
+                style={styles.co_small}
+                onPress={() => setFlashOn(!flashOn)}
               >
-                <LinearGradient
-                  style={styles.bs_1_stroke_circle}
-                  colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-                >
-                  <View style={styles.bs_1_circle_circle}>
-                    <Ionicons name="chevron-back" size={20} color="#fff" />
-                  </View>
-                </LinearGradient>
+                {flashOn ? (
+                  <Ionicons name="flash" size={22} color="#fff" />
+                ) : (
+                  <Ionicons name="flash-off" size={22} color="#fff" />
+                )}
+              </TouchableOpacity>
+
+              {/* Capture */}
+              <TouchableOpacity
+                style={styles.co_large}
+                onPress={capturePhoto}
+              />
+
+              {/* Flip Camera */}
+              <TouchableOpacity
+                style={styles.co_small}
+                onPress={() => setCameraBack(!camera_back)}
+              >
+                <Ionicons name="camera-reverse" size={22} color="#fff" />
               </TouchableOpacity>
             </View>
-            <View style={styles.bs_2}>
-              <Text style={styles.bs_2_cue} numberOfLines={1}>
-                CUE
-              </Text>
+          </View>
+        ) : (
+          <>
+            <Header
+              title={"CUE"}
+              showBack={true}
+              onBackPress={() => navigation.goBack()}
+            />
+
+            {/* title + description */}
+            <View style={styles.welcome_view}>
+              <Text style={styles.welcome_text}>{screenData.headerTitle}</Text>
             </View>
-            <View style={styles.bs_3} />
-          </View>
 
-          {/* title + description */}
-          <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>{screenData.headerTitle}</Text>
-          </View>
+            {/* Open Camera Button */}
+            <TouchableOpacity
+              style={styles.camera_section}
+              onPress={() => setCameraOpen(true)}
+            >
+              <Ionicons name="camera" size={26} color="rgba(30, 63, 142, 1)" />
+            </TouchableOpacity>
 
-          {/* Open Camera Button */}
-          <TouchableOpacity
-            style={styles.camera_section}
-            onPress={() => setCameraOpen(true)}
-          >
-            <Ionicons name="camera" size={26} color="rgba(30, 63, 142, 1)" />
-          </TouchableOpacity>
-
-          {/* Certificates List */}
-          <ScrollView style={styles.main_scroll_view}>
+            {/* Certificates List */}
             {all_certificates.map((item, index) => (
               <View key={index}>
                 <LinearGradient
@@ -224,25 +192,15 @@ export default function CoachProfileCertificateDetails({ navigation }) {
                 </LinearGradient>
               </TouchableOpacity>
             )}
-          </ScrollView>
-        </>
-      )}
+          </>
+        )}
+      </ScreenLayout>
 
       {/* Save Button */}
-      <TouchableOpacity style={styles.input_whole_section_btn} onPress={save}>
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
-        >
-          {loading ? (
-            <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
-          ) : (
-            <Text style={styles.login_text}>Save</Text>
-          )}
-        </LinearGradient>
-      </TouchableOpacity>
-
-      <View style={styles.empty_view} />
-    </SafeAreaView>
+      <Button
+        text={"Save"}
+        onPress={() => navigation.navigate("CoachProfileReviewConfirmDetails")}
+      />
+    </>
   );
 }

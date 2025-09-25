@@ -24,6 +24,7 @@ import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 import Dropdown from "../../../components/common/dropdown/dropdown";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import InputField from "../../../components/common/inputField/inputField";
+import Button from "../../../components/common/button/button";
 
 const background = require("../../../../assets/images/background.png");
 
@@ -131,8 +132,8 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <ScreenLayout>
-      <ScrollView style={styles.main_scroll_view}>
+    <>
+      <ScreenLayout scrollable withPadding>
         <Text style={styles.welcome_text}>Welcome to Cue!</Text>
         <Text style={styles.pda_text}>Personal Development App</Text>
 
@@ -237,32 +238,21 @@ export default function Login({ navigation }) {
             highlightColor="fade"
           />
         </View>
+      </ScreenLayout>
 
-        {/* Log In button */}
-        <TouchableOpacity
-          style={styles.input_whole_section_btn}
-          onPress={handleLogin}
-        >
-          <LinearGradient
-            colors={["rgb(255,255,255)", "rgb(181,195,227)"]}
-            style={styles.input_inner_section_btn}
-          >
-            {loading ? (
-              <ActivityIndicator size={20} color={"#0F1C4E"} />
-            ) : (
-              <Text style={styles.login_text}>Log In</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+      {/* Log In button */}
+      <Button
+        text={loading ? "Logging In..." : "Log In"}
+        onPress={handleLogin}
+      />
 
-        <ButtonLink
-          text="Don't have an account ?"
-          highlightText="Sign-up"
-          onPress={() => navigation.replace("Signup")}
-          align="center"
-          highlightColor="white"
-        />
-      </ScrollView>
-    </ScreenLayout>
+      <ButtonLink
+        text="Don't have an account ?"
+        highlightText="Sign-up"
+        onPress={() => navigation.replace("Signup")}
+        align="center"
+        highlightColor="white"
+      />
+    </>
   );
 }

@@ -13,6 +13,8 @@ import { LinearGradient } from "expo-linear-gradient";
 
 // ✅ Expo vector icons
 import { Ionicons, Feather, AntDesign } from "@expo/vector-icons";
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import Header from "../../../../../components/common/header/header";
 
 export default function CoachCreateServiceDetails({ navigation }) {
   // 🔹 Dummy Data Object
@@ -24,45 +26,8 @@ export default function CoachCreateServiceDetails({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-
-      <View style={styles.top_portion1} />
-
-      {/* Header */}
-      <View style={styles.back_section}>
-        {/* Right-side menu icon (3 dots) */}
-        <View style={styles.bs_3}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        {/* Middle title */}
-        <View style={styles.bs_2}>
-          <Text style={styles.bs_2_cue} numberOfLines={1}>
-            cue
-          </Text>
-        </View>
-
-        {/* Left-side back button (optional, kept hidden for demo) */}
-        <View style={styles.bs_1}></View>
-      </View>
+    <ScreenLayout scrollable withPadding>
+      <Header title={"CUE"} />
 
       {/* Main content */}
       <View style={styles.main_scroll_view}>
@@ -104,6 +69,6 @@ export default function CoachCreateServiceDetails({ navigation }) {
           </View>
         </LinearGradient>
       </View>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }

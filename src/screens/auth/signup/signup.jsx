@@ -21,7 +21,6 @@ export default function Signup({ navigation }) {
   const [role, setRole] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreeTcPp, setAgreeTcPp] = useState(false);
@@ -64,13 +63,6 @@ export default function Signup({ navigation }) {
         "Last name must contain only letters"
       );
 
-    // Email
-    if (!email.trim())
-      return Alert.alert("Validation Error", "Email is required");
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email))
-      return Alert.alert("Validation Error", "Enter a valid email address");
-
     // Password
     if (!password)
       return Alert.alert("Validation Error", "Password is required");
@@ -107,7 +99,6 @@ export default function Signup({ navigation }) {
     try {
       const payload = {
         name: `${firstName.trim()} ${lastName.trim()}`,
-        email: email.trim(),
         password: password.trim(),
         agree_terms_conditions: agreeTcPp,
         agree_privacy_policy: agreeTcPp,
@@ -130,143 +121,133 @@ export default function Signup({ navigation }) {
 
   return (
     <>
-      <ScreenLayout>
-        <ScrollView style={{ flex: 1 }}>
-          {/* ✅ Page Header */}
-          <Header title="Welcome to CUE Wellness" />
+      <ScreenLayout scrollable withPadding>
+        {/* ✅ Page Header */}
+        <Header title="Welcome to CUE Wellness" />
 
-          {/* title */}
-          <View style={styles.welcome_view}>
-            <Text style={styles.welcome_text}>Create a Profile</Text>
-          </View>
+        {/* title */}
+        <View style={styles.welcome_view}>
+          <Text style={styles.welcome_text}>Create a Profile</Text>
+        </View>
 
-          {/* ✅ Role Dropdown */}
-          <Dropdown
-            label="Login As"
-            data={["client", "coach", "eventOrganizer", "productCompany"]}
-            selected={role}
-            onSelect={(val) => setRole(val)}
-            dotSelect
-            renderSelected={(item) =>
-              item === "client"
+        {/* ✅ Role Dropdown */}
+        <Dropdown
+          label="Login As"
+          data={["client", "coach", "eventOrganizer", "productCompany"]}
+          selected={role}
+          onSelect={(val) => setRole(val)}
+          dotSelect
+          renderSelected={(item) =>
+            item === "client"
+              ? "Client"
+              : item === "coach"
+              ? "Coach"
+              : item === "eventOrganizer"
+              ? "Event Organizer"
+              : "Product Company"
+          }
+          renderOption={(item) => (
+            <Text style={{ color: "#fff" }}>
+              {item === "client"
                 ? "Client"
                 : item === "coach"
                 ? "Coach"
                 : item === "eventOrganizer"
                 ? "Event Organizer"
-                : "Product Company"
-            }
-            renderOption={(item) => (
-              <Text style={{ color: "#fff" }}>
-                {item === "client"
-                  ? "Client"
-                  : item === "coach"
-                  ? "Coach"
-                  : item === "eventOrganizer"
-                  ? "Event Organizer"
-                  : "Product Company"}
-              </Text>
-            )}
-            icon="person-outline"
-            containerStyle={{ width: "85%", alignSelf: "center" }}
-          />
-
-          {/* ✅ Inputs */}
-          <InputField
-            placeholder="Enter First Name"
-            value={firstName}
-            onChangeText={setFirstName}
-            type="text"
-            icon="person-outline"
-          />
-          <InputField
-            placeholder="Enter Last Name"
-            value={lastName}
-            onChangeText={setLastName}
-            type="text"
-            icon="person-outline"
-          />
-          <InputField
-            placeholder="Enter Email"
-            value={email}
-            onChangeText={setEmail}
-            type="email"
-            icon="mail-outline"
-          />
-          <InputField
-            placeholder="Enter Password"
-            value={password}
-            onChangeText={setPassword}
-            type="password"
-            icon="lock-closed-outline"
-          />
-          <InputField
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            type="password"
-            icon="lock-closed-outline"
-          />
-
-          {/* ✅ Agree Section */}
-          <View
-            style={[
-              styles.fp_whole_,
-              {
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              },
-            ]}
-          >
-            <Text style={styles.fp_text_center}>
-              I agree to the Apps{" "}
-              <Text
-                style={styles.fp_inner_text}
-                onPress={() =>
-                  navigation.navigate("TermsAndConditions", { role })
-                }
-              >
-                Terms & Conditions
-              </Text>{" "}
-              and{" "}
-              <Text
-                style={styles.fp_inner_text}
-                onPress={() => navigation.navigate("PrivacyPolicy")}
-              >
-                Privacy Policy
-              </Text>
+                : "Product Company"}
             </Text>
-            <TouchableOpacity
-              style={{ paddingLeft: 10 }}
-              onPress={() => setAgreeTcPp(!agreeTcPp)}
+          )}
+          icon="person-outline"
+          containerStyle={{ width: "85%", alignSelf: "center" }}
+        />
+
+        {/* ✅ Inputs */}
+        <InputField
+          placeholder="Enter First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+          type="text"
+          icon="person-outline"
+        />
+        <InputField
+          placeholder="Enter Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+          type="text"
+          icon="person-outline"
+        />
+        <InputField
+          placeholder="Enter Password"
+          value={password}
+          onChangeText={setPassword}
+          type="password"
+          icon="lock-closed-outline"
+        />
+        <InputField
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          type="password"
+          icon="lock-closed-outline"
+        />
+
+        {/* ✅ Agree Section */}
+        <View
+          style={[
+            styles.fp_whole_,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            },
+          ]}
+        >
+          <Text style={styles.fp_text_center}>
+            I agree to the Apps{" "}
+            <Text
+              style={styles.fp_inner_text}
+              onPress={() =>
+                navigation.navigate("TermsAndConditions", { role })
+              }
             >
-              <MaterialCommunityIcons
-                name={agreeTcPp ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={20}
-                color="#fff"
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* ✅ Signup Button */}
-          <Button
-            text={loading ? "Creating..." : "Get Started"}
-            onPress={validateAndSignup}
-          />
-
-          {/* ✅ Login Redirect */}
-          <View style={{ marginBottom: "20px" }}>
-            <ButtonLink
-              text="Already have an account ?"
-              highlightText="Login"
-              onPress={() => navigation.navigate("Login")}
-              align="center"
-              highlightColor="white"
+              Terms & Conditions
+            </Text>{" "}
+            and{" "}
+            <Text
+              style={styles.fp_inner_text}
+              onPress={() => navigation.navigate("PrivacyPolicy")}
+            >
+              Privacy Policy
+            </Text>
+          </Text>
+          <TouchableOpacity
+            style={{ paddingLeft: 10 }}
+            onPress={() => setAgreeTcPp(!agreeTcPp)}
+          >
+            <MaterialCommunityIcons
+              name={agreeTcPp ? "checkbox-marked" : "checkbox-blank-outline"}
+              size={20}
+              color="#fff"
             />
-          </View>
-        </ScrollView>
+          </TouchableOpacity>
+        </View>
       </ScreenLayout>
+
+      {/* ✅ Signup Button */}
+      <Button
+        text={loading ? "Creating..." : "Get Started"}
+        // onPress={validateAndSignup}
+        onPress={() => navigation.navigate("ContactNumber")}
+      />
+
+      {/* ✅ Login Redirect */}
+      <ButtonLink
+        text="Already have an account ?"
+        highlightText="Login"
+        onPress={() => navigation.navigate("Login")}
+        align="center"
+        highlightColor="white"
+      />
     </>
   );
 }

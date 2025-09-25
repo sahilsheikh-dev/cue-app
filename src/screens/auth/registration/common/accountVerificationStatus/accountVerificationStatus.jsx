@@ -1,4 +1,3 @@
-// AccountVerificationStatus.jsx (Demo with Dummy Object + Dynamic Status)
 import {
   Text,
   View,
@@ -11,13 +10,15 @@ import { StatusBar } from "expo-status-bar";
 const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
 import { useRoute } from "@react-navigation/native"; // ✅ to read params
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import ButtonLink from "../../../../../components/common/buttonLink/buttonLink";
+import Header from "../../../../../components/common/header/header";
 
 export default function AccountVerificationStatus({ navigation }) {
   const route = useRoute();
   const { status = "inprogress" } = route.params || {}; // default to "inprogress"
 
-  // ✅ Dummy object for all statuses
-  const dummyData = {
+  const screenData = {
     inprogress: {
       title: "Verification In Progress",
       description:
@@ -38,7 +39,7 @@ export default function AccountVerificationStatus({ navigation }) {
     },
   };
 
-  const currentStatus = dummyData[status] || dummyData.inprogress;
+  const currentStatus = screenData[status] || screenData.inprogress;
 
   // ✅ helper to reset navigation stack safely
   const safeResetTo = (routeName, params = {}) => {
@@ -59,37 +60,30 @@ export default function AccountVerificationStatus({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
+    <>
+      <ScreenLayout scrollable withPadding>
+        <Header title={"CUE"} />
 
-      <View style={styles.main_scroll_view}>
-        <View style={styles.img_section}>
-          <Image source={currentStatus.icon} />
+        <View style={styles.main_scroll_view}>
+          <View style={styles.img_section}>
+            <Image source={currentStatus.icon} />
+          </View>
+          <Text style={styles.title} numberOfLines={1}>
+            {currentStatus.title}
+          </Text>
+          <Text style={styles.des} numberOfLines={5}>
+            {currentStatus.description}
+          </Text>
         </View>
-        <Text style={styles.title} numberOfLines={1}>
-          {currentStatus.title}
-        </Text>
-        <Text style={styles.des} numberOfLines={5}>
-          {currentStatus.description}
-        </Text>
-      </View>
+      </ScreenLayout>
 
       {/* Footer - support */}
-      <View style={styles.nhcs_section}>
-        <TouchableOpacity
-          style={styles.nh_cs}
-          onPress={() => safeResetTo("Support")}
-        >
-          <Text style={styles.need_help}>
-            Need Help? <Text style={styles.cs}>Contact Support</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      <ButtonLink
+        text={"Need Help?"}
+        highlightText={"Contact Support"}
+        onPress={() => navigation.navigate("CustomerChat")}
+        align="center"
+      />
+    </>
   );
 }

@@ -19,6 +19,9 @@ import * as ImagePicker from "expo-image-picker";
 
 // ✅ Expo vector icons
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import Header from "../../../../../components/common/header/header";
+import Button from "../../../../../components/common/button/button";
 
 export default function CoachServicePictures({ navigation }) {
   // 🔹 Dummy data object
@@ -69,41 +72,17 @@ export default function CoachServicePictures({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      ></LinearGradient>
+    <>
+      <ScreenLayout scrollable withPadding>
+        <Header
+          title={"CUE"}
+          showBack={true}
+          onBackPress={() => navigation.goBack()}
+        />
 
-      {/* Header */}
-      <View style={styles.top_portion1}></View>
-      <View style={styles.back_section}>
-        <View style={styles.bs_1}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.bs_2}>
-          <Text style={styles.bs_2_cue} numberOfLines={1}>
-            Add Your Picture
-          </Text>
-        </View>
-        <View style={styles.bs_3}></View>
-      </View>
-
-      <ScrollView style={styles.main_scroll_view}>
+        <Text style={{ fontSize: 24, color: "white", textAlign: "center" }}>
+          Add Your Picture
+        </Text>
         <Text style={styles.up_text}>
           Upload pictures to showcase your profile and work. The first image
           should be your profile picture, and the rest can represent your work
@@ -220,22 +199,12 @@ export default function CoachServicePictures({ navigation }) {
             </View>
           </LinearGradient>
         </TouchableOpacity>
-      </ScrollView>
+      </ScreenLayout>
 
-      {/* Save / Next */}
-      <TouchableOpacity
-        style={styles.input_whole_section_btn}
-        onPress={() => {
-          navigation.navigate("CoachAccountDetails");
-        }}
-      >
-        <LinearGradient
-          colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-          style={styles.input_inner_section_btn}
-        >
-          <Text style={styles.login_text}>Next</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </SafeAreaView>
+      <Button
+        text={"Next"}
+        onPress={() => navigation.navigate("CoachVirtualPricingDetails")}
+      />
+    </>
   );
 }

@@ -4,18 +4,11 @@ import Button from "../../../../../components/common/button/button";
 import { Text, View } from "react-native";
 
 export default function CoachIntroduction({ navigation }) {
-  const screenData = {
-    headerTitle: "CUE",
-    content: `At Cue we focus on promoting individuals rather than businesses, providing a platform for you to showcase your skills and talents, and the reason for us using this approach, is to enable you to contribute directly and more meaningfully to society.\n\nWe hope you enjoy the journey with us and wish you all the very best !`,
-    buttonText: "Next",
-    nextScreen: "CoachProfileBasicDetails",
-  };
-
   return (
     <>
-      <ScreenLayout>
+      <ScreenLayout scrollable withPadding>
         <Header
-          title={screenData.headerTitle}
+          title={"CUE"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -27,13 +20,18 @@ export default function CoachIntroduction({ navigation }) {
           <Text
             style={{ fontSize: 16, color: "#ffffffa1", textAlign: "center" }}
           >
-            {screenData.content}
+            At Cue we focus on promoting individuals rather than businesses,
+            providing a platform for you to showcase your skills and talents,
+            and the reason for us using this approach, is to enable you to
+            contribute directly and more meaningfully to society.\n\nWe hope you
+            enjoy the journey with us and wish you all the very best !
           </Text>
         </View>
       </ScreenLayout>
+
       <Button
-        text={screenData.buttonText}
-        onPress={() => navigation.navigate(screenData.nextScreen)}
+        text={"Next"}
+        onPress={() => navigation.navigate("CoachProfileBasicDetails")}
       />
     </>
   );

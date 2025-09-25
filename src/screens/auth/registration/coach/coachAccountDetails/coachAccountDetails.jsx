@@ -94,7 +94,7 @@ export default function CoachAccountDetails({ navigation }) {
         <TouchableOpacity
           style={styles.input_whole_section_btn}
           onPress={() => {
-            navigation.navigate("CoachAgreementDetails");
+            navigation.navigate("AccountVerificationStatus");
           }}
         >
           <LinearGradient
