@@ -230,7 +230,7 @@ export default function Signup({ navigation }) {
           <Button
             text={loading ? "Creating..." : "Get Started"}
             // onPress={validateAndSignup}
-            onPress={() => navigation.replace("CoachIntroduction")}
+            onPress={() => navigation.replace("ContactNumber")}
           />
 
           {/* ✅ Login Redirect */}

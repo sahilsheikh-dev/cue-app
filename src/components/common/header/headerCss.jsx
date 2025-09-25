@@ -5,22 +5,28 @@ const styles = StyleSheet.create({
     height: 55,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "space-between", // space between left & right
+    position: "relative", // needed for absolute center
   },
   leftSection: {
-    width: "20%",
+    width: 55, // fixed width, matches back button area
     justifyContent: "center",
     alignItems: "flex-start",
     paddingLeft: 10,
   },
   centerSection: {
-    width: "60%",
+    position: "absolute", // center it regardless of left/right
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    pointerEvents: "none", // title won't block touches on left/right
   },
   rightSection: {
-    width: "20%",
+    width: 55, // fixed width
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: 10,
@@ -53,6 +59,7 @@ const styles = StyleSheet.create({
     color: "#ffffff90",
     fontFamily: "Poppins-Regular",
     letterSpacing: 0.7,
+    textAlign: "center",
   },
 });
 

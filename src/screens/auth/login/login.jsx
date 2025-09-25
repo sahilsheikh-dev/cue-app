@@ -71,14 +71,13 @@ export default function Login({ navigation }) {
   const [role, setRole] = useState("");
   const [mobileNumber, setMobileNumber] = useState();
   const [password, setPassword] = useState();
-  const [password_show, setPassword_show] = useState(false);
-  const [selected_country, setSelected_country] = useState(countries[0]);
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
-  const [agree_tc, setAgree_tc] = useState(false);
+  const [agreeTc, setAgreeTc] = useState(false);
 
   const handleLogin = async () => {
     // Terms and conditions check
-    if (!agree_tc) {
+    if (!agreeTc) {
       Alert.alert("Validation Error", "Please agree to Terms & Conditions");
       return;
     }
@@ -98,10 +97,10 @@ export default function Login({ navigation }) {
       Alert.alert("Validation Error", "Phone number must contain only digits");
       return;
     }
-    if (mobileNumber.length !== parseInt(selected_country.number_of_digit)) {
+    if (mobileNumber.length !== parseInt(selectedCountry.number_of_digit)) {
       Alert.alert(
         "Validation Error",
-        `Phone number must be ${selected_country.number_of_digit} digits for ${selected_country.name}`
+        `Phone number must be ${selectedCountry.number_of_digit} digits for ${selectedCountry.name}`
       );
       return;
     }
@@ -169,9 +168,9 @@ export default function Login({ navigation }) {
             <Dropdown
               label="Country"
               data={countries}
-              selected={selected_country}
+              selected={selectedCountry}
               onSelect={(item) => {
-                setSelected_country(item);
+                setSelectedCountry(item);
                 setMobileNumber("");
               }}
               withFlag
@@ -187,7 +186,7 @@ export default function Login({ navigation }) {
                 keyboardType="phone-pad"
                 value={mobileNumber}
                 onChangeText={(text) => {
-                  const limit = parseInt(selected_country.number_of_digit);
+                  const limit = parseInt(selectedCountry.number_of_digit);
                   if (text.length <= limit) setMobileNumber(text);
                 }}
               />
@@ -205,7 +204,7 @@ export default function Login({ navigation }) {
         />
 
         {/* Agree Section */}
-        <View
+        {/* <View
           style={[
             styles.fp_whole_,
             {
@@ -237,15 +236,15 @@ export default function Login({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={{ paddingLeft: 10 }}
-            onPress={() => setAgree_tc(!agree_tc)}
+            onPress={() => setAgreeTc(!agreeTc)}
           >
             <MaterialCommunityIcons
-              name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
+              name={agreeTc ? "checkbox-marked" : "checkbox-blank-outline"}
               size={20}
               color="#fff"
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View style={{ width: "85%", alignSelf: "center" }}>
           <ButtonLink
