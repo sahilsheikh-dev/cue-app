@@ -100,16 +100,17 @@ export default function OtpVerification({ navigation }) {
       </ScreenLayout>
 
       {/* ✅ Bottom Section stays clickable */}
+
+      <ButtonLink
+        text="Didn't Receive Anything?"
+        highlightText="Resend Code"
+        center
+      />
+
       <View style={{ paddingBottom: Platform.OS === "android" ? 30 : 20 }}>
         <Button
           text={loading ? "Loading..." : "Verify"}
-          onPress={() => navigation.navigate("OtpVerification")}
-        />
-
-        <ButtonLink
-          text="Didn't Receive Anything?"
-          highlightText="Resend Code"
-          center
+          onPress={() => navigation.navigate("CoachIntroduction")}
         />
       </View>
     </>

@@ -7,7 +7,8 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 45,
+    marginTop: 20,
+    marginBottom: 20,
     zIndex: 10,
   },
   buttonInner: {

@@ -58,7 +58,8 @@ export default function CoachProfile({ navigation }) {
   const userImage =
     data.user?.profilePicture ||
     require("../../../../assets/images/dummy_profile.png");
-  const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -71,13 +72,13 @@ export default function CoachProfile({ navigation }) {
           style: "destructive",
           onPress: async () => {
             try {
-              setLoading(true);
+              setDeleteLoading(true);
               const coachId = data.user?._id;
               const token = data.token;
 
               if (!coachId || !token) {
                 alert("Missing coach ID or token!");
-                setLoading(false);
+                setDeleteLoading(false);
                 return;
               }
 
@@ -90,7 +91,7 @@ export default function CoachProfile({ navigation }) {
             } catch (err) {
               alert("Failed to delete account. Please try again.");
             } finally {
-              setLoading(false);
+              setDeleteLoading(false);
             }
           },
         },
@@ -100,13 +101,13 @@ export default function CoachProfile({ navigation }) {
 
   const handleLogout = async () => {
     try {
-      setLoading(true);
+      setLogoutLoading(true);
       await logout();
       navigation.replace("Signup");
     } catch (err) {
       alert("Failed to log out. Please try again.");
     } finally {
-      setLoading(false);
+      setLogoutLoading(false);
     }
   };
 
@@ -198,28 +199,30 @@ export default function CoachProfile({ navigation }) {
           onPress={handleDeleteAccount}
         >
           <View style={styles.io_name_section}>
-            {loading ? (
+            {deleteLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text style={styles.io_name}>Delete Account</Text>
             )}
           </View>
           <View style={styles.indi_option_svg_section}>
-            {!loading && <MaterialIcons name="delete" size={26} color="#fff" />}
+            {!deleteLoading && (
+              <MaterialIcons name="delete" size={26} color="#fff" />
+            )}
           </View>
         </TouchableOpacity>
 
         {/* Logout */}
         <TouchableOpacity style={styles.indi_options} onPress={handleLogout}>
           <View style={styles.io_name_section}>
-            {loading ? (
+            {logoutLoading ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <Text style={styles.io_name}>Log Out</Text>
             )}
           </View>
           <View style={styles.indi_option_svg_section}>
-            {!loading && (
+            {!logoutLoading && (
               <Ionicons name="log-out-outline" size={26} color="#fff" />
             )}
           </View>
