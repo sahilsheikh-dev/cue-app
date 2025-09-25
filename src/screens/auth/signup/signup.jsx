@@ -13,6 +13,7 @@ import InputField from "../../../components/common/inputField/inputField";
 import Button from "../../../components/common/button/button";
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 import { ScrollView } from "react-native-gesture-handler";
+import coachService from "../../../services/coachServices/coachService";
 
 export default function Signup({ navigation }) {
   const role_ref = useRef();
@@ -23,7 +24,7 @@ export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [agree_tc, setAgree_tc] = useState(false);
+  const [agreeTcPp, setAgreeTcPp] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // ✅ Handle hardware back press → exit app
@@ -94,25 +95,36 @@ export default function Signup({ navigation }) {
         "Password and Confirm Password do not match"
       );
 
-    // Terms & Conditions
-    if (!agree_tc)
+    // Terms & Conditions and Privacy Policy
+    if (!agreeTcPp)
       return Alert.alert(
         "Validation Error",
-        "Please agree to Terms & Conditions"
+        "Please agree to Terms & Conditions and Privacy Policy"
       );
 
     // ✅ If all validations pass
     setLoading(true);
     try {
-      // TODO: Replace with API call (signup service)
-      setTimeout(() => {
-        setLoading(false);
-        Alert.alert("Success", "Account created successfully!");
-        navigation.navigate("Login");
-      }, 1200);
+      const payload = {
+        name: `${firstName.trim()} ${lastName.trim()}`,
+        email: email.trim(),
+        password: password.trim(),
+        agree_terms_conditions: agreeTcPp,
+        agree_privacy_policy: agreeTcPp,
+      };
+
+      const res = await coachService.signup(payload);
+
+      setLoading(false);
+      if (res.success) {
+        Alert.alert("Success", res.message || "Account created successfully!");
+        navigation.navigate("ContactNumber");
+      } else {
+        Alert.alert("Signup Failed", res.message || "Something went wrong");
+      }
     } catch (err) {
       setLoading(false);
-      Alert.alert("Signup Failed", "Something went wrong, please try again.");
+      Alert.alert("Signup Failed", err.message || "Something went wrong");
     }
   };
 
@@ -227,10 +239,10 @@ export default function Signup({ navigation }) {
             </Text>
             <TouchableOpacity
               style={{ paddingLeft: 10 }}
-              onPress={() => setAgree_tc(!agree_tc)}
+              onPress={() => setAgreeTcPp(!agreeTcPp)}
             >
               <MaterialCommunityIcons
-                name={agree_tc ? "checkbox-marked" : "checkbox-blank-outline"}
+                name={agreeTcPp ? "checkbox-marked" : "checkbox-blank-outline"}
                 size={20}
                 color="#fff"
               />
@@ -240,8 +252,7 @@ export default function Signup({ navigation }) {
           {/* ✅ Signup Button */}
           <Button
             text={loading ? "Creating..." : "Get Started"}
-            // onPress={validateAndSignup}
-            onPress={() => navigation.navigate("ContactNumber")}
+            onPress={validateAndSignup}
           />
 
           {/* ✅ Login Redirect */}

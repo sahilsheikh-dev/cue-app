@@ -1,20 +1,41 @@
-// services/coachService.js
-import axios from "axios";
 import { BASE_API_URL } from "../../config/app.config";
 
-export const deleteCoachAccount = async (coachId, token) => {
-  try {
-    const response = await axios.delete(
-      `${BASE_API_URL}/coach/deleteCoach/${coachId}`,
-      {
+const coachService = {
+  async signup(data) {
+    try {
+      const response = await fetch(`${BASE_API_URL}/coach/signup`, {
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // token in header
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: result.message || "Signup failed",
+          error: result.error,
+        };
       }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Delete coach error:", error.response?.data || error.message);
-    throw error;
-  }
+
+      return {
+        success: true,
+        message: result.message,
+        data: result.data,
+      };
+    } catch (err) {
+      console.error("Signup API error:", err);
+      return {
+        success: false,
+        message: "Network or server error",
+        error: err.message,
+      };
+    }
+  },
+
+  // ✅ placeholder for future APIs (e.g. registration, etc.)
 };
+
+export default coachService;

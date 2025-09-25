@@ -31,7 +31,6 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
     category: [{ title: "Fitness" }, { title: "Yoga" }],
     languages: [{ name: "English" }, { name: "Hindi" }],
     client_gender: ["Male", "Female"],
-    nextScreen: "CoachCreateServiceDetails", // demo next step
   };
 
   return (
@@ -181,6 +180,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
           </View>
         </LinearGradient>
       </ScrollView>
+
       {/* Next button */}
       <TouchableOpacity
         style={styles.input_whole_section_btn}
