@@ -108,7 +108,7 @@ export default function Signup({ navigation }) {
       setTimeout(() => {
         setLoading(false);
         Alert.alert("Success", "Account created successfully!");
-        navigation.replace("Login");
+        navigation.navigate("Login");
       }, 1200);
     } catch (err) {
       setLoading(false);
@@ -230,7 +230,7 @@ export default function Signup({ navigation }) {
           <Button
             text={loading ? "Creating..." : "Get Started"}
             // onPress={validateAndSignup}
-            onPress={() => navigation.replace("ContactNumber")}
+            onPress={() => navigation.navigate("ContactNumber")}
           />
 
           {/* ✅ Login Redirect */}
@@ -238,7 +238,7 @@ export default function Signup({ navigation }) {
             <ButtonLink
               text="Already have an account ?"
               highlightText="Login"
-              onPress={() => navigation.replace("Login")}
+              onPress={() => navigation.navigate("Login")}
               align="center"
               highlightColor="white"
             />
