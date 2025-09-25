@@ -56,12 +56,16 @@ export default function CoachPersonalInformation({ navigation }) {
       <View style={styles.name_profile_section}>
         <View style={styles.profile_section}>
           <Image
-            source={{ uri: data.user.profilePicture }}
+            source={{
+              uri:
+                data.user.profilePicture ||
+                require("../../../../../assets/images/profile.png"),
+            }}
             style={styles.profile_img}
           />
         </View>
         <View style={styles.name_section}>
-          <Text style={styles.name_text}>{data.user.name}</Text>
+          <Text style={styles.name_text}>{data.user.name || "Coach"}</Text>
         </View>
       </View>
 
@@ -71,7 +75,9 @@ export default function CoachPersonalInformation({ navigation }) {
           <MaterialIcons name="email" size={20} color="white" />
         </View>
         <View style={styles.io_name_section_lo}>
-          <Text style={styles.io_name}>{data.user.email}</Text>
+          <Text style={styles.io_name}>
+            {data.user.email || "coach@cuewellness.net"}
+          </Text>
         </View>
       </TouchableOpacity>
 
@@ -81,7 +87,7 @@ export default function CoachPersonalInformation({ navigation }) {
           <Ionicons name="call-outline" size={20} color="#fff" />
         </View>
         <View style={styles.io_name_section_lo}>
-          <Text style={styles.io_name}>{data.user.mobile}</Text>
+          <Text style={styles.io_name}>{data.user.mobile || "9876543210"}</Text>
         </View>
       </TouchableOpacity>
 
@@ -92,11 +98,10 @@ export default function CoachPersonalInformation({ navigation }) {
         </View>
         <View style={styles.io_name_section_lo}>
           <Text style={styles.io_name}>
-            {data.user.dob.split("T")[0].split("-")[2] +
-              "-" +
-              data.user.dob.split("T")[0].split("-")[1] +
-              "-" +
-              data.user.dob.split("T")[0].split("-")[0]}
+            {data.user.dob.split("T")[0].split("-")[2] ||
+              "01" + "-" + data.user.dob.split("T")[0].split("-")[1] ||
+              "01" + "-" + data.user.dob.split("T")[0].split("-")[0] ||
+              "2025"}
           </Text>
         </View>
       </TouchableOpacity>
@@ -108,7 +113,7 @@ export default function CoachPersonalInformation({ navigation }) {
             <Ionicons name="globe-outline" size={20} color="white" />
           </View>
           <View style={styles.io_name_section_lo_to}>
-            <Text style={styles.io_name}>{data.user.country}</Text>
+            <Text style={styles.io_name}>{data.user.country || "UAE"}</Text>
           </View>
         </TouchableOpacity>
 

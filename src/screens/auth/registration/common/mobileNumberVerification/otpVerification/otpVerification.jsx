@@ -62,8 +62,6 @@ export default function OtpVerification({ navigation }) {
     <>
       <ScreenLayout>
         <ScrollView style={styles.main_scroll_view}>
-          <View style={styles.top_portion1}></View>
-
           <Header title={"CUE"} />
 
           {/* Title + description */}
@@ -107,12 +105,10 @@ export default function OtpVerification({ navigation }) {
         center
       />
 
-      <View style={{ paddingBottom: Platform.OS === "android" ? 30 : 20 }}>
-        <Button
-          text={loading ? "Loading..." : "Verify"}
-          onPress={() => navigation.navigate("CoachIntroduction")}
-        />
-      </View>
+      <Button
+        text={loading ? "Loading..." : "Verify"}
+        onPress={() => navigation.navigate("CoachIntroduction")}
+      />
     </>
   );
 }

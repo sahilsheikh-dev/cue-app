@@ -54,10 +54,7 @@ export default function CoachProfile({ navigation }) {
 
   // get logout from context
   const { logout, data } = useContext(DataContext);
-  const userName = data.user?.name || "Coach"; // fallback if missing
-  const userImage =
-    data.user?.profilePicture ||
-    require("../../../../assets/images/dummy_profile.png");
+
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
@@ -162,10 +159,17 @@ export default function CoachProfile({ navigation }) {
         {/* Profile section */}
         <View style={styles.name_profile_section}>
           <View style={styles.profile_section}>
-            <Image source={userImage} style={styles.profile_img} />
+            <Image
+              source={{
+                uri:
+                  data.user.profilePicture ||
+                  require("../../../../assets/images/profile.png"),
+              }}
+              style={styles.profile_img}
+            />
           </View>
           <View style={styles.name_section}>
-            <Text style={styles.name_text}>{userName}</Text>
+            <Text style={styles.name_text}>{data.user.name || "Coach"}</Text>
           </View>
         </View>
 
