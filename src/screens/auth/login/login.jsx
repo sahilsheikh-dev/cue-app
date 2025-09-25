@@ -76,12 +76,6 @@ export default function Login({ navigation }) {
   // const [agreeTc, setAgreeTc] = useState(false);
 
   const handleLogin = async () => {
-    // Terms and conditions check
-    // if (!agreeTc) {
-    //   Alert.alert("Validation Error", "Please agree to Terms & Conditions");
-    //   return;
-    // }
-
     // Role check
     if (!role) {
       Alert.alert("Validation Error", "Please select a role");
@@ -115,10 +109,13 @@ export default function Login({ navigation }) {
       return;
     }
 
+    // Build full number with country code
+    const fullMobileNumber = `${selectedCountry.code}${mobileNumber}`;
+
     // If all good → continue
     setLoading(true);
     try {
-      const res = await loginWithApi(mobileNumber, password, role);
+      const res = await loginWithApi(fullMobileNumber, password, role);
 
       if (res.ok) {
         await login(res.token, role, res.user);
@@ -183,7 +180,7 @@ export default function Login({ navigation }) {
               onSelect={(item) => setSelectedCountry(item)}
               dotSelect
               searchable
-              searchPlaceholder="Search country..."
+              searchPlaceholder="Search Country"
               renderTrigger={(item) => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Image
@@ -204,7 +201,7 @@ export default function Login({ navigation }) {
                   >{`${item.code} ${item.name}`}</Text>
                 </View>
               )}
-              containerStyle={{ width: "25%" }}
+              containerStyle={{ width: "30%" }}
             />
 
             <View style={styles.input_section}>

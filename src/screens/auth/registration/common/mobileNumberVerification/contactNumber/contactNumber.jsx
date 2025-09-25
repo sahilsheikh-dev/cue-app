@@ -96,7 +96,7 @@ export default function ContactNumber({ navigation }) {
                 onSelect={(item) => setSelectedCountry(item)}
                 dotSelect
                 searchable
-                searchPlaceholder="Search country..."
+                searchPlaceholder="Search Country"
                 renderTrigger={(item) => (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Image
@@ -117,7 +117,7 @@ export default function ContactNumber({ navigation }) {
                     >{`${item.code} ${item.name}`}</Text>
                   </View>
                 )}
-                containerStyle={{ width: "25%" }}
+                containerStyle={{ width: "30%" }}
               />
 
               <View style={styles.input_section}>

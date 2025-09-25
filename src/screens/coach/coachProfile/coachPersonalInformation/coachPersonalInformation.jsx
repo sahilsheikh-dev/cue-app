@@ -98,10 +98,11 @@ export default function CoachPersonalInformation({ navigation }) {
         </View>
         <View style={styles.io_name_section_lo}>
           <Text style={styles.io_name}>
-            {data.user.dob.split("T")[0].split("-")[2] ||
-              "01" + "-" + data.user.dob.split("T")[0].split("-")[1] ||
-              "01" + "-" + data.user.dob.split("T")[0].split("-")[0] ||
-              "2025"}
+            {data.user.dob.split("T")[0].split("-")[2] +
+              "-" +
+              data.user.dob.split("T")[0].split("-")[1] +
+              "-" +
+              data.user.dob.split("T")[0].split("-")[0]}
           </Text>
         </View>
       </TouchableOpacity>

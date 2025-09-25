@@ -95,6 +95,7 @@ const Dropdown = ({
                   paddingHorizontal: 10,
                   paddingVertical: 6,
                   color: "#fff",
+                  width: "95%",
                 }}
               />
             </View>
