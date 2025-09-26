@@ -39,6 +39,7 @@ export default function CoachPersonalInformation({ navigation }) {
                   ? { uri: data.user.profilePicture }
                   : require("../../../../../assets/images/profile.png")
               }
+              style={styles.profile_img}
             />
           </View>
           <View style={styles.name_section}>

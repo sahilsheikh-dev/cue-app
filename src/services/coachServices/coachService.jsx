@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_API_URL } from "../../config/app.config";
+import get from "../../secureStore/get"; // to fetch token from storage
 
 const coachService = {
   async signup(data) {
@@ -38,6 +39,30 @@ const coachService = {
       return {
         available: false,
         message: err.response?.data?.message || err.message || "Network error",
+      };
+    }
+  },
+
+  async coachProfileSetup(payload) {
+    try {
+      const token = await get("auth"); // read from secureStore
+      const res = await axios.patch(
+        `${BASE_API_URL}/coach/coachProfileSetup`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return { success: true, message: res.data.message, data: res.data.data };
+    } catch (err) {
+      console.error(
+        "coachProfileSetup API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message: err.response?.data?.message || "Profile setup failed",
+        error: err.response?.data?.error || err.message,
       };
     }
   },

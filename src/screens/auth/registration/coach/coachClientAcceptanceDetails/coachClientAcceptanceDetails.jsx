@@ -1,185 +1,192 @@
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { Text, View, Alert } from "react-native";
 import styles from "./coachClientAcceptanceDetailsCss";
-import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
-import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState } from "react";
-import RBSheet from "react-native-raw-bottom-sheet";
-import { Ionicons } from "@expo/vector-icons";
+import { useState, useEffect, useContext } from "react";
 import Button from "../../../../../components/common/button/button";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
-import Dropdown from "../../../../../components/common/dropdown/dropdown";
+import MultiSelectDropdown from "../../../../../components/common/multiSelectDropdown/multiSelectDropdown";
+import TreeSelectDropdown from "../../../../../components/common/treeSelectDropdown/treeSelectDropdown";
+import { DataContext } from "../../../../../context/dataContext";
 
-export default function CoachClientAcceptanceDetails({ navigation }) {
-  const category_ref = useRef();
+export default function CoachClientAcceptanceDetails({ navigation, route }) {
+  const { data } = useContext(DataContext);
 
-  const screenData = {
-    all_connections: {
-      Fitness: {
-        _id: "1",
-        title: "Fitness",
-        sub: {
-          Strength: {
-            _id: "1-1",
-            title: "Strength",
-            sub: {
-              "Upper Body": { _id: "1-1-1", title: "Upper Body", sub: {} },
-              "Lower Body": { _id: "1-1-2", title: "Lower Body", sub: {} },
-            },
-          },
-          Cardio: {
-            _id: "1-2",
-            title: "Cardio",
-            sub: {
-              Running: { _id: "1-2-1", title: "Running", sub: {} },
-              Cycling: { _id: "1-2-2", title: "Cycling", sub: {} },
-            },
+  const {
+    email,
+    dob,
+    gender,
+    country,
+    city,
+    address,
+    pincode,
+    experience_since_date,
+    agree_certification,
+    agree_experience,
+    agree_refund,
+  } = route.params || {};
+
+  const all_connections = {
+    Fitness: {
+      _id: "1",
+      title: "Fitness",
+      sub: {
+        Strength: {
+          _id: "1-1",
+          title: "Strength",
+          sub: {
+            "Upper Body": { _id: "1-1-1", title: "Upper Body", sub: {} },
+            "Lower Body": { _id: "1-1-2", title: "Lower Body", sub: {} },
           },
         },
-      },
-      Yoga: {
-        _id: "2",
-        title: "Yoga",
-        sub: {
-          Hatha: { _id: "2-1", title: "Hatha", sub: {} },
-          Vinyasa: { _id: "2-2", title: "Vinyasa", sub: {} },
+        Cardio: {
+          _id: "1-2",
+          title: "Cardio",
+          sub: {
+            Running: { _id: "1-2-1", title: "Running", sub: {} },
+            Cycling: { _id: "1-2-2", title: "Cycling", sub: {} },
+          },
         },
-      },
-      Nutrition: {
-        _id: "3",
-        title: "Nutrition",
-        sub: {},
       },
     },
+    Yoga: {
+      _id: "2",
+      title: "Yoga",
+      sub: {
+        Hatha: { _id: "2-1", title: "Hatha", sub: {} },
+        Vinyasa: { _id: "2-2", title: "Vinyasa", sub: {} },
+      },
+    },
+    Nutrition: { _id: "3", title: "Nutrition", sub: {} },
   };
 
-  // ✅ Track selected categories in path
-  const [selections, setSelections] = useState([]);
-  const [currentOptions, setCurrentOptions] = useState(
-    screenData.all_connections
-  );
-  const [selectedKey, setSelectedKey] = useState(null);
+  const [selectedConnections, setSelectedConnections] = useState([]);
+  const [acceptedGenders, setAcceptedGenders] = useState([]);
+  const [acceptedLanguages, setAcceptedLanguages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [gender, setGender] = useState("");
-  const [language, setLanguage] = useState("");
+  const [isEdit, setIsEdit] = useState(false);
 
-  // ✅ Handle category selection
-  const handleCategorySelect = (key) => {
-    const chosen = currentOptions[key];
-    setSelections((prev) => [...prev, chosen.title]);
-    setSelectedKey(key);
+  // Prefill from context if data exists
+  useEffect(() => {
+    if (data?.user) {
+      setSelectedConnections(data.user.my_connections || []);
+      setAcceptedGenders(data.user.accepted_genders || []);
+      setAcceptedLanguages(data.user.accepted_languages || []);
 
-    if (chosen.sub && Object.keys(chosen.sub).length > 0) {
-      // move deeper into tree
-      setCurrentOptions(chosen.sub);
-      category_ref.current.close();
-      setTimeout(() => category_ref.current.open(), 300); // reopen with suboptions
-    } else {
-      // reached leaf
-      category_ref.current.close();
+      // If values exist → start in preview, else edit
+      setIsEdit(
+        !(
+          data.user.my_connections?.length ||
+          data.user.accepted_genders?.length ||
+          data.user.accepted_languages?.length
+        )
+      );
     }
+  }, [data]);
+
+  const handleNext = () => {
+    if (isEdit) {
+      if (acceptedGenders.length === 0) {
+        return Alert.alert(
+          "Validation Error",
+          "Please select at least one gender"
+        );
+      }
+      if (acceptedLanguages.length === 0) {
+        return Alert.alert(
+          "Validation Error",
+          "Please select at least one language"
+        );
+      }
+      if (selectedConnections.length === 0) {
+        return Alert.alert(
+          "Validation Error",
+          "Please select at least one category"
+        );
+      }
+    }
+
+    const payload = {
+      email,
+      dob,
+      gender,
+      country,
+      city,
+      address,
+      pincode,
+      experience_since_date,
+      agree_certification,
+      agree_experience,
+      agree_refund,
+      my_connections: selectedConnections,
+      accepted_genders: acceptedGenders,
+      accepted_languages: acceptedLanguages,
+    };
+
+    navigation.navigate("CoachProfileReviewConfirmDetails", payload);
   };
 
   return (
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title="CUE"
           showBack={true}
           onBackPress={() => navigation.goBack()}
+          rightIcon={isEdit ? null : "create-outline"}
+          onRightPress={() => setIsEdit(true)}
         />
 
-        {/* Title */}
         <View style={styles.welcome_view}>
           <Text style={styles.welcome_text}>Client's Acceptance Details</Text>
         </View>
 
-        {/* Gender Dropdown */}
-        <Dropdown
-          label="Select Your Gender"
-          data={["male", "female", "other"]}
-          selected={gender}
-          onSelect={(val) => setGender(val)}
-          dotSelect
-          renderSelected={(item) =>
-            item === "male" ? "Male" : item === "female" ? "Female" : "Other"
-          }
-          renderOption={(item) => (
-            <Text style={{ color: "#fff" }}>
-              {item === "male"
-                ? "Male"
-                : item === "female"
-                ? "Female"
-                : "Other"}
+        {isEdit ? (
+          <>
+            <MultiSelectDropdown
+              label="Select Accepted Genders"
+              data={["male", "female", "other"]}
+              selected={acceptedGenders}
+              onChange={setAcceptedGenders}
+            />
+
+            <MultiSelectDropdown
+              label="Select Accepted Languages"
+              data={["English", "Hindi", "Marathi", "Gujarati"]}
+              selected={acceptedLanguages}
+              onChange={setAcceptedLanguages}
+              searchable
+            />
+
+            <TreeSelectDropdown
+              label="Choose Categories"
+              data={all_connections}
+              selected={selectedConnections}
+              onChange={setSelectedConnections}
+            />
+          </>
+        ) : (
+          <>
+            <Text style={{ color: "#fff", marginVertical: 8 }}>
+              Accepted Genders:{" "}
+              {acceptedGenders.length > 0 ? acceptedGenders.join(", ") : "None"}
             </Text>
-          )}
-          icon="person-outline"
-          containerStyle={{ width: "85%", alignSelf: "center" }}
-        />
-
-        {/* Language Dropdown */}
-        <Dropdown
-          label="Select Languages"
-          data={["English", "Hindi", "Marathi", "Gujarati"]}
-          selected={language}
-          onSelect={(val) => setLanguage(val)}
-          dotSelect
-          icon="language"
-          containerStyle={{ width: "85%", alignSelf: "center" }}
-        />
-
-        <View style={styles.welcome_view}>
-          <Text style={styles.welcome_text}>Choose Category</Text>
-        </View>
-
-        {/* Category Multi Select */}
-        <TouchableOpacity
-          onPress={() => {
-            setCurrentOptions(screenData.all_connections);
-            category_ref.current.open();
-          }}
-          style={styles.input_whole_section}
-        >
-          <LinearGradient
-            colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-            style={styles.input_inner_section}
-          >
-            <View style={styles.svg_circle}>
-              <Ionicons name="list" size={20} color="#fff" />
-            </View>
-            <View style={styles.input_section_text}>
-              <Text
-                style={
-                  selections.length === 0
-                    ? styles.input_text
-                    : styles.input_text_active
-                }
-              >
-                {selections.length === 0
-                  ? "Choose Category"
-                  : selections.join(" → ")}
-              </Text>
-            </View>
-            <View style={styles.svg_circle_eye}>
-              <Ionicons name="chevron-down" size={20} color="#fff" />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+            <Text style={{ color: "#fff", marginVertical: 8 }}>
+              Accepted Languages:{" "}
+              {acceptedLanguages.length > 0
+                ? acceptedLanguages.join(", ")
+                : "None"}
+            </Text>
+            <Text style={{ color: "#fff", marginVertical: 8 }}>
+              My Connections:{" "}
+              {selectedConnections.length > 0
+                ? selectedConnections.join(", ")
+                : "None"}
+            </Text>
+          </>
+        )}
       </ScreenLayout>
-      <Button
-        text={loading ? "Loading..." : "Next"}
-        onPress={() => navigation.navigate("CoachProfileCertificateDetails")}
-      />
+
+      <Button text={loading ? "Loading..." : "Next"} onPress={handleNext} />
     </>
   );
 }

@@ -1,21 +1,20 @@
-import React, { useState } from "react";
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { StatusBar } from "expo-status-bar";
+import React, { useContext } from "react";
+import { Text, View, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import styles from "./coachDashboardCss";
 import { Ionicons } from "@expo/vector-icons";
+import styles from "./coachDashboardCss";
+
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import Header from "../../../components/common/header/header";
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 
+import { DataContext } from "../../../context/dataContext";
+
 export default function CoachDashboard({ navigation }) {
+  const { data } = useContext(DataContext);
+
+  const status = data?.user?.status || ""; // ✅ get status safely
+
   const options = [
     // {
     //   id: "eventOrganizer",
@@ -43,15 +42,9 @@ export default function CoachDashboard({ navigation }) {
     },
     {
       id: "personalProfile",
-      title: "Personal Profile",
+      title: "Profile Setup",
       icon: "person-outline",
       screen: "CoachPersonalProfileDetails",
-    },
-    {
-      id: "clientAcceptance",
-      title: "Client Acceptance",
-      icon: "people-outline",
-      screen: "CoachClientAcceptanceDetails",
     },
     {
       id: "certificate",
@@ -86,65 +79,85 @@ export default function CoachDashboard({ navigation }) {
   ];
 
   return (
-    <>
-      <ScreenLayout scrollable withPadding>
-        <Header title={"Dashboard"} />
+    <ScreenLayout scrollable withPadding>
+      <Header title={"Dashboard"} />
 
+      {/* ✅ Conditional Verification Banner */}
+      {status === "pending" && (
         <LinearGradient
           style={styles.bankdetail_section_small_fc}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
         >
-          <Text style={styles.bs_2_cue}>Un - Verified Account</Text>
+          <Text style={styles.bs_2_cue}>Account Verification in Progress</Text>
           <Text
             style={{
-              fontSize: 16,
-              color: "#ffffffa1",
               textAlign: "center",
-              marginTop: "20px",
-              marginBottom: 0,
-              marginHorizontal: "auto",
-              maxWidth: "90%",
+              color: "rgba(255, 255, 255, 0.7)",
+              fontFamily: "Poppins-Regular",
+              letterSpacing: 0.7,
+              fontSize: 16,
+              marginTop: 6,
             }}
           >
-            Your Account is not verified yet, please click below and complete
-            the registration process!
+            Your account is under review. You’ll be notified once verified.
           </Text>
+        </LinearGradient>
+      )}
 
+      {status === "unverified" && (
+        <LinearGradient
+          style={styles.bankdetail_section_small_fc}
+          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+        >
+          <Text style={styles.bs_2_cue}>Unverified Account</Text>
+          <Text
+            style={{
+              textAlign: "center",
+              color: "rgba(255, 255, 255, 0.7)",
+              fontFamily: "Poppins-Regular",
+              letterSpacing: 0.7,
+              fontSize: 16,
+              marginTop: 6,
+            }}
+          >
+            Your account is not verified yet. Please complete the registration
+            process!
+          </Text>
           <ButtonLink
             highlightText={"Click Here"}
             onPress={() => navigation.navigate("CoachIntroduction")}
           />
         </LinearGradient>
+      )}
 
-        {/* Render options in pairs (2 per row) */}
-        {Array.from({ length: Math.ceil(options.length / 2) }).map((_, row) => (
-          <View key={row} style={styles.options_double}>
-            {options.slice(row * 2, row * 2 + 2).map((opt) => (
-              <TouchableOpacity
-                key={opt.id}
-                style={styles.indi_option_sq}
-                onPress={() => navigation.navigate(opt.screen)}
+      {/* ✅ No banner if verified */}
+      {status === "verified" && null}
+
+      {/* Options in pairs (2 per row) */}
+      {Array.from({ length: Math.ceil(options.length / 2) }).map((_, row) => (
+        <View key={row} style={styles.options_double}>
+          {options.slice(row * 2, row * 2 + 2).map((opt) => (
+            <TouchableOpacity
+              key={opt.id}
+              style={styles.indi_option_sq}
+              onPress={() => navigation.navigate(opt.screen)}
+            >
+              <LinearGradient
+                style={styles.indi_option_circle}
+                colors={["rgba(255, 255, 255, 0.1)", "rgba(15, 26, 73, 0)"]}
               >
                 <LinearGradient
-                  style={styles.indi_option_circle}
-                  colors={["rgba(255, 255, 255, 0.1)", "rgba(15, 26, 73, 0)"]}
+                  style={styles.ioc_circle}
+                  colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
                 >
-                  <LinearGradient
-                    style={styles.ioc_circle}
-                    colors={[
-                      "rgba(255, 255, 255, 0.1)",
-                      "rgba(30, 53, 126, 0)",
-                    ]}
-                  >
-                    <Ionicons name={opt.icon} size={50} color="#fff" />
-                    <Text style={styles.ioc_text}>{opt.title}</Text>
-                  </LinearGradient>
+                  <Ionicons name={opt.icon} size={50} color="#fff" />
+                  <Text style={styles.ioc_text}>{opt.title}</Text>
                 </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </ScreenLayout>
-    </>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ))}
+    </ScreenLayout>
   );
 }

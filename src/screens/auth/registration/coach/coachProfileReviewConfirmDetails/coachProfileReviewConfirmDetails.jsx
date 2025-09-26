@@ -1,39 +1,99 @@
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
+import { Text, View, Alert } from "react-native";
 import styles from "./coachProfileReviewConfirmDetailsCss";
-import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-import { Ionicons } from "@expo/vector-icons";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
+import coachService from "../../../../../services/coachServices/coachService";
 
-export default function CoachProfileReviewConfirmDetails({ navigation }) {
+import { DataContext } from "../../../../../context/dataContext";
+
+export default function CoachProfileReviewConfirmDetails({
+  navigation,
+  route,
+}) {
   const [loading, setLoading] = useState(false);
 
-  const screenData = {
-    email: "demo@email.com",
-    dob: "14-08-1999",
-    gender: "Male",
-    pin_code: "110001",
-    country: { country: "India" },
-    city: "New Delhi",
-    address: "123 Demo Street, Demo Nagar",
-    experience: { year: 3, months: 6 },
-    category: [{ title: "Fitness" }, { title: "Yoga" }],
-    languages: [{ name: "English" }, { name: "Hindi" }],
-    client_gender: ["Male", "Female"],
+  const { data } = useContext(DataContext);
+
+  // ✅ Data passed from previous screens
+  const {
+    email,
+    dob,
+    gender,
+    country,
+    city,
+    address,
+    pincode,
+    experience_since_date,
+    agree_certification,
+    agree_experience,
+    agree_refund,
+    my_connections,
+    accepted_genders,
+    accepted_languages,
+  } = route.params;
+
+  // 🔹 Helpers
+  const formatDate = (date) => {
+    if (!date) return "Not provided";
+    const d = new Date(date);
+    if (isNaN(d)) return date; // fallback
+    return d.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const capitalize = (text) => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const formatArray = (arr) => {
+    if (!arr || arr.length === 0) return "None";
+    return arr.map((item) => capitalize(item)).join(", ");
+  };
+
+  // 🔹 Submit Handler
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    const payload = {
+      id: data?.user?.id || data?.user?._id,
+      email,
+      dob,
+      gender,
+      country,
+      city,
+      address,
+      pincode,
+      experience_since_date,
+      agree_certification,
+      agree_experience,
+      agree_refund,
+      my_connections,
+      accepted_genders,
+      accepted_languages,
+    };
+
+    const res = await coachService.coachProfileSetup(payload);
+
+    setLoading(false);
+
+    if (res.success) {
+      Alert.alert("Success", res.message || "Profile setup completed!", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("CoachProfileCertificateDetails"),
+        },
+      ]);
+    } else {
+      Alert.alert("Error", res.message || "Failed to setup profile");
+    }
   };
 
   return (
@@ -49,6 +109,7 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
           Review and Submit
         </Text>
 
+        {/* Personal Info */}
         <LinearGradient
           style={styles.bankdetail_section}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
@@ -59,112 +120,127 @@ export default function CoachProfileReviewConfirmDetails({ navigation }) {
             </View>
 
             <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Email ID : </Text>
-              <Text style={styles.bd_details_text}>{screenData.email}</Text>
+              <Text style={styles.bd_details_text_label}>Email : </Text>
+              <Text style={styles.bd_details_text}>{email}</Text>
             </View>
+
             <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Dob : </Text>
-              <Text style={styles.bd_details_text}>{screenData.dob}</Text>
+              <Text style={styles.bd_details_text_label}>Date of Birth : </Text>
+              <Text style={styles.bd_details_text}>{formatDate(dob)}</Text>
             </View>
+
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Gender : </Text>
-              <Text style={styles.bd_details_text}>{screenData.gender}</Text>
+              <Text style={styles.bd_details_text}>{capitalize(gender)}</Text>
             </View>
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Pin code : </Text>
-              <Text style={styles.bd_details_text}>{screenData.pin_code}</Text>
-            </View>
+
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Country : </Text>
-              <Text style={styles.bd_details_text}>
-                {screenData.country.country}
-              </Text>
+              <Text style={styles.bd_details_text}>{country}</Text>
             </View>
+
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>City : </Text>
-              <Text style={styles.bd_details_text}>{screenData.city}</Text>
+              <Text style={styles.bd_details_text}>{capitalize(city)}</Text>
             </View>
+
             <View style={styles.bd_details_text_view}>
               <Text style={styles.bd_details_text_label}>Address : </Text>
-              <Text style={styles.bd_details_text}>{screenData.address}</Text>
+              <Text style={styles.bd_details_text}>{address}</Text>
+            </View>
+
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text_label}>Pincode : </Text>
+              <Text style={styles.bd_details_text}>{pincode}</Text>
             </View>
           </View>
         </LinearGradient>
 
-        {/* Category */}
+        {/* Experience and My Connections */}
         <LinearGradient
-          style={styles.bankdetail_section_small_fc}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-        >
-          <View style={styles.bd_inner_fc}>
-            <View style={styles.bd_details_text_view_nh_fc}>
-              <Text style={styles.bd_details_text_label}>Category : </Text>
-              <Text style={styles.bd_details_text_fc}>
-                {screenData.category.map((item, index) =>
-                  index === 0 ? item.title : `, ${item.title}`
-                )}
-              </Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        {/* Languages */}
-        <LinearGradient
-          style={styles.bankdetail_section_small}
+          style={styles.bankdetail_section}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
         >
           <View style={styles.bd_inner}>
-            <View style={styles.bd_details_text_view_nh}>
-              <Text style={styles.bd_details_text_label}>Languages : </Text>
-              <Text style={styles.bd_details_text_fc}>
-                {screenData.languages.map((item, index) =>
-                  index === 0 ? item.name : `, ${item.name}`
-                )}
-              </Text>
+            <View style={styles.bd_top_section}>
+              <Text style={styles.bd_text}>Experience Information</Text>
             </View>
-          </View>
-        </LinearGradient>
 
-        {/* Client Gender */}
-        <LinearGradient
-          style={styles.bankdetail_section_small}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-        >
-          <View style={styles.bd_inner}>
-            <View style={styles.bd_details_text_view_nh}>
-              <Text style={styles.bd_details_text_label}>Client Gender : </Text>
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text_label}>
+                Experience Since :{" "}
+              </Text>
               <Text style={styles.bd_details_text}>
-                {screenData.client_gender.map((item, index) =>
-                  index === 0 ? item : `, ${item}`
-                )}
+                {formatDate(experience_since_date)}
+              </Text>
+            </View>
+
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text_label}>
+                My Connections :{" "}
+              </Text>
+              <Text style={styles.bd_details_text}>
+                {formatArray(my_connections)}
               </Text>
             </View>
           </View>
         </LinearGradient>
 
-        {/* Experience */}
+        {/* Accepted Genders and Accepted Languages */}
         <LinearGradient
-          style={styles.bankdetail_section_small}
+          style={styles.bankdetail_section}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
         >
           <View style={styles.bd_inner}>
-            <View style={styles.bd_details_text_view_nh}>
-              <Text style={styles.bd_details_text_label}>Experience : </Text>
+            <View style={styles.bd_top_section}>
+              <Text style={styles.bd_text}>Acceptance</Text>
+            </View>
+
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text_label}>
+                Accepted Genders :{" "}
+              </Text>
               <Text style={styles.bd_details_text}>
-                {screenData.experience.year}{" "}
-                {screenData.experience.year === 1 ? "year" : "years"} -{" "}
-                {screenData.experience.months}{" "}
-                {screenData.experience.months === 1 ? "month" : "months"}
+                {formatArray(accepted_genders)}
+              </Text>
+            </View>
+
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text_label}>
+                Accepted Languages :{" "}
+              </Text>
+              <Text style={styles.bd_details_text}>
+                {formatArray(accepted_languages)}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+
+        {/* Agreements */}
+        <LinearGradient
+          style={styles.bankdetail_section}
+          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+        >
+          <View style={styles.bd_inner}>
+            <View style={styles.bd_top_section}>
+              <Text style={styles.bd_text}>Agreements</Text>
+            </View>
+
+            <View style={styles.bd_details_text_view}>
+              <Text style={styles.bd_details_text}>
+                {agree_certification ? "✔ Certification" : "✖ Certification"},{" "}
+                {agree_experience ? "✔ Experience" : "✖ Experience"},{" "}
+                {agree_refund ? "✔ Refund" : "✖ Refund"}
               </Text>
             </View>
           </View>
         </LinearGradient>
       </ScreenLayout>
 
-      {/* Next button */}
+      {/* Submit button */}
       <Button
-        text={"Submit"}
-        onPress={() => navigation.navigate("CoachCreateServiceDetails")}
+        text={loading ? "Submitting..." : "Submit"}
+        onPress={handleSubmit}
       />
     </>
   );

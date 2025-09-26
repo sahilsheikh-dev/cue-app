@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
   },
   bankdetail_section: {
     alignSelf: "center",
-    height: 300,
     width: "90%",
     marginTop: 30,
     borderRadius: 20,
@@ -127,7 +126,6 @@ const styles = StyleSheet.create({
   },
   bankdetail_section_2: {
     alignSelf: "center",
-    height: 220,
     width: "90%",
     marginTop: 10,
     borderRadius: 20,
@@ -135,16 +133,15 @@ const styles = StyleSheet.create({
   },
   bankdetail_section_small: {
     alignSelf: "center",
-    height: 60,
     width: "90%",
     marginTop: 10,
+    padding: 20,
     borderRadius: 20,
     overflow: "hidden",
     justifyContent: "center",
   },
   bankdetail_section_small_fc: {
     alignSelf: "center",
-    minHeight: 60,
     height: "fit-content",
     width: "90%",
     marginTop: 10,
@@ -165,10 +162,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
+    paddingBottom: 15,
   },
   bd_inner_fc: {
     // height: "100%",
-    minHeight: 60,
+    height: 60,
     width: "100%",
     borderRadius: 20,
     borderWidth: 1,

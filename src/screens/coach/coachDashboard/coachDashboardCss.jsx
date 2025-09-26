@@ -137,9 +137,9 @@ const styles = StyleSheet.create({
   bankdetail_section_small_fc: {
     alignSelf: "center",
     minHeight: 60,
-    height: "fit-content",
     width: "90%",
-    paddingVertical: "20px",
+    marginTop: 50,
+    paddingVertical: 50,
     borderBlockColor: "#fff",
     borderRadius: 20,
     overflow: "hidden",
