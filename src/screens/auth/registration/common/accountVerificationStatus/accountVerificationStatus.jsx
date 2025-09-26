@@ -14,32 +14,48 @@ import ScreenLayout from "../../../../../components/common/screenLayout/screenLa
 import ButtonLink from "../../../../../components/common/buttonLink/buttonLink";
 import Header from "../../../../../components/common/header/header";
 
+import { DataContext } from "../../../../../context/dataContext";
+
 export default function AccountVerificationStatus({ navigation }) {
-  const route = useRoute();
-  const { status = "inprogress" } = route.params || {}; // default to "inprogress"
+  const { data } = useContext(DataContext);
+
+  // ✅ pull status from data context
+  const userStatus = data?.user?.status?.toLowerCase() || "unverified";
 
   const screenData = {
-    inprogress: {
-      title: "Verification In Progress",
+    unverified: {
+      title: "Account Unverified",
       description:
-        "Thank you for your application! Once your details have been verified, someone from our team will get in touch with you to finalize the details before we go live.",
+        "Your account is currently unverified. Please complete the verification process to gain full access.",
       icon: require("../../../../../../assets/images/verification-icon.png"),
     },
-    approved: {
-      title: "Verification Approved!",
+    "pending-unverified": {
+      title: "Verification Pending",
       description:
-        "Congratulations! Your details have been verified successfully. You can now access all the features and start your journey with us.",
+        "Your verification is pending. Our team will review your details shortly.",
       icon: require("../../../../../../assets/images/verification-icon.png"),
     },
-    failed: {
-      title: "Verification Failed",
+    "semi-verified": {
+      title: "Semi Verified",
       description:
-        "Unfortunately, your verification could not be completed. Please re-submit your details or contact support for assistance.",
+        "Some of your details have been verified. Please complete the remaining steps.",
+      icon: require("../../../../../../assets/images/verification-icon.png"),
+    },
+    "pending-semi-verified": {
+      title: "Semi-Verification Pending",
+      description:
+        "We’re reviewing your semi-verified details. Hang tight while we complete the process.",
+      icon: require("../../../../../../assets/images/verification-icon.png"),
+    },
+    verified: {
+      title: "Account Verified!",
+      description:
+        "Congratulations! Your account has been fully verified. You can now enjoy all the features.",
       icon: require("../../../../../../assets/images/verification-icon.png"),
     },
   };
 
-  const currentStatus = screenData[status] || screenData.inprogress;
+  const currentStatus = screenData[userStatus] || screenData["unverified"];
 
   // ✅ helper to reset navigation stack safely
   const safeResetTo = (routeName, params = {}) => {

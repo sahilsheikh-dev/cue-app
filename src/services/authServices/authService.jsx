@@ -1,4 +1,5 @@
 // src/services/authServices/authService.js
+import axios from "axios";
 import put from "../../secureStore/put";
 import get from "../../secureStore/get";
 import remove from "../../secureStore/remove";
@@ -95,24 +96,28 @@ export async function logout() {
  */
 export async function loginWithApi(mobile, password, role) {
   try {
-    const res = await fetch(`${BASE_API_URL}/${role}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mobile, password }),
+    const res = await axios.post(`${BASE_API_URL}/${role}/login`, {
+      mobile,
+      password,
     });
 
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      return { ok: false, status: res.status, data };
-    }
-
+    const data = res.data;
     const token = data.token;
+
     await saveAuthTokenAndRole(token, role, data[role] || null);
+
     return { ok: true, token, user: data[role] || null };
   } catch (err) {
-    console.error("authService.loginWithApi error:", err);
-    return { ok: false, error: err.message || "Network error" };
+    console.error(
+      "authService.loginWithApi error:",
+      err.response?.data || err.message
+    );
+    return {
+      ok: false,
+      status: err.response?.status,
+      data: err.response?.data,
+      error: err.message || "Network error",
+    };
   }
 }
 
@@ -129,18 +134,23 @@ export async function serverLogout() {
     }
 
     // POST to /coach/logout with Bearer token
-    await fetch(`${BASE_API_URL}/coach/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }).catch((e) => {
-      // swallow and continue to clear local storage
-      console.warn("serverLogout fetch error (ignored):", e);
-    });
+    await axios
+      .post(
+        `${BASE_API_URL}/coach/logout`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .catch((e) => {
+        // swallow and continue to clear local storage
+        console.warn(
+          "serverLogout axios error (ignored):",
+          e.response?.data || e.message
+        );
+      });
   } catch (err) {
-    console.warn("authService.serverLogout error (ignored):", err);
+    console.warn("authService.serverLogout error (ignored):", err.message);
   } finally {
     await logout();
     return true;

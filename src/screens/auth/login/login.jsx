@@ -20,6 +20,7 @@ import { Alert } from "react-native";
 
 import { loginWithApi } from "../../../services/authServices/authService";
 import { DataContext } from "../../../context/dataContext";
+
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 import Dropdown from "../../../components/common/dropdown/dropdown";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
@@ -120,6 +121,23 @@ export default function Login({ navigation }) {
 
       if (res.ok) {
         await login(res.token, role, res.user);
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name:
+                role === "client"
+                  ? "ClientHome"
+                  : role === "coach"
+                  ? "CoachDashboard"
+                  : role === "eventOrganizer"
+                  ? "EventOrganizerDashboard"
+                  : role === "productCompany"
+                  ? "ProductCompanyDashboard"
+                  : "Signup",
+            },
+          ],
+        });
       } else {
         Alert.alert("Login failed", res.data?.message || res.error || "Error");
       }

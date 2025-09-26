@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 10,
     marginBottom: 10,
+    zIndex: 11,
   },
   linkText: {
     color: "rgba(255, 255, 255, 0.5)",

@@ -8,6 +8,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between", // space between left & right
     position: "relative", // needed for absolute center
+    zIndex: 11,
   },
   leftSection: {
     width: 55, // fixed width, matches back button area
@@ -30,6 +31,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: 10,
+    zIndex: 11,
   },
   backButton: {
     height: 40,
@@ -38,6 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 11,
   },
   backButtonGradient: {
     height: "100%",

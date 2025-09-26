@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     marginBottom: 20,
-    zIndex: 10,
+    zIndex: 11,
   },
   buttonInner: {
     height: "100%",

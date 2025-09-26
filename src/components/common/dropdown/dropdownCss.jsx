@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
+    zIndex: 11,
   },
   triggerInner: {
     height: "100%",
@@ -40,6 +41,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     marginBottom: 10,
+    zIndex: 11,
   },
   optionInner: {
     height: 55,

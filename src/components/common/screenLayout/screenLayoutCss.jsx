@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    zIndex: 1,
+    zIndex: -2,
     opacity: 0.25,
   },
   backgroundGradient: {
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   contentWrapper: {
     flexGrow: 1,
     width: "100%",
-    zIndex: 10,
+    zIndex: 1,
   },
   contentWithPadding: {
     paddingHorizontal: 20,

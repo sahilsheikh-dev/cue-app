@@ -1,29 +1,24 @@
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { Text, View, Image, TextInput, Alert } from "react-native";
 import styles from "./contactNumberCss";
-import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState } from "react";
-import RBSheet from "react-native-raw-bottom-sheet";
-import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import ScreenLayout from "../../../../../../components/common/screenLayout/screenLayout";
 import Button from "../../../../../../components/common/button/button";
 import Header from "../../../../../../components/common/header/header";
 import Dropdown from "../../../../../../components/common/dropdown/dropdown";
 
-export default function ContactNumber({ navigation }) {
-  const role_ref = useRef();
+import otpService from "../../../../../../services/otpService/otpService";
+import coachService from "../../../../../../services/coachServices/coachService";
+
+export default function ContactNumber({ route, navigation }) {
+  const {
+    role,
+    firstName,
+    lastName,
+    password,
+    agree_terms_conditions,
+    agree_privacy_policy,
+  } = route.params;
 
   const countries = [
     {
@@ -67,6 +62,79 @@ export default function ContactNumber({ navigation }) {
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
 
+  const handleContinue = async () => {
+    // 1️⃣ Role check
+    if (!role) {
+      return Alert.alert(
+        "Validation Error",
+        "Something went wrong. Please select your role again."
+      );
+    }
+
+    // 2️⃣ Country check
+    if (!selectedCountry || !selectedCountry.code) {
+      return Alert.alert("Validation Error", "Please select a country.");
+    }
+
+    // 3️⃣ Phone required
+    if (!mobileNumber.trim()) {
+      return Alert.alert("Validation Error", "Phone number is required.");
+    }
+
+    // 4️⃣ Digits only
+    if (!/^\d+$/.test(mobileNumber)) {
+      return Alert.alert(
+        "Validation Error",
+        "Phone number must contain digits only."
+      );
+    }
+
+    // 5️⃣ Length check
+    if (mobileNumber.length !== parseInt(selectedCountry.number_of_digit)) {
+      return Alert.alert(
+        "Validation Error",
+        `Phone number must be exactly ${selectedCountry.number_of_digit} digits`
+      );
+    }
+
+    const fullPhone = `${selectedCountry.code}${mobileNumber}`;
+
+    setLoading(true);
+    try {
+      // 🔍 Step 1: Check if mobile is available
+      const checkRes = await coachService.checkMobileAvailability(fullPhone);
+      if (!checkRes.available) {
+        setLoading(false);
+        return Alert.alert(
+          "Error",
+          checkRes.message || "Mobile already registered"
+        );
+      }
+
+      // 📲 Step 2: Send OTP if available
+      const res = await otpService.sendOtp(fullPhone, role || "client");
+      setLoading(false);
+
+      if (res.ok && res.otpId) {
+        navigation.navigate("OtpVerification", {
+          phone: fullPhone,
+          otpId: res.otpId,
+          userType: role,
+          firstName,
+          lastName,
+          password,
+          agree_terms_conditions,
+          agree_privacy_policy,
+        });
+      } else {
+        Alert.alert("Error", res.message || "Failed to send OTP");
+      }
+    } catch (err) {
+      setLoading(false);
+      Alert.alert("Error", err.message || "Something went wrong");
+    }
+  };
+
   return (
     <>
       <ScreenLayout scrollable withPadding>
@@ -103,7 +171,7 @@ export default function ContactNumber({ navigation }) {
                   <Text style={{ color: "#fff" }}>{item.code}</Text>
                 </View>
               )}
-              renderOption={(item, selected) => (
+              renderOption={(item) => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Image
                     source={{ uri: item.img }}
@@ -135,8 +203,9 @@ export default function ContactNumber({ navigation }) {
       </ScreenLayout>
 
       <Button
-        text={loading ? "Loading..." : "Continue"}
-        onPress={() => navigation.navigate("OtpVerification")}
+        text={loading ? "Sending OTP..." : "Continue"}
+        onPress={handleContinue}
+        disabled={loading}
       />
     </>
   );

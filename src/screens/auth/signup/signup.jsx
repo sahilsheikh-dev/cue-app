@@ -98,21 +98,17 @@ export default function Signup({ navigation }) {
     setLoading(true);
     try {
       const payload = {
-        name: `${firstName.trim()} ${lastName.trim()}`,
+        role,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         password: password.trim(),
         agree_terms_conditions: agreeTcPp,
         agree_privacy_policy: agreeTcPp,
       };
 
-      const res = await coachService.signup(payload);
-
+      // 👉 For now, just navigate with data
       setLoading(false);
-      if (res.success) {
-        Alert.alert("Success", res.message || "Account created successfully!");
-        navigation.navigate("ContactNumber");
-      } else {
-        Alert.alert("Signup Failed", res.message || "Something went wrong");
-      }
+      navigation.navigate("ContactNumber", { ...payload });
     } catch (err) {
       setLoading(false);
       Alert.alert("Signup Failed", err.message || "Something went wrong");
@@ -231,25 +227,22 @@ export default function Signup({ navigation }) {
             />
           </TouchableOpacity>
         </View>
+
+        {/* ✅ Signup Button */}
+        <Button
+          text={loading ? "Creating..." : "Get Started"}
+          onPress={validateAndSignup}
+        />
+
+        {/* ✅ Login Redirect */}
+        <ButtonLink
+          text="Already have an account ?"
+          highlightText="Login"
+          onPress={() => navigation.navigate("Login")}
+          align="center"
+          highlightColor="white"
+        />
       </ScreenLayout>
-
-      {/* ✅ Signup Button */}
-      <Button
-        text={loading ? "Creating..." : "Get Started"}
-        // onPress={validateAndSignup}
-        onPress={() => {
-          navigation.navigate("ContactNumber");
-        }}
-      />
-
-      {/* ✅ Login Redirect */}
-      <ButtonLink
-        text="Already have an account ?"
-        highlightText="Login"
-        onPress={() => navigation.navigate("Login")}
-        align="center"
-        highlightColor="white"
-      />
     </>
   );
 }

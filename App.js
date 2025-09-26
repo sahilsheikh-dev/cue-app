@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { StripeProvider } from "@stripe/stripe-react-native";
+import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -105,7 +105,7 @@ export default function App() {
   // ---------- Render ----------
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}> */}
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <DataContext.Provider
           value={{
             data,
@@ -122,13 +122,12 @@ export default function App() {
             ) : (
               <RootNavigator
                 key={data.role || "auth"} // 👈 force re-mount when role changes after login
-                initialRole={data.auth ? data.role : "auth"}
               />
             )}
           </NavigationContainer>
         </DataContext.Provider>
         <StatusBar style="auto" />
-      {/* </StripeProvider> */}
+      </StripeProvider>
     </GestureHandlerRootView>
   );
 }

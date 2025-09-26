@@ -1,5 +1,10 @@
-import { Text, View, ScrollView, useWindowDimensions } from "react-native";
-import styles from "./coachAgreementDetailsCss";
+import {
+  Text,
+  View,
+  ScrollView,
+  useWindowDimensions,
+  BackHandler,
+} from "react-native";
 import { useState, useRef, useEffect } from "react";
 import { Feather } from "@expo/vector-icons";
 import Header from "../../../../../components/common/header/header";
@@ -16,49 +21,77 @@ import {
 // ✅ Render HTML
 import RenderHtml from "react-native-render-html";
 
-export default function CoachAgreementDetails({ navigation, route }) {
+export default function CoachAgreementDetails({ navigation }) {
   const richText = useRef();
   const { width } = useWindowDimensions();
 
   // ✅ Mock data (replace with API/props)
   const data = {
     user: {
-      agreement_terms: null, // 👉 change this to some HTML string to test preview
+      agreement_terms: null, // 👉 change this to test
     },
   };
 
   // If agreement_terms exists → preview mode, else edit mode
   const [editMode, setEditMode] = useState(!data?.user?.agreement_terms);
 
-  // Initialize agreement terms
+  // Agreement text
   const [agreementTerm, setAgreementTerm] = useState(
     data?.user?.agreement_terms || ""
   );
 
-  const [title, setTitle] = useState("Coach Agreement");
+  const [title] = useState("Coach Agreement");
+
+  // ✅ Handle Back Button
+  useEffect(() => {
+    const backAction = () => {
+      if (!editMode) {
+        // If preview → go to edit mode
+        setEditMode(true);
+        return true;
+      }
+      return false; // normal back
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [editMode]);
 
   const saveAgreement = () => {
     console.log("Saved Agreement:", agreementTerm);
-    setEditMode(false);
+  };
+
+  const confirmAgreement = () => {
+    console.log("Confirmed Agreement:", agreementTerm);
+    navigation.navigate("CoachCommissionStructure");
   };
 
   return (
     <>
-      <ScreenLayout scrollable withPadding>
+      <ScreenLayout scrollable={false} withPadding={false}>
         <Header
           title={"Agreement Terms"}
           showBack={true}
-          onBackPress={() => navigation.goBack()}
-          rightIcon={"eye"}
-          onRightPress={() => setEditMode(!editMode)}
+          onBackPress={() => {
+            if (!editMode) {
+              setEditMode(true);
+            } else {
+              navigation.goBack();
+            }
+          }}
         />
 
-        <View style={{ flex: 1, marginVertical: 10 }}>
+        <View style={{ flex: 1 }}>
           {editMode ? (
             <>
+              {/* ✅ Editor Full Screen */}
               <RichEditor
                 ref={richText}
-                style={{ borderColor: "#ccc", borderWidth: 1, minHeight: 200 }}
+                style={{ flex: 1, padding: 10 }}
                 placeholder={
                   data?.user?.agreement_terms
                     ? "Edit agreement terms..."
@@ -66,8 +99,10 @@ export default function CoachAgreementDetails({ navigation, route }) {
                 }
                 initialContentHTML={agreementTerm}
                 onChange={(html) => setAgreementTerm(html)}
+                androidLayerType="software"
               />
 
+              {/* ✅ Toolbar */}
               <RichToolbar
                 editor={richText}
                 actions={[
@@ -92,8 +127,8 @@ export default function CoachAgreementDetails({ navigation, route }) {
               />
             </>
           ) : (
-            // ✅ Preview Mode
-            <ScrollView style={{ padding: 10 }}>
+            // ✅ Preview Mode (Full Screen)
+            <ScrollView style={{ flex: 1, padding: 15 }}>
               <Text
                 style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
               >
@@ -125,14 +160,15 @@ export default function CoachAgreementDetails({ navigation, route }) {
 
       {/* ✅ Action Buttons */}
       {editMode ? (
-        <Button text={"Save"} onPress={saveAgreement} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Button text={"Preview"} onPress={() => setEditMode(false)} />
+          <Button text={"Save"} onPress={saveAgreement} />
+        </View>
       ) : (
-        (title || agreementTerm.length > 0) && (
-          <Button
-            text={"Confirm"}
-            onPress={() => navigation.navigate("CoachCommissionStructure")}
-          />
-        )
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Button text={"Edit"} onPress={() => setEditMode(true)} />
+          <Button text={"Confirm"} onPress={confirmAgreement} />
+        </View>
       )}
     </>
   );

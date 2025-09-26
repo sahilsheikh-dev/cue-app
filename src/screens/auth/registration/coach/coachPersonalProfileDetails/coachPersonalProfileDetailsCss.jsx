@@ -445,6 +445,7 @@ const styles = StyleSheet.create({
     gap: 10,
     alignSelf: "center",
     alignItems: "center",
+    zIndex: 11,
   },
 });
 export default styles;

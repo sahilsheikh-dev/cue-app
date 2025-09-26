@@ -112,7 +112,7 @@ export default function CoachDashboard({ navigation }) {
 
           <ButtonLink
             highlightText={"Click Here"}
-            onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
+            onPress={() => navigation.navigate("CoachIntroduction")}
           />
         </LinearGradient>
 
