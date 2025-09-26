@@ -34,7 +34,7 @@ const roleUrls = {
   productCompany: "https://cuewellness.net/",
 };
 
-export default function CueGuideline({ route }) {
+export default function CueGuideline({ route, navigation }) {
   // ✅ fallback role is client
   const role = route?.params?.role || "client";
 
@@ -42,7 +42,7 @@ export default function CueGuideline({ route }) {
   const safeRole = roleUrls[role] ? role : "client";
 
   return (
-    <ScreenLayout scrollable withPadding>
+    <ScreenLayout>
       <Header
         title={roleLabels[safeRole] + "'s Cue Guildlines"}
         showBack={true}
@@ -50,6 +50,8 @@ export default function CueGuideline({ route }) {
       />
       <WebView
         style={{ flex: 1 }}
+        containerStyle={{ flex: 1 }}
+        originWhitelist={["*"]}
         source={{ uri: roleUrls[safeRole] }}
         startInLoadingState={true}
         renderLoading={() => (

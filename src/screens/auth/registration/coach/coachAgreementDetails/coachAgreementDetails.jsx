@@ -1,72 +1,45 @@
-// CoachAgreementDetails.jsx (Demo with Dynamic Sections)
-import {
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  Keyboard,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, ScrollView, useWindowDimensions } from "react-native";
 import styles from "./coachAgreementDetailsCss";
-import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
-import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
-
-// ✅ Expo vector icons
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { useState, useRef, useEffect } from "react";
+import { Feather } from "@expo/vector-icons";
 import Header from "../../../../../components/common/header/header";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Button from "../../../../../components/common/button/button";
 
-export default function CoachAgreementDetails({ navigation }) {
-  // Dummy Data Object
-  const dummyData = {
-    title: "My Agreement Title",
-    agreement_term: [
-      { type: "paragraph", content: "This is a sample paragraph." },
-      { type: "bullet", content: "Provide quality coaching." },
-      { type: "title", content: "Coach Commitments" },
-    ],
+// ✅ Rich Editor
+import {
+  RichEditor,
+  RichToolbar,
+  actions,
+} from "react-native-pell-rich-editor";
+
+// ✅ Render HTML
+import RenderHtml from "react-native-render-html";
+
+export default function CoachAgreementDetails({ navigation, route }) {
+  const richText = useRef();
+  const { width } = useWindowDimensions();
+
+  // ✅ Mock data (replace with API/props)
+  const data = {
+    user: {
+      agreement_terms: null, // 👉 change this to some HTML string to test preview
+    },
   };
 
-  const [loading, setLoading] = useState(false);
-  const [agreement_term, setAgreement_term] = useState(
-    dummyData.agreement_term || []
+  // If agreement_terms exists → preview mode, else edit mode
+  const [editMode, setEditMode] = useState(!data?.user?.agreement_terms);
+
+  // Initialize agreement terms
+  const [agreementTerm, setAgreementTerm] = useState(
+    data?.user?.agreement_terms || ""
   );
-  const [title, setTitle] = useState(dummyData.title || "");
-  const [editMode, setEditMode] = useState(false); // 🔹 toggle between view & edit
 
-  // Save
-  const save_agreement = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setEditMode(false); // switch back to view mode
-    }, 1200);
-  };
+  const [title, setTitle] = useState("Coach Agreement");
 
-  // Add Section
-  const addSection = (type) => {
-    setAgreement_term([...agreement_term, { type, content: "" }]);
-  };
-
-  // Remove Section
-  const removeSection = (index) => {
-    let all = [...agreement_term];
-    all.splice(index, 1);
-    setAgreement_term(all);
-  };
-
-  // Update Section
-  const updateSection = (index, text) => {
-    let all = [...agreement_term];
-    all[index] = { ...all[index], content: text };
-    setAgreement_term(all);
+  const saveAgreement = () => {
+    console.log("Saved Agreement:", agreementTerm);
+    setEditMode(false);
   };
 
   return (
@@ -80,120 +53,81 @@ export default function CoachAgreementDetails({ navigation }) {
           onRightPress={() => setEditMode(!editMode)}
         />
 
-        {/* Content */}
-        <ScrollView style={styles.main_scroll_view}>
-          {!title && agreement_term.length === 0 && !editMode ? (
-            <Text style={{ color: "#fff", textAlign: "center", marginTop: 20 }}>
-              Please add your agreement details
-            </Text>
-          ) : (
+        <View style={{ flex: 1, marginVertical: 10 }}>
+          {editMode ? (
             <>
-              {/* Title */}
-              {editMode ? (
-                <LinearGradient
-                  colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-                  style={styles.main_agreement_section}
-                >
-                  <TextInput
-                    style={styles.mas_input}
-                    placeholder="Title here..."
-                    multiline
-                    placeholderTextColor={"#ffffff90"}
-                    value={title}
-                    onChangeText={setTitle}
-                  />
-                </LinearGradient>
-              ) : title ? (
-                <Text
-                  style={[
-                    styles.label,
-                    { fontSize: 18, fontWeight: "bold", textAlign: "center" },
-                  ]}
-                >
-                  {title}
-                </Text>
-              ) : null}
+              <RichEditor
+                ref={richText}
+                style={{ borderColor: "#ccc", borderWidth: 1, minHeight: 200 }}
+                placeholder={
+                  data?.user?.agreement_terms
+                    ? "Edit agreement terms..."
+                    : "Please add your agreement details..."
+                }
+                initialContentHTML={agreementTerm}
+                onChange={(html) => setAgreementTerm(html)}
+              />
 
-              {/* Terms */}
-              {agreement_term.map((item, index) => (
-                <View key={index} style={{ marginTop: 10 }}>
-                  {editMode ? (
-                    <LinearGradient
-                      colors={[
-                        "rgba(255, 255, 255, 0.1)",
-                        "rgba(30, 53, 126, 0)",
-                      ]}
-                      style={styles.main_agreement_section_content}
-                    >
-                      <TouchableOpacity
-                        style={styles.cut_circle}
-                        onPress={() => removeSection(index)}
-                      >
-                        <Feather name="x" size={15} color="#000" />
-                      </TouchableOpacity>
-                      <TextInput
-                        style={styles.mas_input}
-                        placeholder={`Enter ${item.type}...`}
-                        multiline
-                        placeholderTextColor={"#ffffff90"}
-                        value={item.content}
-                        onChangeText={(text) => updateSection(index, text)}
-                      />
-                    </LinearGradient>
-                  ) : (
-                    <Text
-                      style={{
-                        color: "#fff",
-                        marginLeft: 5,
-                        textAlign: "center",
-                      }}
-                    >
-                      {item.type === "bullet"
-                        ? `• ${item.content}`
-                        : item.content}
-                    </Text>
-                  )}
-                </View>
-              ))}
+              <RichToolbar
+                editor={richText}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.insertLink,
+                ]}
+                iconMap={{
+                  [actions.setBold]: () => (
+                    <Feather name="bold" size={18} color="black" />
+                  ),
+                  [actions.setItalic]: () => (
+                    <Feather name="italic" size={18} color="black" />
+                  ),
+                  [actions.setUnderline]: () => (
+                    <Feather name="underline" size={18} color="black" />
+                  ),
+                }}
+              />
             </>
+          ) : (
+            // ✅ Preview Mode
+            <ScrollView style={{ padding: 10 }}>
+              <Text
+                style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
+              >
+                {title}
+              </Text>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#ddd",
+                  padding: 10,
+                  minHeight: 200,
+                }}
+              >
+                {agreementTerm ? (
+                  <RenderHtml
+                    contentWidth={width}
+                    source={{ html: agreementTerm }}
+                  />
+                ) : (
+                  <Text style={{ color: "gray" }}>
+                    No agreement entered yet.
+                  </Text>
+                )}
+              </View>
+            </ScrollView>
           )}
-
-          {/* Add buttons only in edit mode */}
-          {editMode && (
-            <View style={styles.add_btn_view}>
-              <TouchableOpacity onPress={() => addSection("title")}>
-                <LinearGradient
-                  colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
-                  style={styles.add_btn}
-                >
-                  <Text style={styles.add_btn_text}>Add Title</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => addSection("paragraph")}>
-                <LinearGradient
-                  colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
-                  style={styles.add_btn}
-                >
-                  <Text style={styles.add_btn_text}>Add Paragraph</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => addSection("bullet")}>
-                <LinearGradient
-                  colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
-                  style={styles.add_btn}
-                >
-                  <Text style={styles.add_btn_text}>Add Bullet Point</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          )}
-        </ScrollView>
+        </View>
       </ScreenLayout>
-      {/* Action Buttons */}
+
+      {/* ✅ Action Buttons */}
       {editMode ? (
-        <Button text={"Save"} onPress={save_agreement} />
+        <Button text={"Save"} onPress={saveAgreement} />
       ) : (
-        (title || agreement_term.length > 0) && (
+        (title || agreementTerm.length > 0) && (
           <Button
             text={"Confirm"}
             onPress={() => navigation.navigate("CoachCommissionStructure")}

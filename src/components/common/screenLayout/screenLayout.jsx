@@ -19,16 +19,21 @@ const ScreenLayout = ({
   scrollable = true, // allow choosing between ScrollView or View
   withPadding = true, // common padding if required
 }) => {
+  const Wrapper = scrollable ? ScrollView : View;
+
   const [contentHeight, setContentHeight] = useState(0);
   const screenHeight = Dimensions.get("window").height;
-  const Wrapper = scrollable ? ScrollView : View;
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
 
       {/* Background image */}
-      <Image source={background} style={styles.backgroundImage} />
+      <Image
+        source={background}
+        style={styles.backgroundImage}
+        pointerEvents="none" // ✅ allow touches to pass through
+      />
 
       {/* Gradient overlay */}
       <LinearGradient
@@ -37,21 +42,36 @@ const ScreenLayout = ({
           styles.backgroundGradient,
           { height: Math.max(contentHeight, screenHeight) },
         ]}
+        pointerEvents="none" // ✅ allow touches to pass through
       />
 
-      {/* Screen Wrapper */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <Wrapper
-          style={[
-            styles.contentWrapper,
-            withPadding && styles.contentWithPadding,
-          ]}
-        >
-          {children}
-        </Wrapper>
+        {/* Screen Wrapper */}
+        {scrollable ? (
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={[
+              styles.contentWrapper,
+              withPadding && styles.contentWithPadding,
+              { paddingBottom: 40 }, // ✅ extra space for last element
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          <View
+            style={[
+              styles.contentWrapper,
+              withPadding && styles.contentWithPadding,
+            ]}
+          >
+            {children}
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -18,11 +18,11 @@ import Header from "../../../components/common/header/header";
 
 const background = require("../../../../assets/images/background.png");
 
-export default function PrivacyPolicy() {
+export default function PrivacyPolicy({ navigation }) {
   const privacyUrl = "https://cuewellness.net/privacy-policy";
 
   return (
-    <ScreenLayout scrollable withPadding>
+    <ScreenLayout>
       <Header
         title={"Privacy Policy"}
         showBack={true}
@@ -30,6 +30,8 @@ export default function PrivacyPolicy() {
       />
       <WebView
         style={{ flex: 1 }}
+        containerStyle={{ flex: 1 }}
+        originWhitelist={["*"]}
         source={{ uri: privacyUrl }}
         startInLoadingState={true}
         renderLoading={() => (
