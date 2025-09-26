@@ -29,15 +29,13 @@ export default function CoachServicePictures({ navigation }) {
     img1: { type: "", content: "" }, // must be image
     img2: { type: "", content: "" }, // image or video
     img3: { type: "", content: "" }, // image or video
-    loading: false,
-    nextScreen: "CoachAccountDetails",
   };
 
   // Local state (uses dummyData as initial)
   const [img1, setImg1] = useState(dummyData.img1);
   const [img2, setImg2] = useState(dummyData.img2);
   const [img3, setImg3] = useState(dummyData.img3);
-  const [loading, setLoading] = useState(dummyData.loading);
+  const [loading, setLoading] = useState(false);
 
   const video_1_ref = useRef(null);
   const video_2_ref = useRef(null);

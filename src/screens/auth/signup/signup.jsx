@@ -237,7 +237,9 @@ export default function Signup({ navigation }) {
       <Button
         text={loading ? "Creating..." : "Get Started"}
         // onPress={validateAndSignup}
-        onPress={() => navigation.navigate("ContactNumber")}
+        onPress={() => {
+          navigation.navigate("ContactNumber");
+        }}
       />
 
       {/* ✅ Login Redirect */}

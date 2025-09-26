@@ -9,21 +9,20 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import styles from "./coachAccountDetailsCss";
+import styles from "./coachCommissionStructureCss";
 import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
-
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Button from "../../../../../components/common/button/button";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
-import Button from "../../../../../components/common/button/button";
 
-export default function CoachAccountDetails({ navigation }) {
-  const [coach_share] = useState(80);
-  const [cue_share] = useState(20);
+const commissionDetails = {
+  coach_share: 80,
+  cue_share: 20,
+};
 
+export default function CoachCommissionStructure({ navigation }) {
   return (
     <>
       <ScreenLayout scrollable withPadding>
@@ -34,10 +33,9 @@ export default function CoachAccountDetails({ navigation }) {
         />
 
         <Text style={{ fontSize: 24, color: "white", textAlign: "center" }}>
-          Accounting Information
+          Commission Structure
         </Text>
 
-        {/* Commission Section (Static) */}
         <LinearGradient
           style={styles.percent_section}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
@@ -50,14 +48,17 @@ export default function CoachAccountDetails({ navigation }) {
               <View style={styles.ps_ips_indi_section}>
                 <Text style={styles.ps_member}>Coach</Text>
                 <View style={styles.percent_ps}>
-                  <Text style={styles.percent_text}>{coach_share}%</Text>
+                  <Text style={styles.percent_text}>
+                    {commissionDetails.coach_share}%
+                  </Text>
                 </View>
               </View>
-
               <View style={styles.ps_ips_indi_section}>
                 <Text style={styles.ps_member}>Cue</Text>
                 <View style={styles.percent_ps}>
-                  <Text style={styles.percent_text}>{cue_share}%</Text>
+                  <Text style={styles.percent_text}>
+                    {commissionDetails.cue_share}%
+                  </Text>
                 </View>
               </View>
             </View>
@@ -67,7 +68,7 @@ export default function CoachAccountDetails({ navigation }) {
 
       {/* Next Button */}
       <Button
-        text={"Next"}
+        text={"Agree"}
         onPress={() => navigation.navigate("AccountVerificationStatus")}
       />
     </>

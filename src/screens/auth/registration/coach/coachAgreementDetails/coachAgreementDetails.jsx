@@ -196,7 +196,7 @@ export default function CoachAgreementDetails({ navigation }) {
         (title || agreement_term.length > 0) && (
           <Button
             text={"Confirm"}
-            onPress={() => navigation.navigate("CoachAccountDetails")}
+            onPress={() => navigation.navigate("CoachCommissionStructure")}
           />
         )
       )}

@@ -134,5 +134,16 @@ const styles = StyleSheet.create({
     width: "80%",
     textAlign: "center",
   },
+  bankdetail_section_small_fc: {
+    alignSelf: "center",
+    minHeight: 60,
+    height: "fit-content",
+    width: "90%",
+    paddingVertical: "20px",
+    borderBlockColor: "#fff",
+    borderRadius: 20,
+    overflow: "hidden",
+    justifyContent: "center",
+  },
 });
 export default styles;

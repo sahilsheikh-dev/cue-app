@@ -11,6 +11,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import styles from "./coachBillingHistoryCss";
 import { Ionicons } from "@expo/vector-icons";
 import "./coachBillingHistoryCss";
+import ScreenLayout from "../../../../components/common/screenLayout/screenLayout";
+import Header from "../../../../components/common/header/header";
 
 const background = require("../../../../../assets/images/background.png");
 
@@ -19,43 +21,14 @@ export default function CoachBillingHistory({ navigation }) {
   const billingHistoryData = null; // Or fetch from API later
 
   return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-      <View style={styles.top_portion1}></View>
+    <>
+      <ScreenLayout scrollable withPadding>
+        <Header
+          title={"Billing History"}
+          showBack={true}
+          onBackPress={() => navigation.goBack()}
+        />
 
-      {/* Header */}
-      <View style={styles.back_section}>
-        <View style={styles.bs_1}>
-          <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => navigation.goBack()}
-          >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.bs_2}>
-          <Text style={styles.bs_2_cue}>Billing History</Text>
-        </View>
-        <View style={styles.bs_3}></View>
-      </View>
-
-      {/* Billing List */}
-      <ScrollView
-        style={styles.main_sv}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
         {!billingHistoryData?.bills || billingHistoryData.bills.length === 0 ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -92,7 +65,7 @@ export default function CoachBillingHistory({ navigation }) {
             </LinearGradient>
           ))
         )}
-      </ScrollView>
-    </SafeAreaView>
+      </ScreenLayout>
+    </>
   );
 }

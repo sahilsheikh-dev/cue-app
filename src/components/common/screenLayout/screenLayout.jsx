@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   Image,
@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   View,
+  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,8 @@ const ScreenLayout = ({
   scrollable = true, // allow choosing between ScrollView or View
   withPadding = true, // common padding if required
 }) => {
+  const [contentHeight, setContentHeight] = useState(0);
+  const screenHeight = Dimensions.get("window").height;
   const Wrapper = scrollable ? ScrollView : View;
 
   return (
@@ -30,7 +33,10 @@ const ScreenLayout = ({
       {/* Gradient overlay */}
       <LinearGradient
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundGradient}
+        style={[
+          styles.backgroundGradient,
+          { height: Math.max(contentHeight, screenHeight) },
+        ]}
       />
 
       {/* Screen Wrapper */}

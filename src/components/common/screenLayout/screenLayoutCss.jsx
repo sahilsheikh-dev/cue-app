@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   backgroundImage: {
-    height: "130%",
+    ...StyleSheet.absoluteFillObject,
     width: "100%",
     resizeMode: "cover",
     position: "absolute",
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     opacity: 0.25,
   },
   backgroundGradient: {
-    height: "130%",
+    ...StyleSheet.absoluteFillObject,
     width: "100%",
     position: "absolute",
     top: 0,
