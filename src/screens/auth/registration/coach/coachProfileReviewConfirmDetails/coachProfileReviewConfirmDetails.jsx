@@ -31,7 +31,7 @@ export default function CoachProfileReviewConfirmDetails({
     agree_certification,
     agree_experience,
     agree_refund,
-    my_connections,
+    my_activities,
     accepted_genders,
     accepted_languages,
   } = route.params;
@@ -75,7 +75,7 @@ export default function CoachProfileReviewConfirmDetails({
       agree_certification,
       agree_experience,
       agree_refund,
-      my_connections,
+      my_activities,
       accepted_genders,
       accepted_languages,
     };
@@ -109,130 +109,87 @@ export default function CoachProfileReviewConfirmDetails({
           Review and Submit
         </Text>
 
-        {/* Personal Info */}
         <LinearGradient
-          style={styles.bankdetail_section}
+          style={styles.bankdetail_section_small_fc}
           colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
         >
-          <View style={styles.bd_inner}>
-            <View style={styles.bd_top_section}>
-              <Text style={styles.bd_text}>Personal Information</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Email : </Text>
-              <Text style={styles.bd_details_text}>{email}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Date of Birth : </Text>
-              <Text style={styles.bd_details_text}>{formatDate(dob)}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Gender : </Text>
-              <Text style={styles.bd_details_text}>{capitalize(gender)}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Country : </Text>
-              <Text style={styles.bd_details_text}>{country}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>City : </Text>
-              <Text style={styles.bd_details_text}>{capitalize(city)}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Address : </Text>
-              <Text style={styles.bd_details_text}>{address}</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>Pincode : </Text>
-              <Text style={styles.bd_details_text}>{pincode}</Text>
-            </View>
+          {/* Personal Info */}
+          <Text style={styles.bs_2_cue}>Personal Information</Text>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Email : </Text>
+            <Text style={styles.bd_details_text}>{email}</Text>
           </View>
-        </LinearGradient>
-
-        {/* Experience and My Connections */}
-        <LinearGradient
-          style={styles.bankdetail_section}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-        >
-          <View style={styles.bd_inner}>
-            <View style={styles.bd_top_section}>
-              <Text style={styles.bd_text}>Experience Information</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>
-                Experience Since :{" "}
-              </Text>
-              <Text style={styles.bd_details_text}>
-                {formatDate(experience_since_date)}
-              </Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>
-                My Connections :{" "}
-              </Text>
-              <Text style={styles.bd_details_text}>
-                {formatArray(my_connections)}
-              </Text>
-            </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Date of Birth : </Text>
+            <Text style={styles.bd_details_text}>{formatDate(dob)}</Text>
           </View>
-        </LinearGradient>
-
-        {/* Accepted Genders and Accepted Languages */}
-        <LinearGradient
-          style={styles.bankdetail_section}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-        >
-          <View style={styles.bd_inner}>
-            <View style={styles.bd_top_section}>
-              <Text style={styles.bd_text}>Acceptance</Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>
-                Accepted Genders :{" "}
-              </Text>
-              <Text style={styles.bd_details_text}>
-                {formatArray(accepted_genders)}
-              </Text>
-            </View>
-
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text_label}>
-                Accepted Languages :{" "}
-              </Text>
-              <Text style={styles.bd_details_text}>
-                {formatArray(accepted_languages)}
-              </Text>
-            </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Gender : </Text>
+            <Text style={styles.bd_details_text}>{capitalize(gender)}</Text>
           </View>
-        </LinearGradient>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Country : </Text>
+            <Text style={styles.bd_details_text}>{country}</Text>
+          </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>City : </Text>
+            <Text style={styles.bd_details_text}>{capitalize(city)}</Text>
+          </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Address : </Text>
+            <Text style={styles.bd_details_text}>{address}</Text>
+          </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>Pincode : </Text>
+            <Text style={styles.bd_details_text}>{pincode}</Text>
+          </View>
 
-        {/* Agreements */}
-        <LinearGradient
-          style={styles.bankdetail_section}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
-        >
-          <View style={styles.bd_inner}>
-            <View style={styles.bd_top_section}>
-              <Text style={styles.bd_text}>Agreements</Text>
-            </View>
+          {/* Experience and My Activities */}
+          <Text style={styles.bs_2_cue}>Experience Information</Text>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>
+              Experience Since :{" "}
+            </Text>
+            <Text style={styles.bd_details_text}>
+              {formatDate(experience_since_date)}
+            </Text>
+          </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>My Activities : </Text>
+            <Text style={styles.bd_details_text}>
+              {formatArray(my_activities)}
+            </Text>
+          </View>
 
-            <View style={styles.bd_details_text_view}>
-              <Text style={styles.bd_details_text}>
-                {agree_certification ? "✔ Certification" : "✖ Certification"},{" "}
-                {agree_experience ? "✔ Experience" : "✖ Experience"},{" "}
-                {agree_refund ? "✔ Refund" : "✖ Refund"}
-              </Text>
-            </View>
+          {/* Accepted Genders and Accepted Languages */}
+          <Text style={styles.bs_2_cue}>Acceptance</Text>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>
+              Accepted Genders :{" "}
+            </Text>
+            <Text style={styles.bd_details_text}>
+              {formatArray(accepted_genders)}
+            </Text>
+          </View>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text_label}>
+              Accepted Languages :{" "}
+            </Text>
+            <Text style={styles.bd_details_text}>
+              {formatArray(accepted_languages)}
+            </Text>
+          </View>
+
+          {/* Agreements */}
+          <Text style={styles.bs_2_cue}>Agreements</Text>
+          <View style={styles.bd_details_text_view}>
+            <Text style={styles.bd_details_text}>
+              {agree_certification ? "✔ Certification" : "✖ Certification"}
+              {"\n"}
+              {agree_experience ? "✔ Experience" : "✖ Experience"}
+              {"\n"}
+              {agree_refund ? "✔ Refund" : "✖ Refund"}
+            </Text>
           </View>
         </LinearGradient>
       </ScreenLayout>

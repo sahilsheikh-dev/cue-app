@@ -11,6 +11,7 @@ import { DataContext } from "../../../../../context/dataContext";
 export default function CoachClientAcceptanceDetails({ navigation, route }) {
   const { data } = useContext(DataContext);
 
+  // 🔹 Params from previous screen
   const {
     email,
     dob,
@@ -25,104 +26,103 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     agree_refund,
   } = route.params || {};
 
-  const all_connections = {
+  const all_activities = {
     Fitness: {
-      _id: "1",
+      id: "1",
       title: "Fitness",
       sub: {
         Strength: {
-          _id: "1-1",
+          id: "1-1",
           title: "Strength",
           sub: {
-            "Upper Body": { _id: "1-1-1", title: "Upper Body", sub: {} },
-            "Lower Body": { _id: "1-1-2", title: "Lower Body", sub: {} },
+            "Upper Body": { id: "1-1-1", title: "Upper Body", sub: {} },
+            "Lower Body": { id: "1-1-2", title: "Lower Body", sub: {} },
           },
         },
         Cardio: {
-          _id: "1-2",
+          id: "1-2",
           title: "Cardio",
           sub: {
-            Running: { _id: "1-2-1", title: "Running", sub: {} },
-            Cycling: { _id: "1-2-2", title: "Cycling", sub: {} },
+            Running: { id: "1-2-1", title: "Running", sub: {} },
+            Cycling: { id: "1-2-2", title: "Cycling", sub: {} },
           },
         },
       },
     },
     Yoga: {
-      _id: "2",
+      id: "2",
       title: "Yoga",
       sub: {
-        Hatha: { _id: "2-1", title: "Hatha", sub: {} },
-        Vinyasa: { _id: "2-2", title: "Vinyasa", sub: {} },
+        Hatha: { id: "2-1", title: "Hatha", sub: {} },
+        Vinyasa: { id: "2-2", title: "Vinyasa", sub: {} },
       },
     },
-    Nutrition: { _id: "3", title: "Nutrition", sub: {} },
+    Nutrition: { id: "3", title: "Nutrition", sub: {} },
   };
 
-  const [selectedConnections, setSelectedConnections] = useState([]);
+  const [selectedActivities, setSelectedActivities] = useState([]);
   const [acceptedGenders, setAcceptedGenders] = useState([]);
   const [acceptedLanguages, setAcceptedLanguages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  // Prefill from context if data exists
+  // Prefill from context or route params
   useEffect(() => {
-    if (data?.user) {
-      setSelectedConnections(data.user.my_connections || []);
-      setAcceptedGenders(data.user.accepted_genders || []);
-      setAcceptedLanguages(data.user.accepted_languages || []);
+    const user = data?.user || {};
 
-      // If values exist → start in preview, else edit
-      setIsEdit(
-        !(
-          data.user.my_connections?.length ||
-          data.user.accepted_genders?.length ||
-          data.user.accepted_languages?.length
-        )
-      );
+    setSelectedActivities(user.my_activities || []);
+    setAcceptedGenders(user.accepted_genders || []);
+    setAcceptedLanguages(user.accepted_languages || []);
+
+    // If no values → start in edit, otherwise preview
+    setIsEdit(
+      !(
+        (user.my_activities?.length || route.params?.my_activities?.length) &&
+        (user.accepted_genders?.length ||
+          route.params?.accepted_genders?.length) &&
+        (user.accepted_languages?.length ||
+          route.params?.accepted_languages?.length)
+      )
+    );
+  }, [data, route.params]);
+
+  // 🔹 reusable validation function
+  const validateFields = () => {
+    if (acceptedGenders.length === 0) {
+      Alert.alert("Validation Error", "Please select at least one gender");
+      return false;
     }
-  }, [data]);
+    if (acceptedLanguages.length === 0) {
+      Alert.alert("Validation Error", "Please select at least one language");
+      return false;
+    }
+    if (selectedActivities.length === 0) {
+      Alert.alert("Validation Error", "Please select at least one activity");
+      return false;
+    }
+    return true;
+  };
+
+  const buildPayload = () => ({
+    email,
+    dob,
+    gender,
+    country,
+    city,
+    address,
+    pincode,
+    experience_since_date,
+    agree_certification,
+    agree_experience,
+    agree_refund,
+    my_activities: selectedActivities,
+    accepted_genders: acceptedGenders,
+    accepted_languages: acceptedLanguages,
+  });
 
   const handleNext = () => {
-    if (isEdit) {
-      if (acceptedGenders.length === 0) {
-        return Alert.alert(
-          "Validation Error",
-          "Please select at least one gender"
-        );
-      }
-      if (acceptedLanguages.length === 0) {
-        return Alert.alert(
-          "Validation Error",
-          "Please select at least one language"
-        );
-      }
-      if (selectedConnections.length === 0) {
-        return Alert.alert(
-          "Validation Error",
-          "Please select at least one category"
-        );
-      }
-    }
-
-    const payload = {
-      email,
-      dob,
-      gender,
-      country,
-      city,
-      address,
-      pincode,
-      experience_since_date,
-      agree_certification,
-      agree_experience,
-      agree_refund,
-      my_connections: selectedConnections,
-      accepted_genders: acceptedGenders,
-      accepted_languages: acceptedLanguages,
-    };
-
-    navigation.navigate("CoachProfileReviewConfirmDetails", payload);
+    if (isEdit && !validateFields()) return;
+    navigation.navigate("CoachProfileReviewConfirmDetails", buildPayload());
   };
 
   return (
@@ -130,63 +130,56 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
       <ScreenLayout scrollable withPadding>
         <Header
           title="CUE"
-          showBack={true}
+          showBack={!isEdit} // 🔹 hide back in edit mode
           onBackPress={() => navigation.goBack()}
-          rightIcon={isEdit ? null : "create-outline"}
-          onRightPress={() => setIsEdit(true)}
+          rightIcon={isEdit ? "checkmark-done-outline" : "create-outline"}
+          onRightPress={() => {
+            if (isEdit) {
+              if (validateFields()) setIsEdit(false);
+            } else {
+              setIsEdit(true);
+            }
+          }}
         />
 
         <View style={styles.welcome_view}>
           <Text style={styles.welcome_text}>Client's Acceptance Details</Text>
         </View>
 
-        {isEdit ? (
-          <>
-            <MultiSelectDropdown
-              label="Select Accepted Genders"
-              data={["male", "female", "other"]}
-              selected={acceptedGenders}
-              onChange={setAcceptedGenders}
-            />
+        {/* Always render inputs, disable when in preview */}
+        <View style={!isEdit && { opacity: 0.6 }}>
+          <MultiSelectDropdown
+            label="Select Genders"
+            data={["male", "female", "other"]}
+            selected={acceptedGenders}
+            onChange={setAcceptedGenders}
+            disabled={!isEdit}
+          />
 
-            <MultiSelectDropdown
-              label="Select Accepted Languages"
-              data={["English", "Hindi", "Marathi", "Gujarati"]}
-              selected={acceptedLanguages}
-              onChange={setAcceptedLanguages}
-              searchable
-            />
+          <MultiSelectDropdown
+            label="Select Languages Spoken"
+            data={["English", "Hindi", "Marathi", "Gujarati"]}
+            selected={acceptedLanguages}
+            onChange={setAcceptedLanguages}
+            searchable
+            disabled={!isEdit}
+          />
 
-            <TreeSelectDropdown
-              label="Choose Categories"
-              data={all_connections}
-              selected={selectedConnections}
-              onChange={setSelectedConnections}
-            />
-          </>
-        ) : (
-          <>
-            <Text style={{ color: "#fff", marginVertical: 8 }}>
-              Accepted Genders:{" "}
-              {acceptedGenders.length > 0 ? acceptedGenders.join(", ") : "None"}
-            </Text>
-            <Text style={{ color: "#fff", marginVertical: 8 }}>
-              Accepted Languages:{" "}
-              {acceptedLanguages.length > 0
-                ? acceptedLanguages.join(", ")
-                : "None"}
-            </Text>
-            <Text style={{ color: "#fff", marginVertical: 8 }}>
-              My Connections:{" "}
-              {selectedConnections.length > 0
-                ? selectedConnections.join(", ")
-                : "None"}
-            </Text>
-          </>
-        )}
+          <TreeSelectDropdown
+            label="Choose Activities"
+            selectedTitle="Selected Activities"
+            data={all_activities}
+            selected={selectedActivities}
+            onChange={setSelectedActivities}
+            disabled={!isEdit}
+          />
+        </View>
       </ScreenLayout>
 
-      <Button text={loading ? "Loading..." : "Next"} onPress={handleNext} />
+      {/* ✅ Show Next only in preview mode */}
+      {!isEdit && (
+        <Button text={loading ? "Loading..." : "Next"} onPress={handleNext} />
+      )}
     </>
   );
 }

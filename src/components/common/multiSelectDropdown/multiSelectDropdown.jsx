@@ -22,6 +22,7 @@ const MultiSelectDropdown = ({
   searchable = false,
   searchPlaceholder = "Search...",
   containerStyle = {},
+  disabled = false, // ✅ NEW
 }) => {
   const sheetRef = useRef();
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,8 +49,13 @@ const MultiSelectDropdown = ({
     <>
       {/* Trigger */}
       <TouchableOpacity
-        style={[styles.triggerWrapper, containerStyle]}
-        onPress={() => sheetRef.current.open()}
+        style={[
+          styles.triggerWrapper,
+          containerStyle,
+          disabled && { opacity: 0.6 }, // ✅ visual feedback
+        ]}
+        onPress={() => !disabled && sheetRef.current.open()} // ✅ block opening
+        disabled={disabled}
       >
         <LinearGradient
           colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
@@ -109,9 +115,10 @@ const MultiSelectDropdown = ({
 
                 return (
                   <TouchableOpacity
-                    key={item._id || value}
+                    key={item.id || value}
                     style={styles.optionWrapper}
-                    onPress={() => toggleSelect(item)}
+                    onPress={() => !disabled && toggleSelect(item)} // ✅ prevent select
+                    disabled={disabled}
                   >
                     <LinearGradient
                       style={styles.optionInner}

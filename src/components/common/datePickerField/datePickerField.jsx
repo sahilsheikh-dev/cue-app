@@ -11,12 +11,13 @@ const DatePickerField = ({
   onChange,
   icon = "calendar-outline",
   containerStyle = {},
+  disabled = false,
 }) => {
   const [showPicker, setShowPicker] = useState(false);
 
   const onDateChange = (event, selectedDate) => {
     setShowPicker(false); // close picker
-    if (selectedDate) {
+    if (selectedDate && !disabled) {
       onChange(selectedDate);
     }
   };
@@ -25,16 +26,17 @@ const DatePickerField = ({
     <View style={[styles.input_whole_section, containerStyle]}>
       <LinearGradient
         colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-        style={styles.input_inner_section}
+        style={[styles.input_inner_section, disabled && { opacity: 0.6 }]}
       >
         {/* Left Icon */}
-        <TouchableOpacity style={styles.svg_circle}>
+        <TouchableOpacity style={styles.svg_circle} disabled>
           <Ionicons name={icon} size={20} color="#fff" />
         </TouchableOpacity>
 
         {/* Date Display */}
         <TouchableOpacity
           style={[styles.input_section, { alignItems: "center" }]}
+          disabled={disabled}
           onPress={() => setShowPicker(true)}
         >
           <Text

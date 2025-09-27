@@ -11,6 +11,7 @@ const InputField = ({
   type = "text", // text | password | email | number
   icon = "person-outline", // left icon
   containerStyle = {},
+  disabled = false,
 }) => {
   const [secure, setSecure] = useState(type === "password");
 
@@ -18,7 +19,7 @@ const InputField = ({
     <View style={[styles.input_whole_section, containerStyle]}>
       <LinearGradient
         colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-        style={styles.input_inner_section}
+        style={[styles.input_inner_section, disabled && { opacity: 0.6 }]}
       >
         {/* Left Icon */}
         <TouchableOpacity style={styles.svg_circle}>
@@ -34,6 +35,7 @@ const InputField = ({
             value={value}
             onChangeText={onChangeText}
             secureTextEntry={secure}
+            editable={!disabled}
             autoCapitalize={type === "email" ? "none" : "sentences"}
             keyboardType={
               type === "email"

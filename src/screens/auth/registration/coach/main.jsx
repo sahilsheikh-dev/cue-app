@@ -6,7 +6,6 @@ import CoachPersonalProfileDetails from "./coachPersonalProfileDetails/coachPers
 import CoachClientAcceptanceDetails from "./coachClientAcceptanceDetails/coachClientAcceptanceDetails";
 import CoachProfileCertificateDetails from "./coachProfileCertificateDetails/coachProfileCertificateDetails";
 import CoachProfileReviewConfirmDetails from "./coachProfileReviewConfirmDetails/coachProfileReviewConfirmDetails";
-import CoachCreateServiceDetails from "./coachCreateServiceDetails/coachCreateServiceDetails";
 import CoachYourStoryDetails from "./coachYourStoryDetails/coachYourStoryDetails";
 import CoachVirtualPricingDetails from "./coachVirtualPricingDetails/coachVirtualPricingDetails";
 import CoachInPersonPricingDetails from "./coachInPersonPricingDetails/coachInPersonPricingDetails";
@@ -32,23 +31,17 @@ export const CoachRegistrationScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
   <Stack.Screen
-    name="CoachProfileCertificateDetails"
-    component={CoachProfileCertificateDetails}
-    options={{ headerShown: false }}
-  />,
-  <Stack.Screen
     name="CoachProfileReviewConfirmDetails"
     component={CoachProfileReviewConfirmDetails}
     options={{ headerShown: false }}
   />,
-
-  //   COACH - SEMI VERIFIED ACCESS
-
   <Stack.Screen
-    name="CoachCreateServiceDetails"
-    component={CoachCreateServiceDetails}
+    name="CoachProfileCertificateDetails"
+    component={CoachProfileCertificateDetails}
     options={{ headerShown: false }}
   />,
+
+  //   COACH - SEMI VERIFIED ACCESS
   <Stack.Screen
     name="CoachYourStoryDetails"
     component={CoachYourStoryDetails}

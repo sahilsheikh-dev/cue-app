@@ -24,21 +24,13 @@ import ScreenLayout from "../../../../../components/common/screenLayout/screenLa
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
 
-// ✅ Helper to strip HTML tags (for char count)
 const stripHtml = (html) => {
   return html.replace(/<[^>]*>?/gm, "");
 };
 
 export default function CoachYourStoryDetails({ navigation }) {
-  // 🔹 Dummy Data Object
-  const dummyData = {
-    story:
-      "<p>I’m a certified fitness coach with 5 years of experience helping clients achieve their health goals.</p>",
-    loading: false,
-  };
-
-  const [story, setStory] = useState(dummyData.story);
-  const [loading, setLoading] = useState(dummyData.loading);
+  const [story, setStory] = useState("");
+  const [loading, setLoading] = useState(false);
   const richText = useRef(null);
 
   // ✅ Max character limit

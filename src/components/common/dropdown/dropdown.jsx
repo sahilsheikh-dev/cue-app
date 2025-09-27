@@ -26,6 +26,7 @@ const Dropdown = ({
   icon = null,
   searchable = false,
   searchPlaceholder = "Search...",
+  disabled = false,
 }) => {
   const sheetRef = useRef();
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,11 +45,12 @@ const Dropdown = ({
       {/* Trigger */}
       <TouchableOpacity
         style={[styles.triggerWrapper, containerStyle]}
-        onPress={() => sheetRef.current.open()}
+        onPress={() => !disabled && sheetRef.current.open()}
+        disabled={disabled}
       >
         <LinearGradient
           colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-          style={styles.triggerInner}
+          style={[styles.triggerInner, disabled && { opacity: 0.6 }]}
         >
           <View style={styles.triggerLeft}>
             {icon && !selected && (
@@ -111,7 +113,7 @@ const Dropdown = ({
             ) : (
               filteredData.map((item) => (
                 <TouchableOpacity
-                  key={item._id || item}
+                  key={item.id || item}
                   style={styles.optionWrapper}
                   onPress={() => {
                     onSelect(item);
@@ -127,7 +129,7 @@ const Dropdown = ({
                       <View style={styles.dotWrapper}>
                         <View
                           style={
-                            (selected?._id || selected) === (item._id || item)
+                            (selected?.id || selected) === (item.id || item)
                               ? styles.dotActive
                               : styles.dot
                           }

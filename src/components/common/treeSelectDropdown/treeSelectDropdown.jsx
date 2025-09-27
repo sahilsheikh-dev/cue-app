@@ -5,7 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 import styles from "./treeSelectDropdownCss";
 
-const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
+const TreeSelectDropdown = ({
+  label,
+  selectedTitle,
+  data,
+  selected = [],
+  onChange,
+  disabled = false, // ✅ NEW
+}) => {
   const sheetRef = useRef();
   const [currentOptions, setCurrentOptions] = useState(data);
   const [path, setPath] = useState([]); // store keys instead of objects
@@ -19,7 +26,7 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
   };
 
   const handleGoDeeper = (key, option) => {
-    setPath((prev) => [...prev, key]); // push key, not object
+    setPath((prev) => [...prev, key]); // push key
     setCurrentOptions(option.sub);
   };
 
@@ -40,8 +47,9 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
     <>
       {/* Trigger */}
       <TouchableOpacity
-        style={[styles.triggerWrapper]}
-        onPress={() => sheetRef.current.open()}
+        style={[styles.triggerWrapper, disabled && { opacity: 0.6 }]} // ✅ dimmed if disabled
+        onPress={() => !disabled && sheetRef.current.open()} // ✅ block open
+        disabled={disabled}
       >
         <LinearGradient
           colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
@@ -69,6 +77,7 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
                 alignItems: "center",
               }}
               onPress={handleBack}
+              disabled={disabled} // ✅ disable back button too
             >
               <Ionicons name="arrow-back" size={20} color="orange" />
               <Text style={{ color: "orange", marginLeft: 8 }}>Back</Text>
@@ -81,7 +90,7 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
 
               return (
                 <View
-                  key={option._id}
+                  key={option.id}
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -97,8 +106,10 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
                       flexDirection: "row",
                       alignItems: "center",
                       flex: 1,
+                      opacity: disabled ? 0.6 : 1, // ✅ dim text if disabled
                     }}
-                    onPress={() => toggleSelect(option.title)}
+                    onPress={() => !disabled && toggleSelect(option.title)}
+                    disabled={disabled}
                   >
                     <Ionicons
                       name={isSelected ? "radio-button-on" : "radio-button-off"}
@@ -114,7 +125,8 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
                   {/* Go Deeper */}
                   {option.sub && Object.keys(option.sub).length > 0 && (
                     <TouchableOpacity
-                      onPress={() => handleGoDeeper(key, option)}
+                      onPress={() => !disabled && handleGoDeeper(key, option)}
+                      disabled={disabled}
                     >
                       <Ionicons
                         name="chevron-forward"
@@ -134,7 +146,7 @@ const TreeSelectDropdown = ({ label, data, selected = [], onChange }) => {
       {selected.length > 0 && (
         <View style={{ marginTop: 16 }}>
           <Text style={{ color: "#fff", fontSize: 14, marginBottom: 6 }}>
-            Selected Connections:
+            {selectedTitle} :
           </Text>
           <Text style={{ color: "lightgreen" }}>{selected.join(", ")}</Text>
         </View>

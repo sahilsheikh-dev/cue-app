@@ -34,35 +34,35 @@ export default function Login({ navigation }) {
   const { login } = useContext(DataContext);
   const countries = [
     {
-      _id: "in",
+      id: "in",
       name: "India",
       code: "+91",
       number_of_digit: "10",
       img: "https://flagcdn.com/w20/in.png",
     },
     {
-      _id: "us",
+      id: "us",
       name: "United States",
       code: "+1",
       number_of_digit: "10",
       img: "https://flagcdn.com/w20/us.png",
     },
     {
-      _id: "gb",
+      id: "gb",
       name: "United Kingdom",
       code: "+44",
       number_of_digit: "10",
       img: "https://flagcdn.com/w20/gb.png",
     },
     {
-      _id: "ca",
+      id: "ca",
       name: "Canada",
       code: "+1",
       number_of_digit: "10",
       img: "https://flagcdn.com/w20/ca.png",
     },
     {
-      _id: "au",
+      id: "au",
       name: "Australia",
       code: "+61",
       number_of_digit: "9",

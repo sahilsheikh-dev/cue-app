@@ -10,7 +10,11 @@ const styles = StyleSheet.create({
   sav: {
     height: "100%",
     width: "100%",
-    // paddingTop: Platform.OS == "ios" ? 0 : sb.currentHeight,
+    marginTop: 15,
+    paddingLeft: 20,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
   },
   backgroundView: {
     height: "130%",
@@ -119,6 +123,7 @@ const styles = StyleSheet.create({
   },
   bankdetail_section: {
     alignSelf: "center",
+    height: 300,
     width: "90%",
     marginTop: 30,
     borderRadius: 20,
@@ -126,6 +131,7 @@ const styles = StyleSheet.create({
   },
   bankdetail_section_2: {
     alignSelf: "center",
+    height: 220,
     width: "90%",
     marginTop: 10,
     borderRadius: 20,
@@ -133,6 +139,7 @@ const styles = StyleSheet.create({
   },
   bankdetail_section_small: {
     alignSelf: "center",
+    height: 60,
     width: "90%",
     marginTop: 10,
     padding: 20,
@@ -142,12 +149,26 @@ const styles = StyleSheet.create({
   },
   bankdetail_section_small_fc: {
     alignSelf: "center",
-    height: "fit-content",
+    minHeight: 60,
     width: "90%",
-    marginTop: 10,
+    marginTop: 50,
+    paddingVertical: 25,
+    borderBlockColor: "#fff",
     borderRadius: 20,
     overflow: "hidden",
     justifyContent: "center",
+  },
+  bs_2_cue: {
+    textAlign: "left",
+    fontSize: 22,
+    color: "white",
+    fontWeight: 400,
+    letterSpacing: 0.7,
+    marginTop: 20,
+    paddingLeft: 20,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
   },
   ps_inner: {
     height: "100%",
@@ -162,7 +183,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
-    paddingBottom: 15,
   },
   bd_inner_fc: {
     // height: "100%",
@@ -247,10 +267,9 @@ const styles = StyleSheet.create({
   bd_details_text_view: {
     marginTop: 10,
     paddingLeft: 20,
-    display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    height: 20,
+    alignItems: "flex-start",
+    flexWrap: "wrap",
   },
   bd_details_text_view_nh: {
     paddingLeft: 20,
@@ -270,11 +289,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#ffffff90",
     fontFamily: "Poppins-Regular",
+    flexShrink: 0,
   },
   bd_details_text: {
     fontSize: 14,
     color: "white",
     fontFamily: "Poppins-Regular",
+    flex: 1,
+    flexWrap: "wrap",
   },
   bd_details_text_fc: {
     fontSize: 14,
