@@ -67,6 +67,32 @@ const coachService = {
     }
   },
 
+  async saveStory({ id, story }) {
+    try {
+      const token = await get("auth");
+      const res = await axios.patch(
+        `${BASE_API_URL}/coach/saveStory`,
+        { id, story },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return {
+        success: true,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (err) {
+      console.error("saveStory API error:", err.response?.data || err.message);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to save story",
+        error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
   // ✅ Placeholder for future APIs
 };
 

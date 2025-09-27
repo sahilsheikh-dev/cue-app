@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   yourstory_input_section: {
     minHeight: 300,
     // height: "fit-content",
+    flex: 1,
     width: "85%",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.09)",
@@ -125,6 +126,10 @@ const styles = StyleSheet.create({
     marginTop: 40,
     position: "relative",
     paddingBottom: 50,
+  },
+  rich_editor: {
+    flex: 1,
+    minHeight: "100%",
   },
   input_section: {
     height: "100%",

@@ -1,47 +1,74 @@
 import {
   Text,
   View,
-  SafeAreaView,
-  Image,
   ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
-  Platform,
-  KeyboardAvoidingView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import styles from "./coachYourStoryDetailsCss";
-import { StatusBar } from "expo-status-bar";
-const background = require("../../../../../../assets/images/background.png");
 import { LinearGradient } from "expo-linear-gradient";
-import { useRef, useState } from "react";
-import { RichEditor } from "react-native-pell-rich-editor"; // ✅ removed RichToolbar
-
-// ✅ Expo vector icons
-import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState, useContext, useEffect } from "react";
+import { RichEditor } from "react-native-pell-rich-editor";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
+import { DataContext } from "../../../../../context/dataContext";
+import coachService from "../../../../../services/coachServices/coachService";
 
-const stripHtml = (html) => {
-  return html.replace(/<[^>]*>?/gm, "");
-};
+const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
 export default function CoachYourStoryDetails({ navigation }) {
+  const { data } = useContext(DataContext);
   const [story, setStory] = useState("");
   const [loading, setLoading] = useState(false);
   const richText = useRef(null);
 
-  // ✅ Max character limit
-  const maxChars = 500;
+  // ✅ Preload story if present
+  useEffect(() => {
+    if (data?.user?.story) {
+      setStory(data.user.story);
+    }
+  }, [data]);
+
+  const maxChars = 1000;
   const plainText = stripHtml(story);
   const remainingChars = `${plainText.length}/${maxChars}`;
+
+  const handleSave = async () => {
+    if (!plainText.trim()) {
+      Alert.alert("Validation", "Story cannot be empty.");
+      return;
+    }
+
+    if (plainText.length > maxChars) {
+      Alert.alert("Validation", "Story exceeds maximum length.");
+      return;
+    }
+
+    setLoading(true);
+    const res = await coachService.saveStory({
+      id: data?.user?._id,
+      story,
+    });
+    setLoading(false);
+
+    if (res.success) {
+      Alert.alert("Success", res.message, [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("CoachServicePictures"),
+        },
+      ]);
+    } else {
+      Alert.alert("Error", res.message);
+    }
+  };
 
   return (
     <>
       <ScreenLayout scrollable withPadding>
-        {/* Header */}
         <Header
           title={"CUE"}
           showBack={true}
@@ -52,7 +79,6 @@ export default function CoachYourStoryDetails({ navigation }) {
           Write Your Story
         </Text>
 
-        {/* Content */}
         <TouchableWithoutFeedback
           onPress={() => {
             Keyboard.dismiss();
@@ -70,10 +96,11 @@ export default function CoachYourStoryDetails({ navigation }) {
             >
               <RichEditor
                 ref={richText}
-                usecontainer={true}
+                useContainer={true}
                 onChange={(text) => setStory(text)}
                 placeholder="Write about yourself..."
                 initialContentHTML={story}
+                style={styles.rich_editor}
                 editorStyle={{
                   backgroundColor: "transparent",
                   contentCSSText: "background-color: transparent;",
@@ -92,8 +119,9 @@ export default function CoachYourStoryDetails({ navigation }) {
       </ScreenLayout>
 
       <Button
-        text={"Next"}
-        onPress={() => navigation.navigate("CoachServicePictures")}
+        text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+        onPress={handleSave}
+        disabled={loading}
       />
     </>
   );
