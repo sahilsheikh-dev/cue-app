@@ -199,7 +199,7 @@ export default function CoachServicePictures({ navigation }) {
         </TouchableOpacity>
 
         <Button
-          text={"Next"}
+          text={"Save"}
           onPress={() => navigation.navigate("CoachDashboard")}
         />
       </ScreenLayout>

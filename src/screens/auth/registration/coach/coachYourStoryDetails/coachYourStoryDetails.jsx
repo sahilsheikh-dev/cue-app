@@ -141,7 +141,7 @@ export default function CoachYourStoryDetails({ navigation }) {
       </ScreenLayout>
 
       <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
         onPress={handleSave}
         disabled={loading}
       />

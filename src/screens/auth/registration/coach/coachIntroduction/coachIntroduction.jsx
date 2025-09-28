@@ -32,6 +32,12 @@ export default function CoachIntroduction({ navigation }) {
       <Button
         text={"Next"}
         onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
+        // onPress={() => {
+        //   navigation.reset({
+        //     index: 0,
+        //     routes: [{ name: "CoachDashboard" }],
+        //   });
+        // }}
       />
     </>
   );

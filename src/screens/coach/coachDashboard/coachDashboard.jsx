@@ -123,6 +123,10 @@ export default function CoachDashboard({ navigation }) {
             Your account is not verified yet. Please complete the registration
             process!
           </Text>
+          <ButtonLink
+            highlightText={"Click Here"}
+            onPress={() => navigation.navigate("CoachIntroduction")}
+          />
         </LinearGradient>
       )}
 

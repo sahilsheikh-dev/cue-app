@@ -315,7 +315,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
             colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
             style={styles.input_inner_section_btn}
           >
-            <Text style={styles.login_text}>Confirm</Text>
+            <Text style={styles.login_text}>Save</Text>
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>

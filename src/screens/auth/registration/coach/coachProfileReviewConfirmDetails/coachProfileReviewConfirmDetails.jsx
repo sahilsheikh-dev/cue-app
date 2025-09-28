@@ -200,10 +200,7 @@ export default function CoachProfileReviewConfirmDetails({
       </ScreenLayout>
 
       {/* Submit button */}
-      <Button
-        text={loading ? "Submitting..." : "Submit"}
-        onPress={handleSubmit}
-      />
+      <Button text={loading ? "Saving..." : "Save"} onPress={handleSubmit} />
     </>
   );
 }

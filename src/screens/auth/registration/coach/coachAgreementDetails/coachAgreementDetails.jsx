@@ -451,7 +451,7 @@ export default function CoachAgreementDetails({ navigation }) {
         <>
           {/* ✅ Show NEXT only in preview mode */}
           <Button
-            text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+            text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
             onPress={handleNext}
             disabled={loading}
           />
