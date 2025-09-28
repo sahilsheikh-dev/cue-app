@@ -22,7 +22,7 @@ const MultiSelectDropdown = ({
   searchable = false,
   searchPlaceholder = "Search...",
   containerStyle = {},
-  disabled = false, // ✅ NEW
+  disabled = false,
 }) => {
   const sheetRef = useRef();
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,14 +36,17 @@ const MultiSelectDropdown = ({
     });
   }, [searchQuery, data, searchable]);
 
+  // 🔹 Normalize to ID or string for comparison
+  const getValue = (item) =>
+    typeof item === "string" ? item : item.id || item.name;
+
   const toggleSelect = (item) => {
-    const value = typeof item === "string" ? item : item.id;
-    if (selected.some((x) => (typeof x === "string" ? x : x.id) === value)) {
-      onChange(
-        selected.filter((x) => (typeof x === "string" ? x : x.id) !== value)
-      );
+    const value = getValue(item);
+
+    if (selected.some((x) => getValue(x) === value)) {
+      onChange(selected.filter((x) => getValue(x) !== value));
     } else {
-      onChange([...selected, typeof item === "string" ? item : item]);
+      onChange([...selected, item]);
     }
   };
 
@@ -54,9 +57,9 @@ const MultiSelectDropdown = ({
         style={[
           styles.triggerWrapper,
           containerStyle,
-          disabled && { opacity: 0.6 }, // ✅ visual feedback
+          disabled && { opacity: 0.6 },
         ]}
-        onPress={() => !disabled && sheetRef.current.open()} // ✅ block opening
+        onPress={() => !disabled && sheetRef.current.open()}
         disabled={disabled}
       >
         <LinearGradient
@@ -68,7 +71,11 @@ const MultiSelectDropdown = ({
               renderTrigger ? (
                 renderTrigger(selected)
               ) : (
-                <Text style={styles.selectedText}>{selected.join(", ")}</Text>
+                <Text style={styles.selectedText}>
+                  {selected
+                    .map((s) => (typeof s === "string" ? s : s.name))
+                    .join(", ")}
+                </Text>
               )
             ) : (
               <Text style={styles.placeholderText}>{label}</Text>
@@ -112,14 +119,14 @@ const MultiSelectDropdown = ({
               </Text>
             ) : (
               filteredData.map((item) => {
-                const value = typeof item === "string" ? item : item.name;
-                const isSelected = selected.includes(value);
+                const value = getValue(item);
+                const isSelected = selected.some((x) => getValue(x) === value);
 
                 return (
                   <TouchableOpacity
                     key={item.id || value}
                     style={styles.optionWrapper}
-                    onPress={() => !disabled && toggleSelect(item)} // ✅ prevent select
+                    onPress={() => !disabled && toggleSelect(item)}
                     disabled={disabled}
                   >
                     <LinearGradient
@@ -137,7 +144,7 @@ const MultiSelectDropdown = ({
                         renderOption(item, isSelected)
                       ) : (
                         <Text style={styles.optionText}>
-                          {renderLabel ? renderLabel(item) : value}
+                          {renderLabel ? renderLabel(item) : item.name || value}
                         </Text>
                       )}
                     </LinearGradient>

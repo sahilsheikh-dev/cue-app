@@ -32,7 +32,7 @@ export default function CoachYourStoryDetails({ navigation }) {
     }
   }, [data]);
 
-  const maxChars = 1000;
+  const maxChars = 2500;
   const plainText = stripHtml(story);
   const remainingChars = `${plainText.length}/${maxChars}`;
 
@@ -97,7 +97,24 @@ export default function CoachYourStoryDetails({ navigation }) {
               <RichEditor
                 ref={richText}
                 useContainer={true}
-                onChange={(text) => setStory(text)}
+                onChange={(text) => {
+                  const plain = stripHtml(text);
+
+                  if (plain.length <= maxChars) {
+                    // ✅ Still within limit → accept
+                    setStory(text);
+                  } else {
+                    // ✅ Reject new input → revert back to old valid state
+                    // But allow paste: only take up to maxChars
+                    const trimmedPlain = plain.substring(0, maxChars);
+
+                    // Build trimmed HTML by slicing text based on plain text length
+                    // Easiest safe fallback: just set trimmed plain text
+                    richText.current?.setContentHTML(trimmedPlain);
+
+                    setStory(trimmedPlain);
+                  }
+                }}
                 placeholder="Write about yourself..."
                 initialContentHTML={story}
                 style={styles.rich_editor}
