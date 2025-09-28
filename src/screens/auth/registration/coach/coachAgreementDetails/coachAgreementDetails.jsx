@@ -20,6 +20,7 @@ import {
   actions,
 } from "react-native-pell-rich-editor";
 import RenderHtml from "react-native-render-html";
+import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
 
 const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
@@ -147,7 +148,8 @@ Looking forward to our coaching journey together!
 export default function CoachAgreementDetails({ navigation }) {
   const richText = useRef();
   const { width } = useWindowDimensions();
-  const { data, setData } = useContext(DataContext);
+  const { data, refreshUser } = useContext(DataContext);
+  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
 
   // load from user OR default template
   const initialAgreement =
@@ -157,7 +159,7 @@ export default function CoachAgreementDetails({ navigation }) {
 
   const [agreementTerm, setAgreementTerm] = useState(initialAgreement);
   const [isEdit, setIsEdit] = useState(!data?.user?.agreement_terms); // preview if data exists
-  const [loading, setLoading] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
 
   // --- helper to strip only color/background rules but keep other inline styles ---
   const sanitizeHtml = (html) => {
@@ -182,59 +184,24 @@ export default function CoachAgreementDetails({ navigation }) {
     });
   };
 
-  // ✅ Save Agreement (only from Preview mode)
-  const saveAgreement = async () => {
+  const handleSave = async () => {
     const cleanHtml = sanitizeHtml(agreementTerm);
     const plainText = stripHtml(cleanHtml);
 
     if (!plainText.trim()) {
       Alert.alert("Validation", "Agreement terms cannot be empty.");
-      return false; // ❌ stop here
+      return;
     }
     if (plainText.length > 5000) {
       Alert.alert("Validation", "Agreement terms exceed maximum length.");
-      return false; // ❌ stop here
+      return;
     }
 
-    setLoading(true);
-    const res = await coachService.coachAgreementTerms({
-      id: data?.user?._id,
-      agreement_terms: cleanHtml,
-    });
-    setLoading(false);
-
-    if (res.success) {
-      // update context
-      setData((prev) => ({
-        ...prev,
-        user: {
-          ...prev.user,
-          agreement_terms: res.data.agreement_terms,
-        },
-      }));
-
-      setAgreementTerm(cleanHtml);
-
-      Alert.alert("Success", res.message || "Saved Your Agreement!", [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "CoachDashboard" }],
-            });
-          },
-        },
-      ]);
-      return true;
-    } else {
-      Alert.alert("Error", res.message || "Something went wrong");
-      return false;
-    }
-  };
-
-  const handleNext = async () => {
-    const ok = await saveAgreement(); // runs validation + API
+    await saveAndRedirect(
+      coachService.coachAgreementTerms,
+      { id: data?.user?._id, agreement_terms: cleanHtml },
+      "Saved Your Agreement!"
+    );
   };
 
   return (
@@ -451,9 +418,9 @@ export default function CoachAgreementDetails({ navigation }) {
         <>
           {/* ✅ Show NEXT only in preview mode */}
           <Button
-            text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
-            onPress={handleNext}
-            disabled={loading}
+            text={requestLoading ? <ActivityIndicator color="#fff" /> : "Save"}
+            onPress={handleSave}
+            disabled={requestLoading}
           />
         </>
       )}

@@ -9,14 +9,16 @@ import Button from "../../../../../components/common/button/button";
 import coachService from "../../../../../services/coachServices/coachService";
 
 import { DataContext } from "../../../../../context/dataContext";
+import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
 
 export default function CoachProfileReviewConfirmDetails({
   navigation,
   route,
 }) {
-  const [loading, setLoading] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
 
-  const { data } = useContext(DataContext);
+  const { data, refreshUser } = useContext(DataContext); // 👈 include setData
+  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
 
   // ✅ Data passed from previous screens
   const {
@@ -59,9 +61,7 @@ export default function CoachProfileReviewConfirmDetails({
   };
 
   // 🔹 Submit Handler
-  const handleSubmit = async () => {
-    setLoading(true);
-
+  const handleSave = async () => {
     const payload = {
       id: data?.user?.id || data?.user?._id,
       email,
@@ -80,25 +80,11 @@ export default function CoachProfileReviewConfirmDetails({
       accepted_languages,
     };
 
-    const res = await coachService.coachProfileSetup(payload);
-
-    setLoading(false);
-
-    if (res.success) {
-      Alert.alert("Success", res.message || "Profile setup completed!", [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "CoachDashboard" }],
-            });
-          },
-        },
-      ]);
-    } else {
-      Alert.alert("Error", res.message || "Failed to setup profile");
-    }
+    await saveAndRedirect(
+      coachService.coachProfileSetup,
+      payload,
+      "Profile setup completed!"
+    );
   };
 
   return (
@@ -200,7 +186,10 @@ export default function CoachProfileReviewConfirmDetails({
       </ScreenLayout>
 
       {/* Submit button */}
-      <Button text={loading ? "Saving..." : "Save"} onPress={handleSubmit} />
+      <Button
+        text={requestLoading ? "Saving..." : "Save"}
+        onPress={handleSave}
+      />
     </>
   );
 }

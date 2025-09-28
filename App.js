@@ -18,6 +18,7 @@ import {
   checkedToday,
   markDataFilled,
 } from "./src/services/authServices/authService";
+import coachService from "./src/services/coachServices/coachService";
 
 export default function App() {
   // ---------- Load fonts ----------
@@ -70,6 +71,32 @@ export default function App() {
     }
   }, []);
 
+  const refreshUser = useCallback(async (partialData = null) => {
+    try {
+      const refreshed = await coachService.getMyInfo();
+      if (refreshed.success) {
+        setData((prev) => ({
+          ...prev,
+          user: refreshed.data,
+        }));
+        return refreshed.data;
+      }
+    } catch (err) {
+      console.error("refreshUser error:", err);
+    }
+
+    // fallback if request fails but partialData is available
+    if (partialData) {
+      let merged;
+      setData((prev) => {
+        merged = { ...prev?.user, ...partialData };
+        return { ...prev, user: merged };
+      });
+      return merged;
+    }
+    return null;
+  }, []);
+
   const markFilled = useCallback(async () => {
     const ok = await markDataFilled();
     if (ok) {
@@ -114,6 +141,7 @@ export default function App() {
             logout,
             data_filled: markFilled,
             checked_today: markCheckedToday,
+            refreshUser,
           }}
         >
           <NavigationContainer>

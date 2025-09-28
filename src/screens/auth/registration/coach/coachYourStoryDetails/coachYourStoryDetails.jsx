@@ -16,13 +16,16 @@ import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
 import { DataContext } from "../../../../../context/dataContext";
 import coachService from "../../../../../services/coachServices/coachService";
+import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
 
 const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
 export default function CoachYourStoryDetails({ navigation }) {
-  const { data } = useContext(DataContext);
+  const { data, refreshUser } = useContext(DataContext);
+  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
+
   const [story, setStory] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [requestLoading, setRequestLoading] = useState(false);
   const richText = useRef(null);
 
   // ✅ Preload story if present
@@ -41,34 +44,16 @@ export default function CoachYourStoryDetails({ navigation }) {
       Alert.alert("Validation", "Story cannot be empty.");
       return;
     }
-
     if (plainText.length > maxChars) {
       Alert.alert("Validation", "Story exceeds maximum length.");
       return;
     }
 
-    setLoading(true);
-    const res = await coachService.saveStory({
-      id: data?.user?._id,
-      story,
-    });
-    setLoading(false);
-
-    if (res.success) {
-      Alert.alert("Success", res.message || "Saved Your Story!", [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "CoachDashboard" }],
-            });
-          },
-        },
-      ]);
-    } else {
-      Alert.alert("Error", res.message);
-    }
+    await saveAndRedirect(
+      coachService.saveStory,
+      { id: data?.user?._id, story },
+      "Saved Your Story!"
+    );
   };
 
   return (
@@ -141,9 +126,9 @@ export default function CoachYourStoryDetails({ navigation }) {
       </ScreenLayout>
 
       <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
+        text={requestLoading ? <ActivityIndicator color="#fff" /> : "Save"}
         onPress={handleSave}
-        disabled={loading}
+        disabled={requestLoading}
       />
     </>
   );
