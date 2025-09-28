@@ -18,7 +18,11 @@ import {
   checkedToday,
   markDataFilled,
 } from "./src/services/authServices/authService";
+
 import coachService from "./src/services/coachServices/coachService";
+import clientService from "./src/services/clientServices/clientService";
+import eventOrganizerService from "./src/services/eventOrganizerServices/eventOrganizerService";
+import productCompanyService from "./src/services/productCompanyServices/productCompanyService";
 
 export default function App() {
   // ---------- Load fonts ----------
@@ -71,31 +75,46 @@ export default function App() {
     }
   }, []);
 
-  const refreshUser = useCallback(async (partialData = null) => {
-    try {
-      const refreshed = await coachService.getMyInfo();
-      if (refreshed.success) {
-        setData((prev) => ({
-          ...prev,
-          user: refreshed.data,
-        }));
-        return refreshed.data;
-      }
-    } catch (err) {
-      console.error("refreshUser error:", err);
-    }
+  const refreshUser = useCallback(
+    async (partialData = null) => {
+      try {
+        let refreshed;
 
-    // fallback if request fails but partialData is available
-    if (partialData) {
-      let merged;
-      setData((prev) => {
-        merged = { ...prev?.user, ...partialData };
-        return { ...prev, user: merged };
-      });
-      return merged;
-    }
-    return null;
-  }, []);
+        if (data.role === "coach") {
+          refreshed = await coachService.getMyInfo();
+        } else if (data.role === "client") {
+          refreshed = await clientService.getMyInfo();
+        } else if (data.role === "eventOrganizer") {
+          refreshed = await eventOrganizerService.getMyInfo();
+        } else if (data.role === "productCompany") {
+          refreshed = await productCompanyService.getMyInfo();
+        }
+
+        if (refreshed?.success) {
+          setData((prev) => ({
+            ...prev,
+            user: refreshed.data,
+          }));
+          return refreshed.data;
+        }
+      } catch (err) {
+        console.error("refreshUser error:", err);
+      }
+
+      // fallback merge if request fails
+      if (partialData) {
+        let merged;
+        setData((prev) => {
+          merged = { ...prev?.user, ...partialData };
+          return { ...prev, user: merged };
+        });
+        return merged;
+      }
+
+      return null;
+    },
+    [data.role]
+  );
 
   const markFilled = useCallback(async () => {
     const ok = await markDataFilled();

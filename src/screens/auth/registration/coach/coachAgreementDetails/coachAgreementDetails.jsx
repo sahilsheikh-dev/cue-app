@@ -20,7 +20,7 @@ import {
   actions,
 } from "react-native-pell-rich-editor";
 import RenderHtml from "react-native-render-html";
-import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
+import { useSaveAndRedirect } from "../../../../../hooks/useSaveAndRedirect";
 
 const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
@@ -149,7 +149,7 @@ export default function CoachAgreementDetails({ navigation }) {
   const richText = useRef();
   const { width } = useWindowDimensions();
   const { data, refreshUser } = useContext(DataContext);
-  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
+  const { saveAndRedirect, loading } = useSaveAndRedirect(navigation);
 
   // load from user OR default template
   const initialAgreement =
@@ -159,7 +159,6 @@ export default function CoachAgreementDetails({ navigation }) {
 
   const [agreementTerm, setAgreementTerm] = useState(initialAgreement);
   const [isEdit, setIsEdit] = useState(!data?.user?.agreement_terms); // preview if data exists
-  const [requestLoading, setRequestLoading] = useState(false);
 
   // --- helper to strip only color/background rules but keep other inline styles ---
   const sanitizeHtml = (html) => {
@@ -200,7 +199,8 @@ export default function CoachAgreementDetails({ navigation }) {
     await saveAndRedirect(
       coachService.coachAgreementTerms,
       { id: data?.user?._id, agreement_terms: cleanHtml },
-      "Saved Your Agreement!"
+      "Saved Your Agreement!", // 👈 custom message
+      "CoachDashboard" // 👈 custom route
     );
   };
 
@@ -418,9 +418,9 @@ export default function CoachAgreementDetails({ navigation }) {
         <>
           {/* ✅ Show NEXT only in preview mode */}
           <Button
-            text={requestLoading ? <ActivityIndicator color="#fff" /> : "Save"}
+            text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
             onPress={handleSave}
-            disabled={requestLoading}
+            disabled={loading}
           />
         </>
       )}

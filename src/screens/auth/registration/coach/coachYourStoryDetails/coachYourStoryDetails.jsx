@@ -16,16 +16,15 @@ import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
 import { DataContext } from "../../../../../context/dataContext";
 import coachService from "../../../../../services/coachServices/coachService";
-import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
+import { useSaveAndRedirect } from "../../../../../hooks/useSaveAndRedirect";
 
 const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
 export default function CoachYourStoryDetails({ navigation }) {
   const { data, refreshUser } = useContext(DataContext);
-  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
+  const { saveAndRedirect, loading } = useSaveAndRedirect(navigation);
 
   const [story, setStory] = useState("");
-  const [requestLoading, setRequestLoading] = useState(false);
   const richText = useRef(null);
 
   // ✅ Preload story if present
@@ -52,7 +51,8 @@ export default function CoachYourStoryDetails({ navigation }) {
     await saveAndRedirect(
       coachService.saveStory,
       { id: data?.user?._id, story },
-      "Saved Your Story!"
+      "Saved Your Story!", // 👈 custom message
+      "CoachDashboard" // 👈 custom route
     );
   };
 
@@ -126,9 +126,9 @@ export default function CoachYourStoryDetails({ navigation }) {
       </ScreenLayout>
 
       <Button
-        text={requestLoading ? <ActivityIndicator color="#fff" /> : "Save"}
+        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
         onPress={handleSave}
-        disabled={requestLoading}
+        disabled={loading}
       />
     </>
   );

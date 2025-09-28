@@ -9,16 +9,14 @@ import Button from "../../../../../components/common/button/button";
 import coachService from "../../../../../services/coachServices/coachService";
 
 import { DataContext } from "../../../../../context/dataContext";
-import { useSaveAndRedirectCoach } from "../../../../../hooks/useSaveAndRedirectCoach";
+import { useSaveAndRedirect } from "../../../../../hooks/useSaveAndRedirect";
 
 export default function CoachProfileReviewConfirmDetails({
   navigation,
   route,
 }) {
-  const [requestLoading, setRequestLoading] = useState(false);
-
   const { data, refreshUser } = useContext(DataContext); // 👈 include setData
-  const { saveAndRedirect, loading } = useSaveAndRedirectCoach(navigation);
+  const { saveAndRedirect, loading } = useSaveAndRedirect(navigation);
 
   // ✅ Data passed from previous screens
   const {
@@ -83,7 +81,8 @@ export default function CoachProfileReviewConfirmDetails({
     await saveAndRedirect(
       coachService.coachProfileSetup,
       payload,
-      "Profile setup completed!"
+      "Profile setup completed!", // 👈 custom message
+      "CoachDashboard" // 👈 custom route
     );
   };
 
@@ -186,10 +185,7 @@ export default function CoachProfileReviewConfirmDetails({
       </ScreenLayout>
 
       {/* Submit button */}
-      <Button
-        text={requestLoading ? "Saving..." : "Save"}
-        onPress={handleSave}
-      />
+      <Button text={loading ? "Saving..." : "Save"} onPress={handleSave} />
     </>
   );
 }
