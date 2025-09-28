@@ -26,6 +26,12 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     agree_refund,
   } = route.params || {};
 
+  const genderOptions = [
+    { id: "male", name: "Male", icon: "male" },
+    { id: "female", name: "Female", icon: "female" },
+    { id: "other", name: "Other", icon: "male-female" },
+  ];
+
   const all_activities = {
     Fitness: {
       id: "1",
@@ -150,10 +156,21 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
         <View style={!isEdit && { opacity: 0.6 }}>
           <MultiSelectDropdown
             label="Select Genders"
-            data={["male", "female", "other"]}
-            selected={acceptedGenders}
-            onChange={setAcceptedGenders}
+            data={genderOptions}
+            selected={acceptedGenders.map(
+              (g) =>
+                genderOptions.find((opt) => opt.id === g) || { id: g, name: g }
+            )}
+            onChange={(vals) => setAcceptedGenders(vals.map((v) => v.id))}
             disabled={!isEdit}
+            renderOption={(item) => (
+              <Text style={{ color: "#fff" }}>{item.name}</Text>
+            )}
+            renderTrigger={(items) => (
+              <Text style={{ color: "#fff" }}>
+                {items.map((i) => i.name).join(", ")}
+              </Text>
+            )}
           />
 
           <MultiSelectDropdown

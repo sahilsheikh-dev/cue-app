@@ -37,11 +37,13 @@ const MultiSelectDropdown = ({
   }, [searchQuery, data, searchable]);
 
   const toggleSelect = (item) => {
-    const value = typeof item === "string" ? item : item.name;
-    if (selected.includes(value)) {
-      onChange(selected.filter((x) => x !== value));
+    const value = typeof item === "string" ? item : item.id;
+    if (selected.some((x) => (typeof x === "string" ? x : x.id) === value)) {
+      onChange(
+        selected.filter((x) => (typeof x === "string" ? x : x.id) !== value)
+      );
     } else {
-      onChange([...selected, value]);
+      onChange([...selected, typeof item === "string" ? item : item]);
     }
   };
 

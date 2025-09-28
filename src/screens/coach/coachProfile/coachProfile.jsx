@@ -28,9 +28,9 @@ export default function CoachProfile({ navigation }) {
       screen: "CoachPersonalInformation",
     },
     {
-      id: "billing",
-      title: "Billing History",
-      screen: "CoachBillingHistory",
+      id: "session",
+      title: "Session History",
+      screen: "CoachSessionHistory",
     },
     {
       id: "passive",

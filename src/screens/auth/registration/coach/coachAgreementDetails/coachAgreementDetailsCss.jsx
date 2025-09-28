@@ -249,7 +249,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   rich_toolbar: {
-    position: "absolute",
     bottom: 0,
     width: "107%",
     left: 0,
@@ -285,6 +284,23 @@ const styles = StyleSheet.create({
   },
   space: {
     height: 15,
+    width: "100%",
+  },
+  welcome_view: {
+    // height: "fit-content",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  welcome_text: {
+    fontSize: 24,
+    color: "white",
+    fontWeight: "400",
+    letterSpacing: 0.7,
+    fontFamily: "Poppins-ThinItalic",
+    textAlign: "center",
     width: "100%",
   },
 });
