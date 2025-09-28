@@ -127,11 +127,6 @@ export default function OtpVerification({ navigation, route }) {
       setLoading(false);
 
       if (signupRes.success) {
-        // Alert.alert(
-        //   "Success",
-        //   "Account created successfully! Please Login to Continue"
-        // );
-
         Alert.alert(
           "Success",
           "Account created successfully! Please Login to Continue",
@@ -148,8 +143,6 @@ export default function OtpVerification({ navigation, route }) {
           ],
           { cancelable: false }
         );
-
-        // navigation.reset({ index: 0, routes: [{ name: "Login" }] });
       } else {
         Alert.alert("Signup Failed", signupRes.message);
       }

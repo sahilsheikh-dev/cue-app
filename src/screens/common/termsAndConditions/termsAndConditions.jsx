@@ -44,7 +44,7 @@ export default function TermsAndConditions({ route, navigation }) {
   return (
     <ScreenLayout>
       <Header
-        title={roleLabels[safeRole] + "'s Terms & Conditions"}
+        title={"CUE"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

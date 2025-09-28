@@ -184,23 +184,22 @@ export default function CoachAgreementDetails({ navigation }) {
 
   // ✅ Save Agreement (only from Preview mode)
   const saveAgreement = async () => {
-    // sanitize before saving
     const cleanHtml = sanitizeHtml(agreementTerm);
     const plainText = stripHtml(cleanHtml);
 
     if (!plainText.trim()) {
       Alert.alert("Validation", "Agreement terms cannot be empty.");
-      return;
+      return false; // ❌ stop here
     }
     if (plainText.length > 5000) {
       Alert.alert("Validation", "Agreement terms exceed maximum length.");
-      return;
+      return false; // ❌ stop here
     }
 
     setLoading(true);
     const res = await coachService.coachAgreementTerms({
       id: data?.user?._id,
-      agreement_terms: cleanHtml, // ✅ save sanitized HTML
+      agreement_terms: cleanHtml,
     });
     setLoading(false);
 
@@ -214,29 +213,28 @@ export default function CoachAgreementDetails({ navigation }) {
         },
       }));
 
-      // update local state to sanitized version
       setAgreementTerm(cleanHtml);
 
-      Alert.alert("Success", res.message);
+      Alert.alert("Success", res.message || "Saved Your Agreement!", [
+        {
+          text: "OK",
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "CoachDashboard" }],
+            });
+          },
+        },
+      ]);
+      return true;
     } else {
-      Alert.alert("Error", res.message);
+      Alert.alert("Error", res.message || "Something went wrong");
+      return false;
     }
   };
 
   const handleNext = async () => {
-    const plainText = stripHtml(agreementTerm);
-
-    if (!plainText.trim()) {
-      Alert.alert("Validation", "Agreement terms cannot be empty.");
-      return;
-    }
-    if (plainText.length > 5000) {
-      Alert.alert("Validation", "Agreement terms exceed maximum length.");
-      return;
-    }
-
-    await saveAgreement(); // ✅ save only if valid
-    navigation.navigate("CoachCommissionStructure");
+    const ok = await saveAgreement(); // runs validation + API
   };
 
   return (

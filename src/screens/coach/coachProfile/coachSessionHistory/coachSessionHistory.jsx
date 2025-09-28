@@ -17,7 +17,6 @@ import Header from "../../../../components/common/header/header";
 const background = require("../../../../../assets/images/background.png");
 
 export default function CoachSessionHistory({ navigation }) {
-  // Replace dummyData with actual billing history data
   const sessionHistoryData = null; // Or fetch from API later
 
   return (

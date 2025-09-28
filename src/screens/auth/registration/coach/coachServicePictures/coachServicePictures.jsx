@@ -200,7 +200,7 @@ export default function CoachServicePictures({ navigation }) {
 
         <Button
           text={"Next"}
-          onPress={() => navigation.navigate("CoachVirtualPricingDetails")}
+          onPress={() => navigation.navigate("CoachDashboard")}
         />
       </ScreenLayout>
     </>

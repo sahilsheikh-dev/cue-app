@@ -88,7 +88,12 @@ export default function CoachProfileReviewConfirmDetails({
       Alert.alert("Success", res.message || "Profile setup completed!", [
         {
           text: "OK",
-          onPress: () => navigation.navigate("CoachProfileCertificateDetails"),
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "CoachDashboard" }],
+            });
+          },
         },
       ]);
     } else {

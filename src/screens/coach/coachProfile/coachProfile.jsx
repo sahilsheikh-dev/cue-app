@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -70,28 +71,29 @@ export default function CoachProfile({ navigation }) {
           text: "Yes, Delete",
           style: "destructive",
           onPress: async () => {
-            try {
-              setDeleteLoading(true);
-              const coachId = data.user?._id;
-              const token = data.token;
+            Alert.alert("Deletion Feature will we add soon!");
+            // try {
+            //   setDeleteLoading(true);
+            //   const coachId = data.user?._id;
+            //   const token = data.token;
 
-              if (!coachId || !token) {
-                alert("Missing coach ID or token!");
-                setDeleteLoading(false);
-                return;
-              }
+            //   if (!coachId || !token) {
+            //     alert("Missing coach ID or token!");
+            //     setDeleteLoading(false);
+            //     return;
+            //   }
 
-              const result = await deleteCoachAccount(coachId, token);
+            //   const result = await deleteCoachAccount(coachId, token);
 
-              alert(result.message || "Account deleted successfully");
+            //   alert(result.message || "Account deleted successfully");
 
-              await logout();
-              navigation.replace("Signup");
-            } catch (err) {
-              alert("Failed to delete account. Please try again.");
-            } finally {
-              setDeleteLoading(false);
-            }
+            //   await logout();
+            //   navigation.replace("Signup");
+            // } catch (err) {
+            //   alert("Failed to delete account. Please try again.");
+            // } finally {
+            //   setDeleteLoading(false);
+            // }
           },
         },
       ]

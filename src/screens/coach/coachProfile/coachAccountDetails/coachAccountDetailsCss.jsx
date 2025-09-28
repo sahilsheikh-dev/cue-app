@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   percent_section: {
     height: 200,
     width: "90%",
-    marginTop: 30,
+    marginVertical: 30,
     borderRadius: 20,
     overflow: "hidden",
     alignSelf: "center",
@@ -310,6 +310,13 @@ const styles = StyleSheet.create({
     color: "white",
     letterSpacing: 0.7,
     fontFamily: "Poppins-Regular",
+  },
+  nobill: {
+    textAlign: "center",
+    color: "white",
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    marginTop: 300,
   },
 });
 export default styles;

@@ -44,7 +44,7 @@ export default function CueGuideline({ route, navigation }) {
   return (
     <ScreenLayout>
       <Header
-        title={roleLabels[safeRole] + "'s Cue Guildlines"}
+        title={"CUE"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

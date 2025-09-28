@@ -69,7 +69,12 @@ export default function CoachCommissionStructure({ navigation }) {
       {/* Next Button */}
       <Button
         text={"Agree"}
-        onPress={() => navigation.navigate("AccountVerificationStatus")}
+        onPress={() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "CoachDashboard" }],
+          });
+        }}
       />
     </>
   );

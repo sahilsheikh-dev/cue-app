@@ -55,10 +55,15 @@ export default function CoachYourStoryDetails({ navigation }) {
     setLoading(false);
 
     if (res.success) {
-      Alert.alert("Success", res.message, [
+      Alert.alert("Success", res.message || "Saved Your Story!", [
         {
           text: "OK",
-          onPress: () => navigation.navigate("CoachServicePictures"),
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "CoachDashboard" }],
+            });
+          },
         },
       ]);
     } else {

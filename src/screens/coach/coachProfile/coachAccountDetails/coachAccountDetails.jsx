@@ -62,6 +62,16 @@ export default function CoachAccountDetails({ navigation }) {
             </View>
           </View>
         </LinearGradient>
+
+        <Text style={{ fontSize: 24, color: "white", textAlign: "center" }}>
+          Payment History
+        </Text>
+
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={styles.nobill}>No Payment History</Text>
+        </View>
       </ScreenLayout>
     </>
   );

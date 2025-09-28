@@ -199,7 +199,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
       {/* Save Button */}
       <Button
         text={"Save"}
-        onPress={() => navigation.navigate("CoachYourStoryDetails")}
+        onPress={() => navigation.navigate("CoachDashboard")}
       />
     </>
   );

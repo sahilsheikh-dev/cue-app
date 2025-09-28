@@ -99,7 +99,7 @@ export default function CoachDashboard({ navigation }) {
               marginTop: 6,
             }}
           >
-            Your account is under review. You’ll be notified once verified.
+            Your account is under review. You'll be notified once verified.
           </Text>
         </LinearGradient>
       )}
@@ -123,10 +123,6 @@ export default function CoachDashboard({ navigation }) {
             Your account is not verified yet. Please complete the registration
             process!
           </Text>
-          <ButtonLink
-            highlightText={"Click Here"}
-            onPress={() => navigation.navigate("CoachIntroduction")}
-          />
         </LinearGradient>
       )}
 

@@ -24,7 +24,7 @@ export default function PrivacyPolicy({ navigation }) {
   return (
     <ScreenLayout>
       <Header
-        title={"Privacy Policy"}
+        title={"CUE"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />
