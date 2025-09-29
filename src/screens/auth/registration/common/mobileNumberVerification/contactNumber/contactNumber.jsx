@@ -1,4 +1,4 @@
-import { Text, View, Image, TextInput, Alert } from "react-native";
+import { Text, View, Image, TextInput, Alert, ActivityIndicator } from "react-native";
 import styles from "./contactNumberCss";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
@@ -164,10 +164,6 @@ export default function ContactNumber({ route, navigation }) {
               searchPlaceholder="Search Country"
               renderTrigger={(item) => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={{ uri: item.img }}
-                    style={{ width: 20, height: 14, marginRight: 6 }}
-                  />
                   <Text style={{ color: "#fff" }}>{item.code}</Text>
                 </View>
               )}
@@ -203,7 +199,7 @@ export default function ContactNumber({ route, navigation }) {
       </ScreenLayout>
 
       <Button
-        text={loading ? "Sending OTP..." : "Continue"}
+        text={loading ? <ActivityIndicator color="#fff" /> : "Continue"}
         onPress={handleContinue}
         disabled={loading}
       />

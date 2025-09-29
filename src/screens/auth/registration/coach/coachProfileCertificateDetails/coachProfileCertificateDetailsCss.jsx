@@ -139,10 +139,14 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   upy_text: {
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
-    color: "white",
+    fontSize: 12,
+    fontFamily: "Poppins-Light",
+    textAlign: "center",
     marginTop: 10,
+    marginBottom: 30,
+    color: "white",
+    width: "80%",
+    alignSelf: "center",
   },
   mpp_text: {
     fontSize: 14,

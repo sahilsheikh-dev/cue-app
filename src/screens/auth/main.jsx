@@ -1,5 +1,6 @@
 import Signup from "./signup/signup";
 import Login from "./login/login";
+import ForgetPassword from "./forgetPassword/forgetPassword";
 
 export const AuthScreens = (Stack) => [
   <Stack.Screen
@@ -12,6 +13,12 @@ export const AuthScreens = (Stack) => [
     key="Login"
     name="Login"
     component={Login}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    key="ForgetPassword"
+    name="ForgetPassword"
+    component={ForgetPassword}
     options={{ headerShown: false }}
   />,
 ];

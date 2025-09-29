@@ -1,4 +1,11 @@
-import { Text, View, TouchableOpacity, Alert, Image } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { useState, useContext, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -373,7 +380,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
       {/* ✅ Show Next only in preview mode */}
       {!isEdit && (
         <Button
-          text={loading ? "Loading..." : "Next"}
+          text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
           onPress={validateAndContinue}
         />
       )}

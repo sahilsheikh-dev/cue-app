@@ -23,7 +23,7 @@ export default function CoachIntroduction({ navigation }) {
             At Cue we focus on promoting individuals rather than businesses,
             providing a platform for you to showcase your skills and talents,
             and the reason for us using this approach, is to enable you to
-            contribute directly and more meaningfully to society.\n\nWe hope you
+            contribute directly and more meaningfully to society. We hope you
             enjoy the journey with us and wish you all the very best !
           </Text>
         </View>

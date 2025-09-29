@@ -1,5 +1,12 @@
 import React, { useRef, useState, useCallback } from "react";
-import { Text, View, TouchableOpacity, Alert, BackHandler } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  BackHandler,
+  ActivityIndicator,
+} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -230,7 +237,7 @@ export default function Signup({ navigation }) {
 
         {/* ✅ Signup Button */}
         <Button
-          text={loading ? "Creating..." : "Get Started"}
+          text={loading ? <ActivityIndicator color="#fff" /> : "Get Started"}
           onPress={validateAndSignup}
         />
 

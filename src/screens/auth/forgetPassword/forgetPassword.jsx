@@ -1,37 +1,24 @@
 import {
   Text,
   View,
-  SafeAreaView,
   Image,
-  ScrollView,
   TextInput,
-  TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
 } from "react-native";
-import styles from "./loginCss";
-import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useContext, useRef, useState } from "react";
-import RBSheet from "react-native-raw-bottom-sheet";
-import { Alert } from "react-native";
-
-import { loginWithApi } from "../../../services/authServices/authService";
-import { DataContext } from "../../../context/dataContext";
-
-import ButtonLink from "../../../components/common/buttonLink/buttonLink";
-import Dropdown from "../../../components/common/dropdown/dropdown";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
+import Dropdown from "../../../components/common/dropdown/dropdown";
 import InputField from "../../../components/common/inputField/inputField";
 import Button from "../../../components/common/button/button";
+import ButtonLink from "../../../components/common/buttonLink/buttonLink";
+import styles from "./forgetPasswordCss";
 
 const background = require("../../../../assets/images/background.png");
 
-export default function Login({ navigation }) {
-  // get login function from context
-  const { login } = useContext(DataContext);
+export default function ForgetPassword({ navigation }) {
+  const roles = ["client", "coach", "eventOrganizer", "productCompany"];
   const countries = [
     {
       id: "in",
@@ -71,26 +58,20 @@ export default function Login({ navigation }) {
   ];
 
   const [role, setRole] = useState("");
-  const [mobileNumber, setMobileNumber] = useState();
-  const [password, setPassword] = useState();
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [agreeTc, setAgreeTc] = useState(false);
 
-  const handleLogin = async () => {
-    // Role check
+  const handleReset = async () => {
     if (!role) {
       Alert.alert("Validation Error", "Please select a role");
       return;
     }
-
-    // Mobile validations
-    if (!mobileNumber || mobileNumber.trim() === "") {
+    if (!mobileNumber) {
       Alert.alert("Validation Error", "Please enter your phone number");
-      return;
-    }
-    if (!/^\d+$/.test(mobileNumber)) {
-      Alert.alert("Validation Error", "Phone number must contain only digits");
       return;
     }
     if (mobileNumber.length !== parseInt(selectedCountry.number_of_digit)) {
@@ -100,50 +81,33 @@ export default function Login({ navigation }) {
       );
       return;
     }
-
-    // Password validations
-    if (!password || password.trim() === "") {
-      Alert.alert("Validation Error", "Please enter your password");
+    if (!otp) {
+      Alert.alert("Validation Error", "Please enter OTP");
       return;
     }
-    if (password.length < 6) {
-      Alert.alert("Validation Error", "Password must be at least 6 characters");
+    if (!newPassword || !confirmPassword) {
+      Alert.alert("Validation Error", "Please enter password in both fields");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Validation Error", "Passwords do not match");
       return;
     }
 
-    // Build full number with country code
-    const fullMobileNumber = `${selectedCountry.code}${mobileNumber}`;
-
-    // If all good → continue
     setLoading(true);
     try {
-      const res = await loginWithApi(fullMobileNumber, password, role);
+      // TODO: call your reset password API
+      console.log("Resetting password for:", {
+        role,
+        phone: `${selectedCountry.code}${mobileNumber}`,
+        otp,
+        newPassword,
+      });
 
-      if (res.ok) {
-        await login(res.token, role, res.user);
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name:
-                role === "client"
-                  ? "ClientHome"
-                  : role === "coach"
-                  ? "CoachDashboard"
-                  : role === "eventOrganizer"
-                  ? "EventOrganizerDashboard"
-                  : role === "productCompany"
-                  ? "ProductCompanyDashboard"
-                  : "Signup",
-            },
-          ],
-        });
-      } else {
-        Alert.alert("Login failed", res.data?.message || res.error || "Error");
-      }
+      Alert.alert("Success", "Password reset successfully!");
+      navigation.replace("Login");
     } catch (err) {
-      console.error("handleLogin error:", err);
-      Alert.alert("Login failed", "Network error");
+      Alert.alert("Error", "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -152,15 +116,15 @@ export default function Login({ navigation }) {
   return (
     <>
       <ScreenLayout scrollable withPadding>
-        <Text style={styles.welcome_text}>Welcome to Cue!</Text>
-        <Text style={styles.pda_text}>Personal Development App</Text>
+        <Text style={styles.welcome_text}>Reset Your Password</Text>
+        <Text style={styles.pda_text}>We’ll send an OTP to verify</Text>
 
         {/* Role Dropdown */}
         <Dropdown
-          label="Login As"
-          data={["client", "coach", "eventOrganizer", "productCompany"]}
+          label="Select Role"
+          data={roles}
           selected={role}
-          onSelect={(val) => setRole(val)}
+          onSelect={setRole}
           dotSelect
           renderSelected={(item) =>
             item === "client"
@@ -196,14 +160,12 @@ export default function Login({ navigation }) {
               label="Country"
               data={countries}
               selected={selectedCountry}
-              onSelect={(item) => setSelectedCountry(item)}
+              onSelect={setSelectedCountry}
               dotSelect
               searchable
               searchPlaceholder="Search Country"
               renderTrigger={(item) => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={{ color: "#fff" }}>{item.code}</Text>
-                </View>
+                <Text style={{ color: "#fff" }}>{item.code}</Text>
               )}
               renderOption={(item, selected) => (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -211,9 +173,9 @@ export default function Login({ navigation }) {
                     source={{ uri: item.img }}
                     style={{ width: 20, height: 14, marginRight: 8 }}
                   />
-                  <Text
-                    style={{ color: "#fff" }}
-                  >{`${item.code} ${item.name}`}</Text>
+                  <Text style={{ color: "#fff" }}>
+                    {`${item.code} ${item.name}`}
+                  </Text>
                 </View>
               )}
               containerStyle={{ width: "30%" }}
@@ -235,36 +197,47 @@ export default function Login({ navigation }) {
           </LinearGradient>
         </View>
 
-        {/* Password */}
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Send OTP"}
+          onPress={handleReset}
+        />
+
+        {/* OTP Input */}
         <InputField
-          placeholder="Enter Password"
-          value={password}
-          onChangeText={setPassword}
+          placeholder="Enter OTP"
+          value={otp}
+          onChangeText={setOtp}
+          type="number"
+          icon="key-outline"
+        />
+
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Verify OTP"}
+          onPress={handleReset}
+        />
+
+        {/* New Password */}
+        <InputField
+          placeholder="New Password"
+          value={newPassword}
+          onChangeText={setNewPassword}
           type="password"
           icon="lock-closed-outline"
         />
 
-        <View style={{ width: "85%", alignSelf: "center" }}>
-          <ButtonLink
-            highlightText="Forgot Password?"
-            onPress={() => navigation.navigate("ForgetPassword")}
-            align="right"
-            highlightColor="fade"
-          />
-        </View>
-
-        {/* Log In button */}
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Log In"}
-          onPress={handleLogin}
+        {/* Confirm Password */}
+        <InputField
+          placeholder="Re-enter Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          type="password"
+          icon="lock-closed-outline"
         />
 
-        <ButtonLink
-          text="Don't have an account ?"
-          highlightText="Sign-up"
-          onPress={() => navigation.replace("Signup")}
-          align="center"
-          highlightColor="white"
+        {/* Reset Button */}
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Reset Password"}
+          onPress={handleReset}
         />
       </ScreenLayout>
     </>

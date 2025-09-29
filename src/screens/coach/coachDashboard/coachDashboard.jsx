@@ -125,7 +125,27 @@ export default function CoachDashboard({ navigation }) {
       )}
 
       {/* ✅ No banner if verified */}
-      {status === "verified" && null}
+      {status === "verified" && (
+        <LinearGradient
+          style={styles.bankdetail_section_small_fc}
+          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+        >
+          <Text
+            style={{
+              textAlign: "center",
+              color: "rgba(255, 255, 255, 1)",
+              fontFamily: "Poppins-Regular",
+              letterSpacing: 0.7,
+              fontSize: 16,
+              marginTop: 6,
+              fontWeight: 400,
+            }}
+          >
+            Hey {data?.user?.name ? data.user.name : "Coach"}, your account is
+            Verified Successfully! Congratulations!
+          </Text>
+        </LinearGradient>
+      )}
 
       {/* Options in pairs (2 per row) */}
       {Array.from({ length: Math.ceil(options.length / 2) }).map((_, row) => (

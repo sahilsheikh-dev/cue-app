@@ -139,6 +139,78 @@ const coachService = {
     }
   },
 
+  async uploadWorkAsset({ id, index, file }) {
+    try {
+      const token = await get("auth");
+
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("index", index); // must be single index
+
+      if (file) {
+        formData.append("workAsset", {
+          uri: file.content,
+          type: file.type === "video" ? "video/mp4" : "image/jpeg",
+          name: `asset_${index}.${file.type === "video" ? "mp4" : "jpg"}`,
+        });
+      }
+
+      const res = await axios.patch(
+        `${BASE_API_URL}/coach/upload-work-asset`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return {
+        success: true,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (err) {
+      console.error(
+        "uploadWorkAsset API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message:
+          err.response?.data?.message || "Failed to upload/delete work asset",
+        error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
+  async deleteCoachAccount(coachId) {
+    try {
+      const token = await get("auth"); // get auth token from secure store
+
+      const res = await axios.delete(
+        `${BASE_API_URL}/coach/deleteCoach/${coachId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return { success: true, message: res.data.message, data: res.data.data };
+    } catch (err) {
+      console.error(
+        "deleteCoachAccount API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message:
+          err.response?.data?.message || "Failed to delete coach account",
+        error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
   // ✅ Placeholder for future APIs
 };
 

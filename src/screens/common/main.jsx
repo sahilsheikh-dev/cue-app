@@ -3,6 +3,7 @@ import TermsAndConditions from "./termsAndConditions/termsAndConditions";
 import PrivacyPolicy from "./privacyPolicy/privacyPolicy";
 import CueGuideline from "./cueGuideline/cueGuideline";
 import { RegistrationScreens } from "../auth/registration/main";
+import UpdatePassword from "../auth/updatePassword/updatePassword";
 
 export const CommonScreens = (Stack) => [
   <Stack.Screen
@@ -27,6 +28,12 @@ export const CommonScreens = (Stack) => [
     key="PrivacyPolicy"
     name="PrivacyPolicy"
     component={PrivacyPolicy}
+    options={{ headerShown: false }}
+  />,
+  <Stack.Screen
+    key="UpdatePassword"
+    name="UpdatePassword"
+    component={UpdatePassword}
     options={{ headerShown: false }}
   />,
 

@@ -118,7 +118,10 @@ export default function CoachPersonalInformation({ navigation }) {
 
             <View style={styles.io_name_section_lo_to}>
               <Text style={styles.io_name}>
-                {data?.user?.gender?.trim() || "Not specified"}
+                {data?.user?.gender
+                  ? data.user.gender.charAt(0).toUpperCase() +
+                    data.user.gender.slice(1).toLowerCase()
+                  : "Not specified"}
               </Text>
             </View>
           </TouchableOpacity>

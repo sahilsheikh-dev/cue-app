@@ -1,4 +1,4 @@
-import { Text, View, Alert } from "react-native";
+import { Text, View, Alert, ActivityIndicator } from "react-native";
 import styles from "./coachProfileReviewConfirmDetailsCss";
 import { LinearGradient } from "expo-linear-gradient";
 import { useContext, useState } from "react";
@@ -185,7 +185,10 @@ export default function CoachProfileReviewConfirmDetails({
       </ScreenLayout>
 
       {/* Submit button */}
-      <Button text={loading ? "Saving..." : "Save"} onPress={handleSave} />
+      <Button
+        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
+        onPress={handleSave}
+      />
     </>
   );
 }

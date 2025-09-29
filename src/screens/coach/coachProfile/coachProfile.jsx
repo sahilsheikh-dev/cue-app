@@ -15,7 +15,7 @@ import styles from "./coachProfileCss";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import { DataContext } from "../../../context/dataContext";
-import { deleteCoachAccount } from "../../../services/coachServices/coachService";
+import coachService from "../../../services/coachServices/coachService";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import Header from "../../../components/common/header/header";
 
@@ -53,6 +53,11 @@ export default function CoachProfile({ navigation }) {
       title: "Cue Guideline",
       screen: "CueGuideline",
     },
+    {
+      id: "updatePassword",
+      title: "Update Password",
+      screen: "UpdatePassword",
+    },
   ];
 
   // get logout from context
@@ -71,29 +76,42 @@ export default function CoachProfile({ navigation }) {
           text: "Yes, Delete",
           style: "destructive",
           onPress: async () => {
-            Alert.alert("Deletion Feature will we add soon!");
-            // try {
-            //   setDeleteLoading(true);
-            //   const coachId = data.user?._id;
-            //   const token = data.token;
+            try {
+              setDeleteLoading(true);
 
-            //   if (!coachId || !token) {
-            //     alert("Missing coach ID or token!");
-            //     setDeleteLoading(false);
-            //     return;
-            //   }
+              const coachId = data?.user?._id;
+              if (!coachId) {
+                Alert.alert("Error", "Coach ID missing");
+                setDeleteLoading(false);
+                return;
+              }
 
-            //   const result = await deleteCoachAccount(coachId, token);
+              const result = await coachService.deleteCoachAccount(coachId);
 
-            //   alert(result.message || "Account deleted successfully");
-
-            //   await logout();
-            //   navigation.replace("Signup");
-            // } catch (err) {
-            //   alert("Failed to delete account. Please try again.");
-            // } finally {
-            //   setDeleteLoading(false);
-            // }
+              if (result.success) {
+                Alert.alert("Deleted", result.message || "Account deleted", [
+                  {
+                    text: "OK",
+                    onPress: async () => {
+                      await logout(); // clear context + storage
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: "Signup" }],
+                      });
+                    },
+                  },
+                ]);
+              } else {
+                Alert.alert(
+                  "Error",
+                  result.message || "Failed to delete account"
+                );
+              }
+            } catch (err) {
+              Alert.alert("Error", "Something went wrong. Please try again.");
+            } finally {
+              setDeleteLoading(false);
+            }
           },
         },
       ]
@@ -104,7 +122,10 @@ export default function CoachProfile({ navigation }) {
     try {
       setLogoutLoading(true);
       await logout();
-      navigation.replace("Signup");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Signup" }],
+      });
     } catch (err) {
       alert("Failed to log out. Please try again.");
     } finally {

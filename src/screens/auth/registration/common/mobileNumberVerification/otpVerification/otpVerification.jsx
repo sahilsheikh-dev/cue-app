@@ -223,7 +223,7 @@ export default function OtpVerification({ navigation, route }) {
 
       {/* Verify Button */}
       <Button
-        text={loading ? "Verifying..." : "Verify"}
+        text={loading ? <ActivityIndicator color="#fff" /> : "Verify"}
         onPress={handleVerify}
       />
     </>

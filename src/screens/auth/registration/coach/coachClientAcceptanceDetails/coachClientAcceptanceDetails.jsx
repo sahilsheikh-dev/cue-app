@@ -1,4 +1,4 @@
-import { Text, View, Alert } from "react-native";
+import { Text, View, Alert, ActivityIndicator } from "react-native";
 import styles from "./coachClientAcceptanceDetailsCss";
 import { useState, useEffect, useContext } from "react";
 import Button from "../../../../../components/common/button/button";
@@ -195,7 +195,10 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
 
       {/* ✅ Show Next only in preview mode */}
       {!isEdit && (
-        <Button text={loading ? "Loading..." : "Next"} onPress={handleNext} />
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+          onPress={handleNext}
+        />
       )}
     </>
   );
