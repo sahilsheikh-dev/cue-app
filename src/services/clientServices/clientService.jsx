@@ -6,7 +6,7 @@ const clientService = {
   async getMyInfo() {
     try {
       const token = await get("auth");
-      const res = await axios.get(`${BASE_API_URL}/client/gerMyInfo`, {
+      const res = await axios.get(`${BASE_API_URL}/client/getMyInfo`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return { success: true, data: res.data.data, message: res.data.message };

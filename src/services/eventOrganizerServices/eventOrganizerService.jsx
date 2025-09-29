@@ -6,7 +6,7 @@ const eventOrganizerService = {
   async getMyInfo() {
     try {
       const token = await get("auth");
-      const res = await axios.get(`${BASE_API_URL}/eventOrganizer/gerMyInfo`, {
+      const res = await axios.get(`${BASE_API_URL}/eventOrganizer/getMyInfo`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return { success: true, data: res.data.data, message: res.data.message };

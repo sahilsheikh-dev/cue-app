@@ -126,7 +126,7 @@ const coachService = {
   async getMyInfo() {
     try {
       const token = await get("auth");
-      const res = await axios.get(`${BASE_API_URL}/coach/gerMyInfo`, {
+      const res = await axios.get(`${BASE_API_URL}/coach/getMyInfo`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return { success: true, data: res.data.data, message: res.data.message };
@@ -135,52 +135,6 @@ const coachService = {
       return {
         success: false,
         message: err.response?.data?.message || "Failed to fetch coach info",
-      };
-    }
-  },
-
-  async uploadWorkAsset({ id, index, file }) {
-    try {
-      const token = await get("auth");
-
-      const formData = new FormData();
-      formData.append("id", id);
-      formData.append("index", index); // must be single index
-
-      if (file) {
-        formData.append("workAsset", {
-          uri: file.content,
-          type: file.type === "video" ? "video/mp4" : "image/jpeg",
-          name: `asset_${index}.${file.type === "video" ? "mp4" : "jpg"}`,
-        });
-      }
-
-      const res = await axios.patch(
-        `${BASE_API_URL}/coach/upload-work-asset`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
-      };
-    } catch (err) {
-      console.error(
-        "uploadWorkAsset API error:",
-        err.response?.data || err.message
-      );
-      return {
-        success: false,
-        message:
-          err.response?.data?.message || "Failed to upload/delete work asset",
-        error: err.response?.data?.error || err.message,
       };
     }
   },
@@ -207,6 +161,119 @@ const coachService = {
         message:
           err.response?.data?.message || "Failed to delete coach account",
         error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
+  async uploadCertificate({ id, index, file }) {
+    try {
+      const token = await get("auth");
+
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("index", index); // single slot index
+
+      if (file) {
+        formData.append("certificates", {
+          uri: file.content,
+          type: "image/jpeg",
+          name: `certificate_${index}.jpg`,
+        });
+      }
+
+      const res = await axios.post(
+        `${BASE_API_URL}/coach/upload-certificates`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return {
+        success: true,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (err) {
+      console.error(
+        "uploadCertificate API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message:
+          err.response?.data?.message || "Failed to upload/delete certificate",
+        error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
+  async uploadWorkAsset({ id, index, file }) {
+    try {
+      const token = await get("auth");
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("index", index);
+
+      if (file) {
+        formData.append("workAsset", {
+          uri: file.content,
+          type:
+            file.mimeType ||
+            (file.type === "video" ? "video/mp4" : "image/jpeg"),
+          name:
+            file.fileName ||
+            `asset_${index}.${file.type === "video" ? "mp4" : "jpg"}`,
+        });
+      }
+
+      const res = await axios.patch(
+        `${BASE_API_URL}/coach/upload-work-asset`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return {
+        success: true,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (err) {
+      console.error(
+        "uploadWorkAsset error:",
+        err.response?.data || err.message
+      );
+
+      // Grab more detail from backend response if available
+      const status = err.response?.status;
+      const backendMessage = err.response?.data?.message;
+      const backendError = err.response?.data?.error;
+
+      let userMessage = "Failed to upload/delete work asset";
+      if (status === 400 && backendMessage) {
+        userMessage = backendMessage; // e.g. "Indexes required"
+      } else if (status === 404) {
+        userMessage = "Coach not found";
+      } else if (status === 415) {
+        userMessage =
+          backendMessage || "Invalid file type. Only images and videos allowed";
+      } else if (backendMessage) {
+        userMessage = backendMessage;
+      }
+
+      return {
+        success: false,
+        message: userMessage,
+        error: backendError || err.message,
+        status,
       };
     }
   },

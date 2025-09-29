@@ -8,13 +8,19 @@ const ButtonLink = ({
   onPress,
   align = "center", // "left" | "center" | "right"
   highlightColor = "white", // "white" | "fade" | custom color
+  disabled = false,
 }) => {
   return (
-    <TouchableOpacity style={styles.linkContainer} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.linkContainer, disabled && { opacity: 0.5 }]}
+      onPress={disabled ? null : onPress}
+      activeOpacity={disabled ? 1 : 0.7}
+    >
       <Text
         style={[
           styles.linkText,
-          { textAlign: align }, // force text to fill width
+          { textAlign: align },
+          disabled && { color: "rgba(255,255,255,0.5)" },
         ]}
       >
         {text}{" "}
@@ -22,9 +28,11 @@ const ButtonLink = ({
           <Text
             style={[
               styles.highlightText,
-              highlightColor === "fade"
+              disabled
                 ? { color: "rgba(255,255,255,0.5)" }
-                : { color: highlightColor }, // allow custom too
+                : highlightColor === "fade"
+                ? { color: "rgba(255,255,255,0.5)" }
+                : { color: highlightColor },
             ]}
           >
             {highlightText}

@@ -14,6 +14,9 @@ import InputField from "../../../components/common/inputField/inputField";
 import Button from "../../../components/common/button/button";
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
 import styles from "./forgetPasswordCss";
+import Header from "../../../components/common/header/header";
+import otpService from "../../../services/otpService/otpService";
+import authService from "../../../services/authServices/authService";
 
 const background = require("../../../../assets/images/background.png");
 
@@ -60,33 +63,70 @@ export default function ForgetPassword({ navigation }) {
   const [role, setRole] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [mobileNumber, setMobileNumber] = useState("");
+  const [otpId, setOtpId] = useState(null);
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleReset = async () => {
-    if (!role) {
-      Alert.alert("Validation Error", "Please select a role");
+  const [loadingSend, setLoadingSend] = useState(false);
+  const [loadingVerify, setLoadingVerify] = useState(false);
+  const [loadingReset, setLoadingReset] = useState(false);
+
+  const [step, setStep] = useState("start");
+  // "start" → send OTP enabled
+  // "otp"   → otp input enabled
+  // "verified" → password input enabled
+
+  const fullPhone = `${selectedCountry.code}${mobileNumber}`;
+
+  const handleSendOtp = async () => {
+    if (!role || !mobileNumber) {
+      Alert.alert("Validation Error", "Select role and enter phone number");
       return;
     }
-    if (!mobileNumber) {
-      Alert.alert("Validation Error", "Please enter your phone number");
+    setLoadingSend(true);
+    try {
+      const res = await otpService.sendOtp(fullPhone, role);
+      setOtpId(res.otpId);
+      setStep("otp");
+      Alert.alert("Success", "OTP sent successfully!");
+    } catch (err) {
+      Alert.alert("Error", err.message || "Failed to send OTP");
+    } finally {
+      setLoadingSend(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpId || !otp) {
+      Alert.alert("Validation Error", "Enter OTP");
       return;
     }
-    if (mobileNumber.length !== parseInt(selectedCountry.number_of_digit)) {
-      Alert.alert(
-        "Validation Error",
-        `Phone number must be ${selectedCountry.number_of_digit} digits for ${selectedCountry.name}`
-      );
-      return;
+    setLoadingVerify(true);
+    try {
+      await otpService.verifyOtp(otpId, otp);
+      setStep("verified");
+      Alert.alert("Success", "OTP verified. Enter new password.");
+    } catch (err) {
+      Alert.alert("Error", err.message || "OTP verification failed");
+    } finally {
+      setLoadingVerify(false);
     }
-    if (!otp) {
-      Alert.alert("Validation Error", "Please enter OTP");
-      return;
+  };
+
+  const handleResendOtp = async () => {
+    if (!otpId) return;
+    try {
+      await otpService.resendOtp(otpId);
+      Alert.alert("Success", "OTP resent!");
+    } catch (err) {
+      Alert.alert("Error", err.message || "Failed to resend OTP");
     }
+  };
+
+  const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
-      Alert.alert("Validation Error", "Please enter password in both fields");
+      Alert.alert("Validation Error", "Fill both password fields");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -94,152 +134,142 @@ export default function ForgetPassword({ navigation }) {
       return;
     }
 
-    setLoading(true);
+    setLoadingReset(true);
     try {
-      // TODO: call your reset password API
-      console.log("Resetting password for:", {
+      const res = await authService.forgetPassword(
         role,
-        phone: `${selectedCountry.code}${mobileNumber}`,
-        otp,
-        newPassword,
-      });
-
-      Alert.alert("Success", "Password reset successfully!");
-      navigation.replace("Login");
-    } catch (err) {
-      Alert.alert("Error", "Something went wrong");
+        fullPhone,
+        newPassword
+      );
+      if (res.ok) {
+        Alert.alert("Success", "Password reset successfully!");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        });
+      } else {
+        Alert.alert("Error", res.error || "Password reset failed");
+      }
     } finally {
-      setLoading(false);
+      setLoadingReset(false);
     }
   };
 
   return (
-    <>
-      <ScreenLayout scrollable withPadding>
-        <Text style={styles.welcome_text}>Reset Your Password</Text>
-        <Text style={styles.pda_text}>We’ll send an OTP to verify</Text>
+    <ScreenLayout scrollable withPadding>
+      <Header
+        title={"CUE"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
-        {/* Role Dropdown */}
-        <Dropdown
-          label="Select Role"
-          data={roles}
-          selected={role}
-          onSelect={setRole}
-          dotSelect
-          renderSelected={(item) =>
-            item === "client"
-              ? "Client"
-              : item === "coach"
-              ? "Coach"
-              : item === "eventOrganizer"
-              ? "Event Organizer"
-              : "Product Company"
-          }
-          renderOption={(item) => (
-            <Text style={{ color: "#fff" }}>
-              {item === "client"
-                ? "Client"
-                : item === "coach"
-                ? "Coach"
-                : item === "eventOrganizer"
-                ? "Event Organizer"
-                : "Product Company"}
-            </Text>
-          )}
-          icon="person-outline"
-          containerStyle={{ width: "85%", alignSelf: "center" }}
-        />
+      <Text style={styles.welcome_text}>Reset Your Password</Text>
+      <Text style={styles.pda_text}>We’ll send an OTP to verify</Text>
 
-        {/* Country + Phone */}
-        <View style={styles.input_whole_section}>
-          <LinearGradient
-            colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
-            style={styles.input_inner_section}
-          >
-            <Dropdown
-              label="Country"
-              data={countries}
-              selected={selectedCountry}
-              onSelect={setSelectedCountry}
-              dotSelect
-              searchable
-              searchPlaceholder="Search Country"
-              renderTrigger={(item) => (
-                <Text style={{ color: "#fff" }}>{item.code}</Text>
-              )}
-              renderOption={(item, selected) => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={{ uri: item.img }}
-                    style={{ width: 20, height: 14, marginRight: 8 }}
-                  />
-                  <Text style={{ color: "#fff" }}>
-                    {`${item.code} ${item.name}`}
-                  </Text>
-                </View>
-              )}
-              containerStyle={{ width: "30%" }}
+      {/* Role Dropdown */}
+      <Dropdown
+        label="Select Role"
+        data={roles}
+        selected={role}
+        onSelect={setRole}
+        dotSelect
+        disabled={step !== "start"} // disable after step 1
+        containerStyle={{ width: "85%", alignSelf: "center" }}
+      />
+
+      {/* Country + Phone */}
+      <View style={styles.input_whole_section}>
+        <LinearGradient
+          colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
+          style={styles.input_inner_section}
+        >
+          <Dropdown
+            label="Country"
+            data={countries}
+            selected={selectedCountry}
+            onSelect={setSelectedCountry}
+            dotSelect
+            renderTrigger={(item) => (
+              <Text style={{ color: "#fff" }}>{item.code}</Text>
+            )}
+            disabled={step !== "start"}
+            containerStyle={{ width: "30%" }}
+          />
+
+          <View style={styles.input_section}>
+            <TextInput
+              style={styles.input}
+              placeholder="Your phone number"
+              placeholderTextColor={"#ffffff90"}
+              keyboardType="phone-pad"
+              value={mobileNumber}
+              onChangeText={(text) => {
+                const limit = parseInt(selectedCountry.number_of_digit);
+                if (text.length <= limit) setMobileNumber(text);
+              }}
+              editable={step === "start"}
             />
+          </View>
+        </LinearGradient>
+      </View>
 
-            <View style={styles.input_section}>
-              <TextInput
-                style={styles.input}
-                placeholder="Your phone number"
-                placeholderTextColor={"#ffffff90"}
-                keyboardType="phone-pad"
-                value={mobileNumber}
-                onChangeText={(text) => {
-                  const limit = parseInt(selectedCountry.number_of_digit);
-                  if (text.length <= limit) setMobileNumber(text);
-                }}
-              />
-            </View>
-          </LinearGradient>
-        </View>
+      {/* Send OTP */}
+      <Button
+        text={loadingSend ? <ActivityIndicator color="#fff" /> : "Send OTP"}
+        onPress={handleSendOtp}
+        disabled={step !== "start"}
+      />
 
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Send OTP"}
-          onPress={handleReset}
-        />
+      {/* OTP Input */}
+      <InputField
+        placeholder="Enter OTP"
+        value={otp}
+        onChangeText={setOtp}
+        type="number"
+        icon="key-outline"
+        disabled={step !== "otp"}
+      />
 
-        {/* OTP Input */}
-        <InputField
-          placeholder="Enter OTP"
-          value={otp}
-          onChangeText={setOtp}
-          type="number"
-          icon="key-outline"
-        />
+      <ButtonLink
+        text={"Didn't Receive Anything?"}
+        highlightText={"Resend Code"}
+        align="center"
+        onPress={handleResendOtp}
+        disabled={step !== "otp"} // 👈 disable until OTP step
+      />
 
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Verify OTP"}
-          onPress={handleReset}
-        />
+      <Button
+        text={loadingVerify ? <ActivityIndicator color="#fff" /> : "Verify OTP"}
+        onPress={handleVerifyOtp}
+        disabled={step !== "otp"}
+      />
 
-        {/* New Password */}
-        <InputField
-          placeholder="New Password"
-          value={newPassword}
-          onChangeText={setNewPassword}
-          type="password"
-          icon="lock-closed-outline"
-        />
+      {/* New Password */}
+      <InputField
+        placeholder="New Password"
+        value={newPassword}
+        onChangeText={setNewPassword}
+        type="password"
+        icon="lock-closed-outline"
+        disabled={step !== "verified"}
+      />
 
-        {/* Confirm Password */}
-        <InputField
-          placeholder="Re-enter Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          type="password"
-          icon="lock-closed-outline"
-        />
+      <InputField
+        placeholder="Re-enter Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        type="password"
+        icon="lock-closed-outline"
+        disabled={step !== "verified"}
+      />
 
-        {/* Reset Button */}
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Reset Password"}
-          onPress={handleReset}
-        />
-      </ScreenLayout>
-    </>
+      <Button
+        text={
+          loadingReset ? <ActivityIndicator color="#fff" /> : "Reset Password"
+        }
+        onPress={handleResetPassword}
+        disabled={step !== "verified"}
+      />
+    </ScreenLayout>
   );
 }

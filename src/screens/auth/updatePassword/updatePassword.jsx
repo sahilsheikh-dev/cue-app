@@ -1,54 +1,104 @@
+import { useContext, useState } from "react";
 import { Text, View, ActivityIndicator, Alert } from "react-native";
-import { useState } from "react";
 import styles from "./updatePasswordCss";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
-import Dropdown from "../../../components/common/dropdown/dropdown";
 import InputField from "../../../components/common/inputField/inputField";
 import Button from "../../../components/common/button/button";
-import ButtonLink from "../../../components/common/buttonLink/buttonLink";
+import Header from "../../../components/common/header/header";
+import { DataContext } from "../../../context/dataContext";
+import authService from "../../../services/authServices/authService";
 
 export default function UpdatePassword({ navigation }) {
-  const roles = ["client", "coach", "eventOrganizer", "productCompany"];
-
-  const [role, setRole] = useState("");
+  const { data, logout } = useContext(DataContext);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleUpdatePassword = async () => {
-    if (!role) {
-      Alert.alert("Validation Error", "Please select a role");
-      return;
-    }
+    // ✅ Validation
     if (!currentPassword) {
-      Alert.alert("Validation Error", "Please enter your current password");
-      return;
+      return Alert.alert(
+        "Validation Error",
+        "Please enter your current password"
+      );
     }
+
     if (!newPassword) {
-      Alert.alert("Validation Error", "Please enter a new password");
-      return;
+      return Alert.alert("Validation Error", "Please enter a new password");
     }
+
     if (newPassword.length < 6) {
-      Alert.alert("Validation Error", "Password must be at least 6 characters");
-      return;
+      return Alert.alert(
+        "Validation Error",
+        "Password must be at least 6 characters long"
+      );
     }
+
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+    if (!strongPasswordRegex.test(newPassword)) {
+      return Alert.alert(
+        "Validation Error",
+        "Password must include letters, numbers, and a special character"
+      );
+    }
+
+    if (!confirmPassword) {
+      return Alert.alert(
+        "Validation Error",
+        "Please re-enter your new password"
+      );
+    }
+
     if (newPassword !== confirmPassword) {
-      Alert.alert("Validation Error", "Passwords do not match");
-      return;
+      return Alert.alert("Validation Error", "Passwords do not match");
+    }
+
+    if (
+      currentPassword === newPassword ||
+      currentPassword === confirmPassword
+    ) {
+      return Alert.alert(
+        "Validation Error",
+        "Current and New Password Must not be the same"
+      );
+    }
+
+    const role = data?.role;
+    const userId = data?.user?._id;
+
+    if (!role || !userId) {
+      return Alert.alert(
+        "Error",
+        "User information missing. Please login again."
+      );
     }
 
     setLoading(true);
     try {
-      // 🔗 TODO: Hook into your update password API here
-      console.log("Updating password:", {
+      const res = await authService.updatePassword(
         role,
+        userId,
         currentPassword,
-        newPassword,
-      });
+        newPassword
+      );
 
-      Alert.alert("Success", "Password updated successfully!");
-      navigation.replace("Login");
+      if (res.ok) {
+        Alert.alert("Success", "Password updated successfully!", [
+          {
+            text: "OK",
+            onPress: async () => {
+              await logout(); // clear token + context
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Signup" }],
+              });
+            },
+          },
+        ]);
+      } else {
+        Alert.alert("Error", res.error || "Something went wrong");
+      }
     } catch (err) {
       console.error("Update password error:", err);
       Alert.alert("Error", "Something went wrong");
@@ -58,79 +108,46 @@ export default function UpdatePassword({ navigation }) {
   };
 
   return (
-    <>
-      <ScreenLayout scrollable withPadding>
-        <Text style={styles.welcome_text}>Update Password</Text>
-        <Text style={styles.pda_text}>
-          Change your password to keep your account secure
-        </Text>
+    <ScreenLayout scrollable withPadding>
+      <Header
+        title={"CUE"}
+        showBack={true}
+        onBackPress={() => navigation.goBack()}
+      />
 
-        {/* Role Dropdown */}
-        <Dropdown
-          label="Select Role"
-          data={roles}
-          selected={role}
-          onSelect={setRole}
-          dotSelect
-          renderSelected={(item) =>
-            item === "client"
-              ? "Client"
-              : item === "coach"
-              ? "Coach"
-              : item === "eventOrganizer"
-              ? "Event Organizer"
-              : "Product Company"
-          }
-          renderOption={(item) => (
-            <Text style={{ color: "#fff" }}>
-              {item === "client"
-                ? "Client"
-                : item === "coach"
-                ? "Coach"
-                : item === "eventOrganizer"
-                ? "Event Organizer"
-                : "Product Company"}
-            </Text>
-          )}
-          icon="person-outline"
-          containerStyle={{ width: "85%", alignSelf: "center" }}
-        />
+      <Text style={styles.welcome_text}>Update Password</Text>
+      <Text style={styles.pda_text}>
+        Change your password to keep your account secure
+      </Text>
 
-        {/* Current Password */}
-        <InputField
-          placeholder="Current Password"
-          value={currentPassword}
-          onChangeText={setCurrentPassword}
-          type="password"
-          icon="lock-closed-outline"
-        />
+      <InputField
+        placeholder="Current Password"
+        value={currentPassword}
+        onChangeText={setCurrentPassword}
+        type="password"
+        icon="lock-closed-outline"
+      />
 
-        {/* New Password */}
-        <InputField
-          placeholder="New Password"
-          value={newPassword}
-          onChangeText={setNewPassword}
-          type="password"
-          icon="lock-closed-outline"
-        />
+      <InputField
+        placeholder="New Password"
+        value={newPassword}
+        onChangeText={setNewPassword}
+        type="password"
+        icon="lock-closed-outline"
+      />
 
-        {/* Confirm New Password */}
-        <InputField
-          placeholder="Re-enter New Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          type="password"
-          icon="lock-closed-outline"
-        />
+      <InputField
+        placeholder="Re-enter New Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        type="password"
+        icon="lock-closed-outline"
+      />
 
-        {/* Update Password button */}
-        <Button
-          text={
-            loading ? <ActivityIndicator color="#fff" /> : "Update Password"
-          }
-          onPress={handleUpdatePassword}
-        />
-      </ScreenLayout>
-    </>
+      <Button
+        text={loading ? <ActivityIndicator color="#fff" /> : "Update Password"}
+        onPress={handleUpdatePassword}
+      />
+    </ScreenLayout>
   );
 }

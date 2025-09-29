@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Poppins-Regular",
     color: "#ffffff80",
+    textAlign: "center",
   },
   input_whole_section_btn: {
     height: 60,

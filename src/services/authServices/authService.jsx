@@ -157,6 +157,49 @@ export async function serverLogout() {
   }
 }
 
+export async function updatePassword(role, id, oldPassword, newPassword) {
+  try {
+    const token = await get("auth");
+    if (!token) {
+      return { ok: false, error: "No auth token found" };
+    }
+
+    const res = await axios.put(
+      `${BASE_API_URL}/${role}/updatePassword/${id}`,
+      { oldPassword, newPassword },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error("updatePassword error:", err.response?.data || err.message);
+    return {
+      ok: false,
+      status: err.response?.status,
+      error: err.response?.data?.message || err.message,
+    };
+  }
+}
+
+export async function forgetPassword(role, mobile, newPassword) {
+  try {
+    const res = await axios.put(`${BASE_API_URL}/${role}/forget-password`, {
+      mobile,
+      newPassword,
+    });
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error("forgetPassword error:", err.response?.data || err.message);
+    return {
+      ok: false,
+      status: err.response?.status,
+      error: err.response?.data?.message || err.message,
+    };
+  }
+}
+
 /**
  * Default export (convenience)
  */
@@ -168,6 +211,8 @@ const authService = {
   logout,
   loginWithApi,
   serverLogout,
+  updatePassword,
+  forgetPassword,
 };
 
 export default authService;
