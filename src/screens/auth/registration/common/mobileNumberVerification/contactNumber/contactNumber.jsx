@@ -1,4 +1,11 @@
-import { Text, View, Image, TextInput, Alert, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import styles from "./contactNumberCss";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
@@ -55,6 +62,13 @@ export default function ContactNumber({ route, navigation }) {
       code: "+61",
       number_of_digit: "9",
       img: "https://flagcdn.com/w20/au.png",
+    },
+    {
+      id: "ae",
+      name: "United Arab Emirates (Dubai)",
+      code: "+971",
+      number_of_digit: "9",
+      img: "https://flagcdn.com/w20/ae.png",
     },
   ];
 

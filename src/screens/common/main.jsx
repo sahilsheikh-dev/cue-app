@@ -4,6 +4,7 @@ import PrivacyPolicy from "./privacyPolicy/privacyPolicy";
 import CueGuideline from "./cueGuideline/cueGuideline";
 import { RegistrationScreens } from "../auth/registration/main";
 import UpdatePassword from "../auth/updatePassword/updatePassword";
+import { AuthScreens } from "../auth/main";
 
 export const CommonScreens = (Stack) => [
   <Stack.Screen
@@ -37,7 +38,9 @@ export const CommonScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
 
-  // REGISTRATION SCREENS NEEDS ACCESS ALL USERS
+  // Signup/Login/ForgetPassword
+  ...AuthScreens(Stack),
 
+  // REGISTRATION SCREENS NEEDS ACCESS ALL USERS
   ...RegistrationScreens(Stack),
 ];

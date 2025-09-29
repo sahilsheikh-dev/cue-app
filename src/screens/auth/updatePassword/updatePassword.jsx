@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Text, View, ActivityIndicator, Alert } from "react-native";
+import { Text, ActivityIndicator, Alert } from "react-native";
 import styles from "./updatePasswordCss";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import InputField from "../../../components/common/inputField/inputField";
@@ -23,18 +23,15 @@ export default function UpdatePassword({ navigation }) {
         "Please enter your current password"
       );
     }
-
     if (!newPassword) {
       return Alert.alert("Validation Error", "Please enter a new password");
     }
-
     if (newPassword.length < 6) {
       return Alert.alert(
         "Validation Error",
         "Password must be at least 6 characters long"
       );
     }
-
     const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
     if (!strongPasswordRegex.test(newPassword)) {
       return Alert.alert(
@@ -42,31 +39,24 @@ export default function UpdatePassword({ navigation }) {
         "Password must include letters, numbers, and a special character"
       );
     }
-
     if (!confirmPassword) {
       return Alert.alert(
         "Validation Error",
         "Please re-enter your new password"
       );
     }
-
     if (newPassword !== confirmPassword) {
       return Alert.alert("Validation Error", "Passwords do not match");
     }
-
-    if (
-      currentPassword === newPassword ||
-      currentPassword === confirmPassword
-    ) {
+    if (currentPassword === newPassword) {
       return Alert.alert(
         "Validation Error",
-        "Current and New Password Must not be the same"
+        "Current and New Password must not be the same"
       );
     }
 
     const role = data?.role;
     const userId = data?.user?._id;
-
     if (!role || !userId) {
       return Alert.alert(
         "Error",
@@ -88,11 +78,16 @@ export default function UpdatePassword({ navigation }) {
           {
             text: "OK",
             onPress: async () => {
-              await logout(); // clear token + context
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "Signup" }],
-              });
+              try {
+                await logout(); // clear auth & context
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "Login" }],
+                });
+              } catch (e) {
+                console.error("Logout after password update failed:", e);
+                Alert.alert("Error", "Password updated but logout failed.");
+              }
             },
           },
         ]);

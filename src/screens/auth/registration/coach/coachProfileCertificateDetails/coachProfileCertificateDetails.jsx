@@ -1,4 +1,11 @@
-import { Text, View, Image, TouchableOpacity, Alert } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import styles from "./coachProfileCertificateDetailsCss";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useContext } from "react";
@@ -31,17 +38,29 @@ export default function CoachProfileCertificateDetails({ navigation }) {
 
   const [certificates, setCertificates] = useState(initialState);
   const [saveEnabled, setSaveEnabled] = useState(Array(10).fill(false));
+  const [loadingIndex, setLoadingIndex] = useState(null); // track which slot is uploading
 
+  // Pick image
   // Pick image
   const pickImage = async (slotIndex) => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // ✅ restrict to images only
       allowsEditing: true,
       quality: 1,
     });
 
     if (!result.canceled) {
       let asset = result.assets[0];
+
+      // ✅ extra safeguard: block anything that's not an image
+      if (asset.type !== "image") {
+        Alert.alert(
+          "Invalid File",
+          "Only images are allowed for certificates."
+        );
+        return;
+      }
+
       let updated = [...certificates];
       updated[slotIndex] = { type: "image", content: asset.uri };
       setCertificates(updated);
@@ -54,15 +73,23 @@ export default function CoachProfileCertificateDetails({ navigation }) {
 
   // Remove → mark slot empty + call API
   const removeImage = async (slotIndex) => {
-    let updated = [...certificates];
-    updated[slotIndex] = { type: "", content: "" };
-    setCertificates(updated);
+    setLoadingIndex(slotIndex);
+    try {
+      let updated = [...certificates];
+      updated[slotIndex] = { type: "", content: "" };
+      setCertificates(updated);
 
-    await saveAndRedirect(
-      coachService.uploadCertificate,
-      { id: data.user._id, index: slotIndex, file: null },
-      `Certificate ${slotIndex + 1} removed`
-    );
+      await saveAndRedirect(
+        coachService.uploadCertificate,
+        { id: data.user._id, index: slotIndex, file: null },
+        `Certificate ${slotIndex + 1} removed`,
+        null // ✅ stay on same screen, refresh context only
+      );
+    } catch (err) {
+      Alert.alert("Error", "Failed to remove certificate");
+    } finally {
+      setLoadingIndex(null);
+    }
   };
 
   // Save → call API
@@ -70,17 +97,25 @@ export default function CoachProfileCertificateDetails({ navigation }) {
     const cert = certificates[slotIndex];
     if (!cert.content) return;
 
-    const file = { type: "image", content: cert.content };
+    setLoadingIndex(slotIndex);
+    try {
+      const file = { type: cert.type, content: cert.content };
 
-    await saveAndRedirect(
-      coachService.uploadCertificate,
-      { id: data.user._id, index: slotIndex, file },
-      `Certificate ${slotIndex + 1} saved`
-    );
+      await saveAndRedirect(
+        coachService.uploadCertificate,
+        { id: data.user._id, index: slotIndex, file },
+        `Certificate ${slotIndex + 1} saved`,
+        null // ✅ stay on same screen, refresh context only
+      );
 
-    let updatedSave = [...saveEnabled];
-    updatedSave[slotIndex] = false; // disable after save
-    setSaveEnabled(updatedSave);
+      let updatedSave = [...saveEnabled];
+      updatedSave[slotIndex] = false; // disable after save
+      setSaveEnabled(updatedSave);
+    } catch (err) {
+      Alert.alert("Error", "Upload failed, please try again.");
+    } finally {
+      setLoadingIndex(null);
+    }
   };
 
   return (
@@ -102,26 +137,29 @@ export default function CoachProfileCertificateDetails({ navigation }) {
         Add Your Certificate
       </Text>
       <Text style={styles.upy_text}>
-        Upload your certificates (up to 10). Each slot can store one image.
+        Upload your certificates (up to 10). Each slot can store one
+        image/video.
       </Text>
 
       {certificates.map((item, index) => {
         const hasDbCertificate = Boolean(data?.user?.certificates?.[index]);
+        const isLoading = loadingIndex === index;
+
         return (
           <View key={index} style={{ marginBottom: 20 }}>
-            <TouchableOpacity onPress={() => pickImage(index)}>
+            <TouchableOpacity onPress={() => !isLoading && pickImage(index)}>
               <LinearGradient
                 style={styles.indi_up}
                 colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0)"]}
               >
                 <View style={styles.indi_up_inner}>
-                  {item.content ? (
+                  {isLoading ? (
+                    <ActivityIndicator size="large" color="#fff" />
+                  ) : item.content ? (
                     <Image
                       source={{ uri: String(item.content) }}
                       style={styles.profile_img}
-                      onError={() =>
-                        console.warn("Invalid image URI:", item.content)
-                      }
+                      onError={() => console.warn("Invalid URI:", item.content)}
                     />
                   ) : (
                     <>
@@ -153,13 +191,13 @@ export default function CoachProfileCertificateDetails({ navigation }) {
                 text={"Remove"}
                 onPress={() => removeImage(index)}
                 style={{ flex: 1, marginRight: 5 }}
-                disabled={!hasDbCertificate}
+                disabled={!hasDbCertificate || isLoading}
               />
               <Button
                 text={"Save"}
                 onPress={() => saveImage(index)}
                 style={{ flex: 1, marginLeft: 5 }}
-                disabled={!saveEnabled[index]}
+                disabled={!saveEnabled[index] || isLoading}
               />
             </View>
           </View>

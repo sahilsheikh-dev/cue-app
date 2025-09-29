@@ -19,13 +19,13 @@ export function useSaveAndRedirect(navigation) {
    * @param {Function} apiFn - API function to call
    * @param {Object} payload - Data payload for API
    * @param {string} successMessage - Optional success message
-   * @param {string} customRedirectRoute - Optional explicit redirect route
+   * @param {string|null} customRedirectRoute - Pass `null` to disable redirect
    */
   const saveAndRedirect = async (
     apiFn,
     payload,
     successMessage = "Saved!",
-    customRedirectRoute = null
+    customRedirectRoute = undefined // undefined = auto, null = no redirect
   ) => {
     setLoading(true);
     const res = await apiFn(payload);
@@ -34,20 +34,25 @@ export function useSaveAndRedirect(navigation) {
     if (res.success) {
       await refreshUser(res.data);
 
-      // Decide final route: use custom if given, else fallback to role map
-      const targetRoute =
-        customRedirectRoute || roleDashboardMap[data.role] || "Signup";
+      if (customRedirectRoute === null) {
+        // ✅ Only refresh, stay on same screen
+        Alert.alert("Success", res.message || successMessage);
+      } else {
+        // ✅ Redirect if a route is provided or auto route exists
+        const targetRoute =
+          customRedirectRoute || roleDashboardMap[data.role] || "Signup";
 
-      Alert.alert("Success", res.message || successMessage, [
-        {
-          text: "OK",
-          onPress: () =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: targetRoute }],
-            }),
-        },
-      ]);
+        Alert.alert("Success", res.message || successMessage, [
+          {
+            text: "OK",
+            onPress: () =>
+              navigation.reset({
+                index: 0,
+                routes: [{ name: targetRoute }],
+              }),
+          },
+        ]);
+      }
       return true;
     } else {
       Alert.alert("Error", res.message || "Something went wrong.");

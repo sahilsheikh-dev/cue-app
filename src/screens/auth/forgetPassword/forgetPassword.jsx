@@ -58,6 +58,13 @@ export default function ForgetPassword({ navigation }) {
       number_of_digit: "9",
       img: "https://flagcdn.com/w20/au.png",
     },
+    {
+      id: "ae",
+      name: "United Arab Emirates (Dubai)",
+      code: "+971",
+      number_of_digit: "9",
+      img: "https://flagcdn.com/w20/ae.png",
+    },
   ];
 
   const [role, setRole] = useState("");

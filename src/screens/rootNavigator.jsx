@@ -38,9 +38,6 @@ export default function RootNavigator() {
       {/* Common screens always available */}
       {CommonScreens(Stack)}
 
-      {/* Auth flow */}
-      {!auth && AuthScreens(Stack)}
-
       {/* Role-specific flows */}
       {auth && role === "client" && ClientScreens(Stack)}
       {auth && role === "coach" && CoachScreens(Stack)}
