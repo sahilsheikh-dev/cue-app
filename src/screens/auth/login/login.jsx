@@ -127,24 +127,30 @@ export default function Login({ navigation }) {
       const res = await loginWithApi(fullMobileNumber, password, role);
 
       if (res.ok) {
-        await login(res.token, role, res.user);
-        navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name:
-                role === "client"
-                  ? "ClientHome"
-                  : role === "coach"
-                  ? "CoachDashboard"
-                  : role === "eventOrganizer"
-                  ? "EventOrganizerDashboard"
-                  : role === "productCompany"
-                  ? "ProductCompanyDashboard"
-                  : "Signup",
-            },
-          ],
-        });
+        const saved = await login(res.token, role, res.user);
+
+        if (saved) {
+          // ✅ Reset navigation to role-specific dashboard
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name:
+                  role === "client"
+                    ? "ClientHome"
+                    : role === "coach"
+                    ? "CoachDashboard"
+                    : role === "eventOrganizer"
+                    ? "EventOrganizerDashboard"
+                    : role === "productCompany"
+                    ? "ProductCompanyDashboard"
+                    : "Signup",
+              },
+            ],
+          });
+        } else {
+          Alert.alert("Login failed", "Unable to save login session");
+        }
       } else {
         Alert.alert("Login failed", res.data?.message || res.error || "Error");
       }

@@ -57,7 +57,9 @@ export default function App() {
         user,
       }));
       setLoading(false);
+      return true; // 👈 return success
     }
+    return false; // 👈 return failure
   }, []);
 
   const logout = useCallback(async () => {
@@ -168,7 +170,8 @@ export default function App() {
               <Splash />
             ) : (
               <RootNavigator
-                key={data.role || "auth"} // 👈 force re-mount when role changes after login
+                // key={data.role || "auth"} // 👈 force re-mount when role changes after login
+                key={`${data.role || "auth"}_${data.auth ? "auth" : "noauth"}`}
               />
             )}
           </NavigationContainer>
