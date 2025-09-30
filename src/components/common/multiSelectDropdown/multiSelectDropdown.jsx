@@ -5,11 +5,13 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 import styles from "./multiSelectDropdownCss";
+import Button from "../button/button";
 
 const MultiSelectDropdown = ({
   label,
@@ -86,7 +88,7 @@ const MultiSelectDropdown = ({
       </TouchableOpacity>
 
       {/* Bottom Sheet */}
-      <RBSheet ref={sheetRef} height={400}>
+      <RBSheet ref={sheetRef} height={450}>
         <LinearGradient
           style={styles.sheetContainer}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
@@ -154,6 +156,9 @@ const MultiSelectDropdown = ({
             )}
             <View style={{ height: 20 }} />
           </ScrollView>
+
+          {/* ✅ Done / Close Button */}
+          <Button text={"Done"} onPress={() => sheetRef.current.close()} />
         </LinearGradient>
       </RBSheet>
     </>

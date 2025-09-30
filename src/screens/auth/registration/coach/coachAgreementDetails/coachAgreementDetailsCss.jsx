@@ -4,33 +4,74 @@ import {
   StatusBar as sb,
   Dimensions,
 } from "react-native";
-("expo-status-bar");
+
 const screenHeight = Dimensions.get("window").height;
+
+// ====== Base styles for reuse ======
+const baseAgreementSection = {
+  width: "90%",
+  alignSelf: "center",
+  borderRadius: 10,
+  marginBottom: 20,
+  position: "relative",
+  borderWidth: 1.5,
+  borderColor: "rgba(255, 255, 255, 0.2)",
+};
+
+const baseInput = {
+  width: "100%",
+  padding: 10,
+  verticalAlign: "top",
+  color: "white",
+  fontSize: 16,
+  fontFamily: "Poppins-Regular",
+};
+
+const baseCircle = {
+  borderRadius: 50,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const baseLabel = {
+  fontSize: 12,
+  color: "white",
+  fontFamily: "Poppins-Regular",
+};
+
 const styles = StyleSheet.create({
+  // ===== Common containers =====
   sav: {
     height: "100%",
     width: "100%",
-    // paddingTop: Platform.OS == "ios" ? 0 : sb.currentHeight,
   },
+  container: {
+    flex: 1,
+    width: "100%",
+  },
+
+  // ===== Background (Image + Gradient) =====
   backgroundView: {
     height: "130%",
     width: "100%",
     position: "absolute",
-    // backgroundColor: "red",
     zIndex: -1,
     top: 0,
     left: 0,
   },
   backgroundImage: {
-    height: "130%",
-    width: "100%",
+    ...StyleSheet.absoluteFillObject,
     resizeMode: "cover",
-    position: "absolute",
-    zIndex: 1,
-    top: 0,
-    left: 0,
+    zIndex: -2,
     opacity: 0.25,
   },
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: -1,
+  },
+
+  // ===== Scroll / Content wrapper =====
   main_scroll_view: {
     marginTop: "50px",
     height: "100%",
@@ -40,20 +81,31 @@ const styles = StyleSheet.create({
   main_view: {
     height: screenHeight - 55 - 10,
     width: "100%",
-    // zIndex: 10,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
+  contentWrapper: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    width: "100%",
+    zIndex: 1,
+    minHeight: "100%",
+  },
+  contentWithPadding: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 20 + sb.currentHeight,
+  },
+
+  // ===== Top / Back Section =====
   top_portion1: {
     height: 10 + sb.currentHeight,
     width: "100%",
-    // backgroundColor: "red",
   },
   top_portion: {
     height: 40,
     width: "100%",
-    // backgroundColor: "red",
   },
   back_section: {
     height: 55,
@@ -61,7 +113,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    // backgroundColor: "red",
     zIndex: 10,
   },
   bs_1: {
@@ -77,7 +128,6 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "red",
   },
   bs_3: {
     height: "100%",
@@ -90,110 +140,57 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    ...baseCircle,
   },
   bs_1_stroke_circle: {
     height: "100%",
     width: "100%",
-    borderRadius: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    ...baseCircle,
   },
   bs_1_circle_circle: {
     height: "94%",
     width: "94%",
     backgroundColor: "rgba(51, 80, 148, 1)",
-    borderRadius: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    ...baseCircle,
   },
   bs_2_cue: {
     textAlign: "center",
     fontSize: 14,
     color: "white",
-    fontWeight: 400,
+    fontWeight: "400",
     letterSpacing: 0.7,
     fontFamily: "Poppins-Regular",
   },
+
+  // ===== Agreement Sections =====
   main_agreement_section: {
     height: 50,
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 10,
-    marginBottom: 20,
+    ...baseAgreementSection,
   },
   main_agreement_section_content: {
-    height: "fit-content",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-    position: "relative",
-    overflow: "visible",
+    ...baseAgreementSection,
     minHeight: 150,
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   main_agreement_section_content_title: {
-    height: "fit-content",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: 10,
-    marginBottom: 20,
-    position: "relative",
-    overflow: "visible",
+    ...baseAgreementSection,
     minHeight: 80,
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-  },
-  add_btn: {
-    height: 50,
-    // paddingLeft: 20,
-    // paddright: 20,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.2)",
-    zIndex: 100,
-    width: "fit-content",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingLeft: 10,
-    paddingRight: 10,
   },
   mas_inner: {
     height: "100%",
-    // width: "100%",
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: "rgba(255, 255, 255, 0.2)",
-    overflow: "visible",
   },
   mas_input: {
-    height: "fit-content",
+    ...baseInput,
     minHeight: 150,
-    width: "100%",
-    padding: 10,
-    verticalAlign: "top",
-    color: "white",
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
   },
   mas_input_title: {
-    height: "fit-content",
+    ...baseInput,
     minHeight: 80,
-    width: "100%",
-    padding: 10,
-    verticalAlign: "top",
-    color: "white",
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
   },
+
+  // ===== Buttons =====
   input_whole_section_btn: {
     height: 60,
     width: "100%",
@@ -211,7 +208,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: "#ffffff17",
     flexDirection: "row",
-    overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -220,11 +216,21 @@ const styles = StyleSheet.create({
     color: "#0F1C4E",
     fontFamily: "Poppins-Regular",
   },
+  add_btn: {
+    height: 50,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    width: "auto",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
   add_btn_view: {
     marginTop: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-    width: "fit-content",
+    paddingHorizontal: 20,
+    width: "auto",
     display: "flex",
     flexDirection: "row",
     gap: 10,
@@ -248,6 +254,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 100,
   },
+
+  // ===== Toolbar / Text =====
   rich_toolbar: {
     bottom: 0,
     width: "107%",
@@ -256,22 +264,9 @@ const styles = StyleSheet.create({
     color: "white",
   },
   label: {
-    fontSize: 12,
-    color: "white",
+    ...baseLabel,
     paddingLeft: 25,
     paddingBottom: 5,
-  },
-  empty_space: {
-    height: 300,
-    width: "100%",
-    backgroundColor: "transparent",
-  },
-  main_recommend_section: {
-    width: "100%",
-    height: "fit-content",
-    paddingLeft: 18,
-    paddingRight: 18,
-    marginTop: 20,
   },
   sample_text: {
     color: "white",
@@ -282,12 +277,26 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontSize: 14,
   },
+  add_btn_label: {
+    ...baseLabel,
+  },
+
+  // ===== Helpers / Spacers =====
+  empty_space: {
+    height: 300,
+    width: "100%",
+    backgroundColor: "transparent",
+  },
+  main_recommend_section: {
+    width: "100%",
+    paddingHorizontal: 18,
+    marginTop: 20,
+  },
   space: {
     height: 15,
     width: "100%",
   },
   welcome_view: {
-    // height: "fit-content",
     width: "100%",
     display: "flex",
     justifyContent: "center",
@@ -304,4 +313,5 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 });
+
 export default styles;

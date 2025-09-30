@@ -152,11 +152,8 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // marginBottom: 10,
-    marginTop: 40,
+    marginTop: 40, // 🔹 adds spacing from editor/counter
     zIndex: 10,
-    // position: "absolute",
-    // bottom: 20,
   },
   input_inner_section_btn: {
     height: "100%",

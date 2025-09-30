@@ -90,7 +90,7 @@ export default function CoachProfileReviewConfirmDetails({
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title={"cue"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -182,13 +182,13 @@ export default function CoachProfileReviewConfirmDetails({
             </Text>
           </View>
         </LinearGradient>
-      </ScreenLayout>
 
-      {/* Submit button */}
-      <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
-        onPress={handleSave}
-      />
+        {/* Submit button */}
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
+          onPress={handleSave}
+        />
+      </ScreenLayout>
     </>
   );
 }

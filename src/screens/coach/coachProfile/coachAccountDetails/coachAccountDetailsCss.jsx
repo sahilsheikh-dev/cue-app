@@ -316,7 +316,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontFamily: "Poppins-Regular",
-    marginTop: 300,
+  },
+  noHistoryContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 export default styles;

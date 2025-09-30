@@ -179,7 +179,7 @@ export default function OtpVerification({ navigation, route }) {
   return (
     <>
       <ScreenLayout scrollable withPadding>
-        <Header title={"CUE"} />
+        <Header title={"cue"} />
 
         {/* Title + description */}
         <View style={styles.welcome_view}>
@@ -208,24 +208,24 @@ export default function OtpVerification({ navigation, route }) {
             </View>
           ))}
         </View>
+
+        {/* Resend OTP */}
+        <ButtonLink
+          text={"Didn't Receive Anything?"}
+          highlightText={
+            resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"
+          }
+          center
+          disabled={resendCooldown > 0}
+          onPress={handleResend}
+        />
+
+        {/* Verify Button */}
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Verify"}
+          onPress={handleVerify}
+        />
       </ScreenLayout>
-
-      {/* Resend OTP */}
-      <ButtonLink
-        text={"Didn't Receive Anything?"}
-        highlightText={
-          resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"
-        }
-        center
-        disabled={resendCooldown > 0}
-        onPress={handleResend}
-      />
-
-      {/* Verify Button */}
-      <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Verify"}
-        onPress={handleVerify}
-      />
     </>
   );
 }

@@ -1,9 +1,16 @@
 import React, { useState, useRef } from "react";
-import { Text, View, TouchableOpacity, ScrollView } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 import styles from "./treeSelectDropdownCss";
+import Button from "../button/button";
 
 const TreeSelectDropdown = ({
   label,
@@ -11,11 +18,11 @@ const TreeSelectDropdown = ({
   data,
   selected = [],
   onChange,
-  disabled = false, // ✅ NEW
+  disabled = false,
 }) => {
   const sheetRef = useRef();
   const [currentOptions, setCurrentOptions] = useState(data);
-  const [path, setPath] = useState([]); // store keys instead of objects
+  const [path, setPath] = useState([]);
 
   const toggleSelect = (title) => {
     if (selected.includes(title)) {
@@ -26,7 +33,7 @@ const TreeSelectDropdown = ({
   };
 
   const handleGoDeeper = (key, option) => {
-    setPath((prev) => [...prev, key]); // push key
+    setPath((prev) => [...prev, key]);
     setCurrentOptions(option.sub);
   };
 
@@ -47,8 +54,8 @@ const TreeSelectDropdown = ({
     <>
       {/* Trigger */}
       <TouchableOpacity
-        style={[styles.triggerWrapper, disabled && { opacity: 0.6 }]} // ✅ dimmed if disabled
-        onPress={() => !disabled && sheetRef.current.open()} // ✅ block open
+        style={[styles.triggerWrapper, disabled && { opacity: 0.6 }]}
+        onPress={() => !disabled && sheetRef.current.open()}
         disabled={disabled}
       >
         <LinearGradient
@@ -63,7 +70,7 @@ const TreeSelectDropdown = ({
       </TouchableOpacity>
 
       {/* Bottom Sheet */}
-      <RBSheet ref={sheetRef} height={450}>
+      <RBSheet ref={sheetRef} height={500}>
         <LinearGradient
           style={{ flex: 1, padding: 16 }}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
@@ -77,7 +84,7 @@ const TreeSelectDropdown = ({
                 alignItems: "center",
               }}
               onPress={handleBack}
-              disabled={disabled} // ✅ disable back button too
+              disabled={disabled}
             >
               <Ionicons name="arrow-back" size={20} color="orange" />
               <Text style={{ color: "orange", marginLeft: 8 }}>Back</Text>
@@ -106,7 +113,7 @@ const TreeSelectDropdown = ({
                       flexDirection: "row",
                       alignItems: "center",
                       flex: 1,
-                      opacity: disabled ? 0.6 : 1, // ✅ dim text if disabled
+                      opacity: disabled ? 0.6 : 1,
                     }}
                     onPress={() => !disabled && toggleSelect(option.title)}
                     disabled={disabled}
@@ -139,6 +146,9 @@ const TreeSelectDropdown = ({
               );
             })}
           </ScrollView>
+
+          {/* ✅ Close / Done Button */}
+          <Button text={"Done"} onPress={() => sheetRef.current.close()} />
         </LinearGradient>
       </RBSheet>
 

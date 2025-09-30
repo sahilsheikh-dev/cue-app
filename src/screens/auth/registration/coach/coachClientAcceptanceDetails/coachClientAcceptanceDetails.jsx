@@ -135,10 +135,10 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title="CUE"
+          title="cue"
           showBack={!isEdit} // 🔹 hide back in edit mode
           onBackPress={() => navigation.goBack()}
-          rightIcon={isEdit ? "checkmark-done-outline" : "create-outline"}
+          rightIcon={isEdit ? "eye-outline" : "create-outline"}
           onRightPress={() => {
             if (isEdit) {
               if (validateFields()) setIsEdit(false);
@@ -191,15 +191,15 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
             disabled={!isEdit}
           />
         </View>
-      </ScreenLayout>
 
-      {/* ✅ Show Next only in preview mode */}
-      {!isEdit && (
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
-          onPress={handleNext}
-        />
-      )}
+        {/* ✅ Show Next only in preview mode */}
+        {!isEdit && (
+          <Button
+            text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+            onPress={handleNext}
+          />
+        )}
+      </ScreenLayout>
     </>
   );
 }

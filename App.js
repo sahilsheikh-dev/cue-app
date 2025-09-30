@@ -170,8 +170,7 @@ export default function App() {
               <Splash />
             ) : (
               <RootNavigator
-                // key={data.role || "auth"} // 👈 force re-mount when role changes after login
-                key={`${data.role || "auth"}_${data.auth ? "auth" : "noauth"}`}
+                key={data.role || "auth"} // 👈 force re-mount when role changes after login
               />
             )}
           </NavigationContainer>

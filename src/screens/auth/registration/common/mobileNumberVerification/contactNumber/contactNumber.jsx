@@ -65,7 +65,7 @@ export default function ContactNumber({ route, navigation }) {
     },
     {
       id: "ae",
-      name: "United Arab Emirates (Dubai)",
+      name: "United Arab Emirates",
       code: "+971",
       number_of_digit: "9",
       img: "https://flagcdn.com/w20/ae.png",
@@ -152,7 +152,7 @@ export default function ContactNumber({ route, navigation }) {
   return (
     <>
       <ScreenLayout scrollable withPadding>
-        <Header title={"CUE"} />
+        <Header title={"cue"} />
 
         {/* title + description */}
         <View style={styles.welcome_view}>
@@ -210,13 +210,12 @@ export default function ContactNumber({ route, navigation }) {
             </View>
           </LinearGradient>
         </View>
+        <Button
+          text={loading ? <ActivityIndicator color="#fff" /> : "Continue"}
+          onPress={handleContinue}
+          disabled={loading}
+        />
       </ScreenLayout>
-
-      <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Continue"}
-        onPress={handleContinue}
-        disabled={loading}
-      />
     </>
   );
 }

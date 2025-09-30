@@ -1,594 +1,408 @@
-// coachVirtualPricingDetails.jsx
 import React, { useState } from "react";
 import {
   Text,
   View,
-  SafeAreaView,
-  Image,
-  ScrollView,
-  TextInput,
   TouchableOpacity,
-  ActivityIndicator,
+  TextInput,
+  Platform,
 } from "react-native";
-import styles from "./coachVirtualPricingDetailsCss";
-import { StatusBar } from "expo-status-bar";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-
-const background = require("../../../../../../assets/images/background.png");
+import DateTimePicker from "@react-native-community/datetimepicker";
+import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
+import Header from "../../../../../components/common/header/header";
+import Button from "../../../../../components/common/button/button";
 
 export default function CoachVirtualPricingDetails({ navigation }) {
-  // Hardcoded demo data with discounts arrays so rows can be rendered dynamically
-  const demo = {
-    levels: ["Beginner", "Intermediate", "Advanced"],
-    trial: {
-      private: {
-        baseTime: "60 mins",
-        basePrice: 100, // numeric for calculation
-        discounts: [{ idx: "1", pct: 10 }], // pct as number
-        dateLabel: "January 2024",
-        timeLabel: "9:00 AM - 10:00 AM",
-      },
-      group: {
-        baseTime: "60 mins",
-        basePrice: 100,
-        discounts: [{ idx: "1", pct: 10 }],
-        dateLabel: "January 2024",
-        timeLabel: "9:00 AM - 10:00 AM",
-      },
-    },
-    packages: [
-      {
-        title: "Introductory Package",
-        private: {
-          baseTime: "60 mins",
-          basePrice: 100,
-          discounts: [
-            { idx: "1", pct: 10 },
-            { idx: "2", pct: 20 },
-            { idx: "3", pct: 30 },
-          ],
-          dateLabel: "January 2024",
-          timeLabel: "9:00 AM - 10:00 AM",
-        },
-        group: {
-          baseTime: "60 mins",
-          basePrice: 100,
-          discounts: [
-            { idx: "1", pct: 10 },
-            { idx: "2", pct: 20 },
-            { idx: "3", pct: 30 },
-          ],
-          dateLabel: "January 2024",
-          timeLabel: "9:00 AM - 10:00 AM",
-        },
-      },
-      {
-        title: "Main Package",
-        private: {
-          baseTime: "60 mins",
-          basePrice: 100,
-          discounts: [
-            { idx: "1", pct: 10 },
-            { idx: "2", pct: 20 },
-            { idx: "3", pct: 30 },
-            { idx: "4", pct: 40 },
-          ],
-          dateLabel: "January 2024",
-          timeLabel: "9:00 AM - 10:00 AM",
-        },
-        group: {
-          baseTime: "60 mins",
-          basePrice: 100,
-          discounts: [
-            { idx: "1", pct: 10 },
-            { idx: "2", pct: 20 },
-            { idx: "3", pct: 30 },
-            { idx: "4", pct: 40 },
-          ],
-          dateLabel: "January 2024",
-          timeLabel: "9:00 AM - 10:00 AM",
-        },
-      },
-    ],
-  };
+  // Levels
+  const client_accepted_levels = ["Beginner", "Intermediate", "Advanced"];
+  const [selectedLevels, setSelectedLevels] = useState([]);
 
-  // Use local state so inputs cycle & edit in demo
-  const [values, setValues] = useState(demo);
-  const [loading, setLoading] = useState(false);
+  // Sessions
+  const [sessions, setSessions] = useState({
+    private: [{ duration: "30 mins", price: "" }],
+    group: [{ duration: "30 mins", price: "" }],
+  });
 
-  // helper to update nested value (path is array of keys/indices)
-  const updateField = (path, newVal) => {
-    setValues((prev) => {
-      const next = JSON.parse(JSON.stringify(prev));
-      let cursor = next;
-      for (let i = 0; i < path.length - 1; i++) {
-        cursor = cursor[path[i]];
-      }
-      cursor[path[path.length - 1]] = newVal;
-      return next;
-    });
-  };
+  // Discounts
+  const [discounts, setDiscounts] = useState([
+    { min: "3", max: "5", pct: "20" },
+    { min: "6", max: "10", pct: "30" },
+    { min: "11", max: "", pct: "50" },
+  ]);
 
-  // cycle helper for small dropdown-like values (works on web & mobile)
-  const cycleValue = (current, options) => {
-    const idx = options.indexOf(current);
-    if (idx === -1 || idx === options.length - 1) return options[0];
-    return options[idx + 1];
-  };
+  // Availability
+  const [availability, setAvailability] = useState([
+    { day: "Mon", start: null, end: null, active: false },
+    { day: "Tue", start: null, end: null, active: false },
+    { day: "Wed", start: null, end: null, active: false },
+    { day: "Thu", start: null, end: null, active: false },
+    { day: "Fri", start: null, end: null, active: false },
+    { day: "Sat", start: null, end: null, active: false },
+    { day: "Sun", start: null, end: null, active: false },
+  ]);
+  const [picker, setPicker] = useState({ show: false, idx: null, type: null });
 
-  // toggle baseTime (cycles a few durations)
-  const cycleBaseTime = (path) => {
-    const opts = ["30 mins", "45 mins", "60 mins", "90 mins"];
-    const cur = path.reduce((acc, key) => acc[key], values);
-    updateField(path, cycleValue(cur, opts));
-  };
+  // Mode: edit or preview
+  const [isEdit, setIsEdit] = useState(true);
 
-  // cycle discount percent for a particular discount entry
-  const cycleDiscountPct = (pkgIdx, section, discIdx) => {
-    // options as numbers for calculation
-    const opts = [10, 20, 30, 40];
-    setValues((prev) => {
-      const next = JSON.parse(JSON.stringify(prev));
-      next.packages[pkgIdx][section].discounts[discIdx].pct = cycleValue(
-        next.packages[pkgIdx][section].discounts[discIdx].pct,
-        opts
-      );
-      return next;
-    });
-  };
-
-  // cycle for trial/group (non-package)
-  const cycleDiscountPctTrial = (section, discIdx) => {
-    const opts = [10, 20, 30, 40];
-    setValues((prev) => {
-      const next = JSON.parse(JSON.stringify(prev));
-      next.trial[section].discounts[discIdx].pct = cycleValue(
-        next.trial[section].discounts[discIdx].pct,
-        opts
-      );
-      return next;
-    });
-  };
-
-  // change base price (editable numeric via simple + / - taps could be implemented,
-  // here we provide a quick inline edit by tapping: cycle some sample prices)
-  const cyclePrice = (path) => {
-    const opts = [50, 75, 100, 150];
-    const cur = path.reduce((acc, key) => acc[key], values);
-    updateField(path, cycleValue(cur, opts));
-  };
-
-  // Add discount row (used in Main Package to mimic "Add" button)
-  const addDiscountRow = (pkgIdx, section) => {
-    setValues((prev) => {
-      const next = JSON.parse(JSON.stringify(prev));
-      const arr = next.packages[pkgIdx][section].discounts;
-      const newIdx = (arr.length + 1).toString();
-      arr.push({ idx: newIdx, pct: 10 });
-      return next;
-    });
-  };
-
-  // compute amount from basePrice & pct
-  const computeAmount = (price, pct) => {
-    const amt = Math.round(price * (1 - pct / 100));
-    return `${amt} AED`;
-  };
-
-  const onConfirm = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate("Coach-add-picture");
-    }, 700);
-  };
-
-  // Small render helper for discount rows (keeps existing class usage)
-  const renderDiscountRow = (leftIdx, pct, amount, onCyclePress) => {
-    return (
-      <View style={styles.discount_row_container}>
-        {/* left small index indicator (keeps markup but uses Text) */}
-        <View style={styles.discount_left}>
-          <Text style={styles.oval_text}>{leftIdx}</Text>
-        </View>
-
-        {/* pct dropdown mimic */}
-        <TouchableOpacity
-          onPress={onCyclePress}
-          style={styles.discount_pct_wrap}
-        >
-          <Text style={styles.oval_text}>{pct}%</Text>
-          <Ionicons name="chevron-down" size={14} color="#fff" />
-        </TouchableOpacity>
-
-        {/* amount (readonly computed) */}
-        <Text style={styles.amount_text}>{amount}</Text>
-      </View>
+  // Toggle level
+  const toggleLevel = (lvl) => {
+    if (!isEdit) return;
+    setSelectedLevels((prev) =>
+      prev.includes(lvl) ? prev.filter((l) => l !== lvl) : [...prev, lvl]
     );
   };
 
-  return (
-    <SafeAreaView style={styles.sav}>
-      <StatusBar style="light" />
-      <Image source={background} style={styles.backgroundImage} />
-      <LinearGradient
-        colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={styles.backgroundView}
-      />
-      <View style={styles.top_portion1} />
+  // Session update
+  const updateTimeslot = (type, idx, field, value) => {
+    if (!isEdit) return;
+    setSessions((prev) => {
+      const updated = [...prev[type]];
+      updated[idx][field] = value;
+      return { ...prev, [type]: updated };
+    });
+  };
+  const addTimeslot = (type) => {
+    if (!isEdit) return;
+    setSessions((prev) => ({
+      ...prev,
+      [type]: [...prev[type], { duration: "60 mins", price: "" }],
+    }));
+  };
 
-      {/* Header */}
-      <View style={styles.back_section}>
-        <View style={styles.bs_1}>
+  // Discount update
+  const updateDiscount = (idx, field, value) => {
+    if (!isEdit) return;
+    const updated = [...discounts];
+    updated[idx][field] = value;
+    setDiscounts(updated);
+  };
+  const addDiscountRow = () => {
+    if (!isEdit) return;
+    setDiscounts((prev) => [...prev, { min: "", max: "", pct: "" }]);
+  };
+
+  // Availability toggle
+  const toggleDay = (idx) => {
+    if (!isEdit) return;
+    setAvailability((prev) => {
+      const updated = [...prev];
+      updated[idx].active = !updated[idx].active;
+      return updated;
+    });
+  };
+
+  const openPicker = (idx, type) => {
+    if (!isEdit) return;
+    setPicker({ show: true, idx, type });
+  };
+
+  const onTimePicked = (event, date) => {
+    if (!picker.show) return;
+    const { idx, type } = picker;
+    setPicker({ show: false, idx: null, type: null });
+    if (event.type === "dismissed" || !date) return;
+    const time = date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    setAvailability((prev) => {
+      const updated = [...prev];
+      updated[idx][type] = time;
+      return updated;
+    });
+  };
+
+  const onSave = () => {
+    const payload = { selectedLevels, sessions, discounts, availability };
+    navigation.navigate("CoachInPersonPricingDetails", { data: payload });
+  };
+
+  return (
+    <ScreenLayout scrollable withPadding>
+      <Header
+        title="Virtual Pricing"
+        showBack={!isEdit}
+        onBackPress={() => navigation.goBack()}
+        rightIcon={isEdit ? "eye-outline" : "create-outline"}
+        onRightPress={() => setIsEdit((prev) => !prev)}
+      />
+
+      {/* Levels */}
+      <Text style={{ color: "#fff", fontSize: 16, marginBottom: 10 }}>
+        Client Accepted Levels
+      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 10,
+          opacity: !isEdit ? 0.6 : 1,
+        }}
+      >
+        {client_accepted_levels.map((lvl) => (
           <TouchableOpacity
-            style={styles.bs_1_circle}
-            onPress={() => {
-              navigation.goBack();
+            key={lvl}
+            disabled={!isEdit}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: "#ffffff40",
+              backgroundColor: selectedLevels.includes(lvl)
+                ? "rgba(255,255,255,0.2)"
+                : "transparent",
+            }}
+            onPress={() => toggleLevel(lvl)}
+          >
+            <Text style={{ color: "#fff" }}>{lvl}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Sessions & Pricing */}
+      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
+        Sessions & Pricing
+      </Text>
+      {["private", "group"].map((type) => (
+        <View
+          key={type}
+          style={{
+            backgroundColor: "rgba(255,255,255,0.05)",
+            padding: 12,
+            borderRadius: 12,
+            marginBottom: 15,
+            opacity: !isEdit ? 0.6 : 1,
+          }}
+        >
+          <Text style={{ color: "#fff", fontSize: 15, marginBottom: 10 }}>
+            {type === "private" ? "Private Sessions" : "Group Sessions"}
+          </Text>
+          {sessions[type].map((s, idx) => (
+            <View
+              key={idx}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 8,
+              }}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: 8,
+                  color: "#fff",
+                }}
+                editable={isEdit}
+                placeholder="Duration (e.g. 30 mins)"
+                placeholderTextColor="#aaa"
+                value={s.duration}
+                onChangeText={(val) =>
+                  updateTimeslot(type, idx, "duration", val)
+                }
+              />
+              <TextInput
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: 8,
+                  color: "#fff",
+                }}
+                editable={isEdit}
+                placeholder="Price (USD)"
+                placeholderTextColor="#aaa"
+                keyboardType="numeric"
+                value={s.price}
+                onChangeText={(val) => updateTimeslot(type, idx, "price", val)}
+              />
+            </View>
+          ))}
+          {isEdit && (
+            <TouchableOpacity onPress={() => addTimeslot(type)}>
+              <Text style={{ color: "#4da6ff" }}>+ Add Timeslot</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ))}
+
+      {/* Discounts */}
+      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
+        Bulk Booking Discounts
+      </Text>
+      <View
+        style={{
+          backgroundColor: "rgba(255,255,255,0.05)",
+          borderRadius: 12,
+          padding: 12,
+          opacity: !isEdit ? 0.6 : 1,
+        }}
+      >
+        {discounts.map((d, idx) => (
+          <View
+            key={idx}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 10,
             }}
           >
-            <LinearGradient
-              style={styles.bs_1_stroke_circle}
-              colors={["rgba(255, 255, 255, 0.2)", "rgba(43, 64, 111, 0)"]}
-            >
-              <View style={styles.bs_1_circle_circle}>
-                <Ionicons name="chevron-back" size={20} color="#fff" />
-              </View>
-            </LinearGradient>
+            <TextInput
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255,255,255,0.1)",
+                borderRadius: 8,
+                padding: 8,
+                color: "#fff",
+              }}
+              editable={isEdit}
+              placeholder="Min"
+              placeholderTextColor="#aaa"
+              value={d.min}
+              keyboardType="numeric"
+              onChangeText={(val) => updateDiscount(idx, "min", val)}
+            />
+            <Text style={{ color: "#fff" }}>to</Text>
+            <TextInput
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255,255,255,0.1)",
+                borderRadius: 8,
+                padding: 8,
+                color: "#fff",
+              }}
+              editable={isEdit}
+              placeholder="Max"
+              placeholderTextColor="#aaa"
+              value={d.max}
+              keyboardType="numeric"
+              onChangeText={(val) => updateDiscount(idx, "max", val)}
+            />
+            <TextInput
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255,255,255,0.1)",
+                borderRadius: 8,
+                padding: 8,
+                color: "#fff",
+              }}
+              editable={isEdit}
+              placeholder="% Off"
+              placeholderTextColor="#aaa"
+              value={d.pct}
+              keyboardType="numeric"
+              onChangeText={(val) => updateDiscount(idx, "pct", val)}
+            />
+          </View>
+        ))}
+        {isEdit && (
+          <TouchableOpacity onPress={addDiscountRow}>
+            <Text style={{ color: "#4da6ff" }}>+ Add Discount</Text>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.bs_2}>
-          <Text style={styles.bs_2_cue} numberOfLines={1}>
-            Virtual Pricing
-          </Text>
-        </View>
-        <View style={styles.bs_3} />
+        )}
       </View>
 
-      {/* Level Pills */}
-      <View style={styles.bia_section}>
-        {values.levels.map((lvl) => (
-          <View key={lvl} style={styles.bia_section_indi}>
-            <Text style={styles.bia_text}>{lvl}</Text>
-          </View>
-        ))}
-      </View>
-
-      <ScrollView
-        style={styles.main_scroll_view}
-        contentContainerStyle={{ paddingBottom: 40 }}
-      >
-        {/* Trial Session */}
-        <LinearGradient
-          style={styles.yourstory_input_section}
-          colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+      {/* Availability */}
+      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
+        Weekly Availability
+      </Text>
+      {availability.map((d, idx) => (
+        <View
+          key={idx}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+            backgroundColor: "rgba(255,255,255,0.05)",
+            borderRadius: 8,
+            padding: 8,
+            opacity: !isEdit ? 0.6 : 1,
+          }}
         >
-          <Text style={styles.ts_text}>Trial Session</Text>
-
-          {/* Private */}
-          <Text style={styles.pg_text}>Private</Text>
-          <View style={styles.pg_section}>
-            <View style={styles.pg_s_top}>
-              <View style={styles.btp_section}>
-                <Text style={styles.btp_text}>Base Time & Price</Text>
-
-                {/* baseTime as tappable cycle */}
-                <TouchableOpacity
-                  style={styles.oval}
-                  onPress={() =>
-                    cycleBaseTime(["trial", "private", "baseTime"])
-                  }
-                >
-                  <Text style={styles.oval_text}>
-                    {values.trial.private.baseTime}
-                  </Text>
-                  <Ionicons name="chevron-down" size={14} color="#fff" />
-                </TouchableOpacity>
-
-                {/* basePrice as tappable cycle (shows with AED) */}
-                <TouchableOpacity
-                  style={styles.oval}
-                  onPress={() => cyclePrice(["trial", "private", "basePrice"])}
-                >
-                  <Text style={styles.oval_text}>
-                    {values.trial.private.basePrice} | AED
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.discount_section}>
-                <Text style={styles.btp_text}>Discount</Text>
-
-                {values.trial.private.discounts.map((d, i) =>
-                  renderDiscountRow(
-                    d.idx,
-                    d.pct,
-                    computeAmount(values.trial.private.basePrice, d.pct),
-                    () => cycleDiscountPctTrial("private", i)
-                  )
-                )}
-              </View>
-            </View>
-
-            <View style={styles.line} />
-
-            <View style={styles.pg_s_bottom}>
-              <Text style={styles.sa_text}>Set Availability</Text>
-              <View style={styles.dt_whole_section}>
-                <View style={styles.date_time_section_d}>
-                  <Ionicons name="calendar-outline" size={16} color="#fff" />
-                  <Text style={styles.dt_text}>
-                    {values.trial.private.dateLabel}
-                  </Text>
-                </View>
-
-                <View style={styles.date_time_section_t}>
-                  <Ionicons name="time-outline" size={16} color="#fff" />
-                  <Text style={styles.dt_text}>
-                    {values.trial.private.timeLabel}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Group: Trial */}
-          <Text style={styles.pg_text}>Group</Text>
-          <View style={styles.pg_section}>
-            <View style={styles.pg_s_top}>
-              <View style={styles.btp_section}>
-                <Text style={styles.btp_text}>Base Time & Price</Text>
-                <TouchableOpacity
-                  style={styles.oval}
-                  onPress={() => cycleBaseTime(["trial", "group", "baseTime"])}
-                >
-                  <Text style={styles.oval_text}>
-                    {values.trial.group.baseTime}
-                  </Text>
-                  <Ionicons name="chevron-down" size={14} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.oval}
-                  onPress={() => cyclePrice(["trial", "group", "basePrice"])}
-                >
-                  <Text style={styles.oval_text}>
-                    {values.trial.group.basePrice} | AED
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.discount_section}>
-                <Text style={styles.btp_text}>Discount</Text>
-
-                {values.trial.group.discounts.map((d, i) =>
-                  renderDiscountRow(
-                    d.idx,
-                    d.pct,
-                    computeAmount(values.trial.group.basePrice, d.pct),
-                    () => cycleDiscountPctTrial("group", i)
-                  )
-                )}
-              </View>
-            </View>
-
-            <View style={styles.line} />
-
-            <View style={styles.pg_s_bottom}>
-              <Text style={styles.sa_text}>Set Availability</Text>
-              <View style={styles.dt_whole_section}>
-                <View style={styles.date_time_section_d}>
-                  <Ionicons name="calendar-outline" size={16} color="#fff" />
-                  <Text style={styles.dt_text}>
-                    {values.trial.group.dateLabel}
-                  </Text>
-                </View>
-
-                <View style={styles.date_time_section_t}>
-                  <Ionicons name="time-outline" size={16} color="#fff" />
-                  <Text style={styles.dt_text}>
-                    {values.trial.group.timeLabel}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </LinearGradient>
-
-        {/* packages */}
-        {values.packages.map((pkg, pkgIdx) => (
-          <LinearGradient
-            key={pkg.title + pkgIdx}
-            style={styles.yourstory_input_section}
-            colors={["rgba(255, 255, 255, 0.1)", "rgba(30, 53, 126, 0)"]}
+          {/* Radio Button */}
+          <TouchableOpacity
+            disabled={!isEdit}
+            style={{
+              height: 24,
+              width: 24,
+              borderRadius: 12,
+              borderWidth: 2,
+              borderColor: "#fff",
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 10,
+            }}
+            onPress={() => toggleDay(idx)}
           >
-            <Text style={styles.ts_text}>{pkg.title}</Text>
-
-            {/* PRIVATE */}
-            <Text style={styles.pg_text}>Private</Text>
-            <View style={styles.pg_section}>
-              <View style={styles.pg_s_top}>
-                <View style={styles.btp_section}>
-                  <Text style={styles.btp_text}>Base Time & Price</Text>
-                  <TouchableOpacity
-                    style={styles.oval}
-                    onPress={() =>
-                      cycleBaseTime(["packages", pkgIdx, "private", "baseTime"])
-                    }
-                  >
-                    <Text style={styles.oval_text}>{pkg.private.baseTime}</Text>
-                    <Ionicons name="chevron-down" size={14} color="#fff" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.oval}
-                    onPress={() =>
-                      cyclePrice(["packages", pkgIdx, "private", "basePrice"])
-                    }
-                  >
-                    <Text style={styles.oval_text}>
-                      {pkg.private.basePrice} | AED
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.discount_section}>
-                  <Text style={styles.btp_text}>Discount</Text>
-
-                  {pkg.private.discounts.map((d, i) =>
-                    renderDiscountRow(
-                      d.idx,
-                      d.pct,
-                      computeAmount(pkg.private.basePrice, d.pct),
-                      () => {
-                        // cycle pct for packages
-                        setValues((prev) => {
-                          const next = JSON.parse(JSON.stringify(prev));
-                          next.packages[pkgIdx].private.discounts[i].pct =
-                            cycleValue(
-                              next.packages[pkgIdx].private.discounts[i].pct,
-                              [10, 20, 30, 40]
-                            );
-                          return next;
-                        });
-                      }
-                    )
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.line} />
-
-              <View style={styles.pg_s_bottom}>
-                <Text style={styles.sa_text}>Set Availability</Text>
-                <View style={styles.dt_whole_section}>
-                  <View style={styles.date_time_section_d}>
-                    <Ionicons name="calendar-outline" size={16} color="#fff" />
-                    <Text style={styles.dt_text}>{pkg.private.dateLabel}</Text>
-                  </View>
-
-                  <View style={styles.date_time_section_t}>
-                    <Ionicons name="time-outline" size={16} color="#fff" />
-                    <Text style={styles.dt_text}>{pkg.private.timeLabel}</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* GROUP */}
-            <Text style={styles.pg_text}>Group</Text>
-            <View style={styles.pg_section}>
-              <View style={styles.pg_s_top}>
-                <View style={styles.btp_section}>
-                  <Text style={styles.btp_text}>Base Time & Price</Text>
-                  <TouchableOpacity
-                    style={styles.oval}
-                    onPress={() =>
-                      cycleBaseTime(["packages", pkgIdx, "group", "baseTime"])
-                    }
-                  >
-                    <Text style={styles.oval_text}>{pkg.group.baseTime}</Text>
-                    <Ionicons name="chevron-down" size={14} color="#fff" />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.oval}
-                    onPress={() =>
-                      cyclePrice(["packages", pkgIdx, "group", "basePrice"])
-                    }
-                  >
-                    <Text style={styles.oval_text}>
-                      {pkg.group.basePrice} | AED
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.discount_section}>
-                  <Text style={styles.btp_text}>Discount</Text>
-
-                  {pkg.group.discounts.map((d, i) =>
-                    renderDiscountRow(
-                      d.idx,
-                      d.pct,
-                      computeAmount(pkg.group.basePrice, d.pct),
-                      () => {
-                        setValues((prev) => {
-                          const next = JSON.parse(JSON.stringify(prev));
-                          next.packages[pkgIdx].group.discounts[i].pct =
-                            cycleValue(
-                              next.packages[pkgIdx].group.discounts[i].pct,
-                              [10, 20, 30, 40]
-                            );
-                          return next;
-                        });
-                      }
-                    )
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.line} />
-
-              <View style={styles.pg_s_bottom}>
-                <Text style={styles.sa_text}>Set Availability</Text>
-                <View style={styles.dt_whole_section}>
-                  <View style={styles.date_time_section_d}>
-                    <Ionicons name="calendar-outline" size={16} color="#fff" />
-                    <Text style={styles.dt_text}>{pkg.group.dateLabel}</Text>
-                  </View>
-
-                  <View style={styles.date_time_section_t}>
-                    <Ionicons name="time-outline" size={16} color="#fff" />
-                    <Text style={styles.dt_text}>{pkg.group.timeLabel}</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/* Add button only for Main Package (as design shows) */}
-            {pkg.title === "Main Package" && (
-              <TouchableOpacity
-                style={[styles.input_whole_section_btn, { marginTop: 12 }]}
-                onPress={() => {
-                  // Add discount to both private and group for demo
-                  addDiscountRow(pkgIdx, "private");
+            {d.active && (
+              <View
+                style={{
+                  height: 12,
+                  width: 12,
+                  borderRadius: 6,
+                  backgroundColor: "#4da6ff",
                 }}
-              >
-                <LinearGradient
-                  colors={["rgba(255,255,255,0.06)", "rgba(255,255,255,0.02)"]}
-                  style={[
-                    styles.input_inner_section_btn,
-                    { paddingVertical: 8 },
-                  ]}
-                >
-                  <Text style={styles.login_text}>Add</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              />
             )}
-          </LinearGradient>
-        ))}
+          </TouchableOpacity>
 
-        {/* Next/Confirm */}
-        <TouchableOpacity
-          style={styles.input_whole_section_btn}
-          // onPress={onConfirm}
+          {/* Day */}
+          <Text style={{ color: "#fff", flex: 1 }}>{d.day}</Text>
+
+          {/* Start & End Time */}
+          {d.active && (
+            <>
+              <TouchableOpacity
+                disabled={!isEdit}
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: 6,
+                  marginRight: 6,
+                }}
+                onPress={() => openPicker(idx, "start")}
+              >
+                <Text style={{ color: "#fff" }}>{d.start || "Start"}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={!isEdit}
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: 6,
+                }}
+                onPress={() => openPicker(idx, "end")}
+              >
+                <Text style={{ color: "#fff" }}>{d.end || "End"}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      ))}
+
+      {picker.show && (
+        <DateTimePicker
+          value={new Date()}
+          mode="time"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={onTimePicked}
+        />
+      )}
+
+      {/* ✅ Show Next button only in Preview mode */}
+      {!isEdit && (
+        <Button
+          text={"Next"}
           onPress={() => {
             navigation.navigate("CoachInPersonPricingDetails");
           }}
-        >
-          <LinearGradient
-            colors={["rgb(255, 255, 255)", "rgb(181, 195, 227)"]}
-            style={styles.input_inner_section_btn}
-          >
-            {loading ? (
-              <ActivityIndicator size={20} color={"rgba(30, 63, 142, 1)"} />
-            ) : (
-              <Text style={styles.login_text}>Next</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          style={{ marginTop: 20 }}
+        />
+      )}
+    </ScreenLayout>
   );
 }

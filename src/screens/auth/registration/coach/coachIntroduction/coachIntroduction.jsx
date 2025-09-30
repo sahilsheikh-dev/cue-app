@@ -8,7 +8,7 @@ export default function CoachIntroduction({ navigation }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title={"cue"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -27,18 +27,18 @@ export default function CoachIntroduction({ navigation }) {
             enjoy the journey with us and wish you all the very best !
           </Text>
         </View>
-      </ScreenLayout>
 
-      <Button
-        text={"Next"}
-        onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
-        // onPress={() => {
-        //   navigation.reset({
-        //     index: 0,
-        //     routes: [{ name: "CoachDashboard" }],
-        //   });
-        // }}
-      />
+        <Button
+          text={"Next"}
+          onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
+          // onPress={() => {
+          //   navigation.reset({
+          //     index: 0,
+          //     routes: [{ name: "CoachDashboard" }],
+          //   });
+          // }}
+        />
+      </ScreenLayout>
     </>
   );
 }

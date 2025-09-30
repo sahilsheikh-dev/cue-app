@@ -30,9 +30,7 @@ export default function CoachSessionHistory({ navigation }) {
 
         {!sessionHistoryData?.sessions ||
         sessionHistoryData.sessions.length === 0 ? (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
+          <View style={styles.noHistoryContainer}>
             <Text style={styles.nobill}>No Session History</Text>
           </View>
         ) : (

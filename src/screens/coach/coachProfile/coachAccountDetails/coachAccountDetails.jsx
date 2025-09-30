@@ -27,7 +27,7 @@ export default function CoachAccountDetails({ navigation }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title={"cue"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -67,9 +67,7 @@ export default function CoachAccountDetails({ navigation }) {
           Payment History
         </Text>
 
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.noHistoryContainer}>
           <Text style={styles.nobill}>No Payment History</Text>
         </View>
       </ScreenLayout>

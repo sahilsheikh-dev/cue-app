@@ -242,7 +242,7 @@ export default function CoachServicePictures({ navigation }) {
   return (
     <ScreenLayout scrollable withPadding>
       <Header
-        title={"CUE"}
+        title={"cue"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

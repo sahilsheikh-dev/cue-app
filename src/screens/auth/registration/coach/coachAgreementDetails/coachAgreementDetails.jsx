@@ -21,12 +21,13 @@ import {
 } from "react-native-pell-rich-editor";
 import RenderHtml from "react-native-render-html";
 import { useSaveAndRedirect } from "../../../../../hooks/useSaveAndRedirect";
+import { LinearGradient } from "expo-linear-gradient";
 
 const stripHtml = (html) => html.replace(/<[^>]*>?/gm, "");
 
 // Default agreement template
 const DEFAULT_TEMPLATE = `
-<h1 style="color:#FFF;">Welcome Note</h1>
+<b style="color:#FFF;">Welcome Note</b>
 <p style="color:#FFF;">
 Welcome to my coaching journey! By outlining my policies, I aim to provide clear expectations for our sessions. 
 This level of transparency not only creates a more seamless experience but also helps us avoid any potential misunderstandings. 
@@ -205,13 +206,16 @@ export default function CoachAgreementDetails({ navigation }) {
   };
 
   return (
-    <>
+    <LinearGradient
+      colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
+      style={{ flex: 1 }}
+    >
       <ScreenLayout scrollable withPadding>
         <Header
-          title="CUE"
+          title="cue"
           showBack={!isEdit} // hide back in edit mode
           onBackPress={() => navigation.goBack()}
-          rightIcon={isEdit ? "checkmark-done-outline" : "create-outline"}
+          rightIcon={isEdit ? "eye-outline" : "create-outline"}
           onRightPress={() => {
             if (isEdit) {
               const cleanHtml = sanitizeHtml(agreementTerm);
@@ -264,8 +268,8 @@ export default function CoachAgreementDetails({ navigation }) {
                 useContainer={true}
                 onChange={(html) => setAgreementTerm(html)}
                 editorStyle={{
-                  backgroundColor: "transparent", // ✅ transparent
-                  color: "#FFF", // ✅ force white
+                  backgroundColor: "transparent",
+                  color: "#FFF",
                   placeholderColor: "#aaa",
                   contentCSSText: `
                                     body {
@@ -273,13 +277,13 @@ export default function CoachAgreementDetails({ navigation }) {
                                       line-height: 1.6 !important;
                                       color: #FFF !important;
                                       background-color: transparent !important;
-                                      overflow-y: auto !important;   /* ✅ ensures scrolling */
+                                      overflow-y: auto !important;
                                       max-height: 100%;
                                     }
-                                    * { color: #FFF !important; }
-                                    body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul, ol, strong, b, i, u {
-                                      color: #FFF !important;   /* ✅ force everything white */
-                                      background-color: transparent !important; 
+                                    * { color: #FFF !important; background-color: transparent !important; }
+                                    body, div, p, span, li, ul, ol, strong, b, i, u, h1, h2, h3, h4, h5, h6 {
+                                      color: #FFF !important;
+                                      background-color: transparent !important;
                                     }
                                   `,
                 }}
@@ -293,37 +297,17 @@ export default function CoachAgreementDetails({ navigation }) {
                 contentWidth={width}
                 source={{ html: agreementTerm }}
                 tagsStyles={{
-                  h1: {
-                    fontSize: 24,
-                    fontWeight: "bold",
-                    marginBottom: 10,
-                    color: "#FFF",
-                  },
-                  h2: {
-                    fontSize: 20,
-                    fontWeight: "600",
-                    marginBottom: 8,
-                    color: "#FFF",
-                  },
-                  h3: {
-                    fontSize: 18,
-                    fontWeight: "500",
-                    marginBottom: 6,
-                    color: "#FFF",
-                  },
-                  p: {
-                    fontSize: 16,
-                    lineHeight: 22,
-                    color: "#FFF",
-                    marginBottom: 10,
-                  },
-                  li: {
-                    fontSize: 16,
-                    lineHeight: 22,
-                    color: "#FFF",
-                  },
-                  ol: { color: "#FFF" },
+                  body: { color: "#FFF" },
+                  p: { color: "#FFF" },
+                  li: { color: "#FFF" },
                   ul: { color: "#FFF" },
+                  ol: { color: "#FFF" },
+                  h1: { color: "#FFF" },
+                  h2: { color: "#FFF" },
+                  h3: { color: "#FFF" },
+                  h4: { color: "#FFF" },
+                  h5: { color: "#FFF" },
+                  h6: { color: "#FFF" },
                   "*": { color: "#FFF" },
                 }}
               />
@@ -353,10 +337,6 @@ export default function CoachAgreementDetails({ navigation }) {
             actions.setUnderline,
             actions.insertBulletsList,
             actions.insertOrderedList,
-            actions.heading1,
-            actions.heading2,
-            actions.heading3,
-            actions.setParagraph,
           ]}
           iconMap={{
             [actions.setBold]: ({ tintColor }) => (
@@ -394,24 +374,6 @@ export default function CoachAgreementDetails({ navigation }) {
             [actions.insertOrderedList]: () => (
               <FontAwesome name="list-ol" size={18} color="#fff" /> // ✅ white ordered list
             ),
-            [actions.heading1]: () => (
-              <Text style={{ fontSize: 16, fontWeight: "bold", color: "#fff" }}>
-                H1
-              </Text>
-            ),
-            [actions.heading2]: () => (
-              <Text style={{ fontSize: 14, fontWeight: "bold", color: "#fff" }}>
-                H2
-              </Text>
-            ),
-            [actions.heading3]: () => (
-              <Text style={{ fontSize: 12, fontWeight: "bold", color: "#fff" }}>
-                H3
-              </Text>
-            ),
-            [actions.setParagraph]: () => (
-              <Text style={{ fontSize: 12, color: "#fff" }}>P</Text>
-            ),
           }}
         />
       ) : (
@@ -424,6 +386,6 @@ export default function CoachAgreementDetails({ navigation }) {
           />
         </>
       )}
-    </>
+    </LinearGradient>
   );
 }

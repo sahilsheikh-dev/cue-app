@@ -71,7 +71,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
     },
     {
       id: "ae",
-      name: "United Arab Emirates (Dubai)",
+      name: "United Arab Emirates",
       code: "+971",
       number_of_digit: "9",
       img: "https://flagcdn.com/w20/ae.png",
@@ -241,10 +241,10 @@ export default function CoachPersonalProfileDetails({ navigation }) {
   return (
     <ScreenLayout scrollable withPadding>
       <Header
-        title="CUE"
+        title="cue"
         showBack={!isEdit} // 🔹 hide back in edit mode
         onBackPress={() => navigation.goBack()}
-        rightIcon={isEdit ? "checkmark-done-outline" : "create-outline"}
+        rightIcon={isEdit ? "eye-outline" : "create-outline"}
         onRightPress={() => {
           if (isEdit) {
             if (validateFields()) setIsEdit(false);

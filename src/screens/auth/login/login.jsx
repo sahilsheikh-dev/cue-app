@@ -70,7 +70,7 @@ export default function Login({ navigation }) {
     },
     {
       id: "ae",
-      name: "United Arab Emirates (Dubai)",
+      name: "United Arab Emirates",
       code: "+971",
       number_of_digit: "9",
       img: "https://flagcdn.com/w20/ae.png",

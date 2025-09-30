@@ -78,7 +78,7 @@ export default function AccountVerificationStatus({ navigation }) {
   return (
     <>
       <ScreenLayout scrollable withPadding>
-        <Header title={"CUE"} />
+        <Header title={"cue"} />
 
         <View style={styles.main_scroll_view}>
           <View style={styles.img_section}>
@@ -91,15 +91,15 @@ export default function AccountVerificationStatus({ navigation }) {
             {currentStatus.description}
           </Text>
         </View>
-      </ScreenLayout>
 
-      {/* Footer - support */}
-      <ButtonLink
-        text={"Need Help?"}
-        highlightText={"Contact Support"}
-        onPress={() => navigation.navigate("CustomerChat")}
-        align="center"
-      />
+        {/* Footer - support */}
+        <ButtonLink
+          text={"Need Help?"}
+          highlightText={"Contact Support"}
+          onPress={() => navigation.navigate("CustomerChat")}
+          align="center"
+        />
+      </ScreenLayout>
     </>
   );
 }

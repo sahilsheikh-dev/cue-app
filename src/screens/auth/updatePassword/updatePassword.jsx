@@ -74,23 +74,24 @@ export default function UpdatePassword({ navigation }) {
       );
 
       if (res.ok) {
-        Alert.alert("Success", "Password updated successfully!", [
-          {
-            text: "OK",
-            onPress: async () => {
-              try {
-                await logout(); // clear auth & context
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "Login" }],
-                });
-              } catch (e) {
-                console.error("Logout after password update failed:", e);
-                Alert.alert("Error", "Password updated but logout failed.");
-              }
-            },
-          },
-        ]);
+        Alert.alert("Success", "Password updated successfully!");
+        // , [
+        //   {
+        //     text: "OK",
+        //     onPress: async () => {
+        //       try {
+        //         await logout(); // clear auth & context
+        //         navigation.reset({
+        //           index: 0,
+        //           routes: [{ name: "Login" }],
+        //         });
+        //       } catch (e) {
+        //         console.error("Logout after password update failed:", e);
+        //         Alert.alert("Error", "Password updated but logout failed.");
+        //       }
+        //     },
+        //   },
+        // ]);
       } else {
         Alert.alert("Error", res.error || "Something went wrong");
       }
@@ -105,7 +106,7 @@ export default function UpdatePassword({ navigation }) {
   return (
     <ScreenLayout scrollable withPadding>
       <Header
-        title={"CUE"}
+        title={"cue"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

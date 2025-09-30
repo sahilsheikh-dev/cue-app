@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   SafeAreaView,
   Image,
@@ -6,7 +6,6 @@ import {
   Platform,
   ScrollView,
   View,
-  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,11 +18,6 @@ const ScreenLayout = ({
   scrollable = true, // allow choosing between ScrollView or View
   withPadding = true, // common padding if required
 }) => {
-  const Wrapper = scrollable ? ScrollView : View;
-
-  const [contentHeight, setContentHeight] = useState(0);
-  const screenHeight = Dimensions.get("window").height;
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -35,14 +29,11 @@ const ScreenLayout = ({
         pointerEvents="none" // ✅ allow touches to pass through
       />
 
-      {/* Gradient overlay */}
+      {/* Gradient overlay (always covers full screen) */}
       <LinearGradient
         colors={["rgba(30, 63, 142, 1)", "rgba(8, 11, 46, 1)"]}
-        style={[
-          styles.backgroundGradient,
-          { height: Math.max(contentHeight, screenHeight) },
-        ]}
-        pointerEvents="none" // ✅ allow touches to pass through
+        style={styles.backgroundGradient}
+        pointerEvents="none"
       />
 
       <KeyboardAvoidingView
@@ -56,7 +47,7 @@ const ScreenLayout = ({
             contentContainerStyle={[
               styles.contentWrapper,
               withPadding && styles.contentWithPadding,
-              { paddingBottom: 40 }, // ✅ extra space for last element
+              { paddingBottom: 40 }, // ✅ ensure last element has breathing space
             ]}
             showsVerticalScrollIndicator={false}
           >

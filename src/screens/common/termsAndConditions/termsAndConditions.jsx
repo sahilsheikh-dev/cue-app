@@ -44,7 +44,7 @@ export default function TermsAndConditions({ route, navigation }) {
   return (
     <ScreenLayout>
       <Header
-        title={"CUE"}
+        title={"cue"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

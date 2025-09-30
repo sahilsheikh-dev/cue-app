@@ -27,7 +27,7 @@ export default function CoachCommissionStructure({ navigation }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title={"cue"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -64,18 +64,18 @@ export default function CoachCommissionStructure({ navigation }) {
             </View>
           </View>
         </LinearGradient>
-      </ScreenLayout>
 
-      {/* Next Button */}
-      <Button
-        text={"Agree"}
-        onPress={() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "CoachDashboard" }],
-          });
-        }}
-      />
+        {/* Next Button */}
+        <Button
+          text={"Agree"}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "CoachDashboard" }],
+            });
+          }}
+        />
+      </ScreenLayout>
     </>
   );
 }

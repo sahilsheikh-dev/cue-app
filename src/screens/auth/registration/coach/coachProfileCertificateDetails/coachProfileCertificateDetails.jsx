@@ -41,7 +41,6 @@ export default function CoachProfileCertificateDetails({ navigation }) {
   const [loadingIndex, setLoadingIndex] = useState(null); // track which slot is uploading
 
   // Pick image
-  // Pick image
   const pickImage = async (slotIndex) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images, // ✅ restrict to images only
@@ -121,7 +120,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
   return (
     <ScreenLayout scrollable withPadding>
       <Header
-        title={"CUE"}
+        title={"cue"}
         showBack={true}
         onBackPress={() => navigation.goBack()}
       />

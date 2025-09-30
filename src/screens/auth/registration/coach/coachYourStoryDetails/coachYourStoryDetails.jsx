@@ -60,7 +60,7 @@ export default function CoachYourStoryDetails({ navigation }) {
     <>
       <ScreenLayout scrollable withPadding>
         <Header
-          title={"CUE"}
+          title={"cue"}
           showBack={true}
           onBackPress={() => navigation.goBack()}
         />
@@ -91,17 +91,10 @@ export default function CoachYourStoryDetails({ navigation }) {
                   const plain = stripHtml(text);
 
                   if (plain.length <= maxChars) {
-                    // ✅ Still within limit → accept
                     setStory(text);
                   } else {
-                    // ✅ Reject new input → revert back to old valid state
-                    // But allow paste: only take up to maxChars
                     const trimmedPlain = plain.substring(0, maxChars);
-
-                    // Build trimmed HTML by slicing text based on plain text length
-                    // Easiest safe fallback: just set trimmed plain text
                     richText.current?.setContentHTML(trimmedPlain);
-
                     setStory(trimmedPlain);
                   }
                 }}
@@ -121,15 +114,18 @@ export default function CoachYourStoryDetails({ navigation }) {
             <Text style={{ color: "#ffffff70", marginTop: 5, fontSize: 12 }}>
               {remainingChars}
             </Text>
+
+            {/* ✅ Button moved here */}
+            <View style={styles.input_whole_section_btn}>
+              <Button
+                text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
+                onPress={handleSave}
+                disabled={loading}
+              />
+            </View>
           </ScrollView>
         </TouchableWithoutFeedback>
       </ScreenLayout>
-
-      <Button
-        text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
-        onPress={handleSave}
-        disabled={loading}
-      />
     </>
   );
 }
