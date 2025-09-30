@@ -5,46 +5,45 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
 
+import styles from "./coachVirtualPricingDetailsCss";
+
 export default function CoachVirtualPricingDetails({ navigation }) {
-  // Levels
   const client_accepted_levels = ["Beginner", "Intermediate", "Advanced"];
   const [selectedLevels, setSelectedLevels] = useState([]);
 
-  // Sessions
-  const [sessions, setSessions] = useState({
-    private: [{ duration: "30 mins", price: "" }],
-    group: [{ duration: "30 mins", price: "" }],
+  const [picker, setPicker] = useState({
+    show: false,
+    mode: "date", // "date" or "time"
+    type: null, // start | end | date
+    session: null, // private | group
+    idx: null,
   });
 
-  // Discounts
-  const [discounts, setDiscounts] = useState([
-    { min: "3", max: "5", pct: "20" },
-    { min: "6", max: "10", pct: "30" },
-    { min: "11", max: "", pct: "50" },
-  ]);
-
-  // Availability
-  const [availability, setAvailability] = useState([
-    { day: "Mon", start: null, end: null, active: false },
-    { day: "Tue", start: null, end: null, active: false },
-    { day: "Wed", start: null, end: null, active: false },
-    { day: "Thu", start: null, end: null, active: false },
-    { day: "Fri", start: null, end: null, active: false },
-    { day: "Sat", start: null, end: null, active: false },
-    { day: "Sun", start: null, end: null, active: false },
-  ]);
-  const [picker, setPicker] = useState({ show: false, idx: null, type: null });
-
-  // Mode: edit or preview
   const [isEdit, setIsEdit] = useState(true);
 
-  // Toggle level
+  // Sample sessions
+  const [sessions, setSessions] = useState({
+    private: [
+      { date: "2025-10-05", start: "10:00 AM", end: "11:00 AM", price: "50" },
+    ],
+    group: [
+      { date: "2025-10-06", start: "02:00 PM", end: "03:00 PM", price: "30" },
+    ],
+  });
+
+  const [discounts, setDiscounts] = useState({
+    private: [{ min: "3", max: "5", pct: "20" }],
+    group: [{ min: "3", max: "5", pct: "15" }],
+  });
+
+  // Toggle client levels
   const toggleLevel = (lvl) => {
     if (!isEdit) return;
     setSelectedLevels((prev) =>
@@ -52,68 +51,157 @@ export default function CoachVirtualPricingDetails({ navigation }) {
     );
   };
 
-  // Session update
-  const updateTimeslot = (type, idx, field, value) => {
-    if (!isEdit) return;
-    setSessions((prev) => {
-      const updated = [...prev[type]];
-      updated[idx][field] = value;
-      return { ...prev, [type]: updated };
-    });
-  };
-  const addTimeslot = (type) => {
-    if (!isEdit) return;
+  // Add a new session
+  const addSession = (sessionType, date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date < today) {
+      Alert.alert("Invalid Date", "You cannot select past dates.");
+      return;
+    }
+    const isoDate = date.toISOString().split("T")[0];
     setSessions((prev) => ({
       ...prev,
-      [type]: [...prev[type], { duration: "60 mins", price: "" }],
+      [sessionType]: [
+        ...prev[sessionType],
+        { date: isoDate, start: null, end: null, price: "" },
+      ],
     }));
   };
 
-  // Discount update
-  const updateDiscount = (idx, field, value) => {
+  // Remove session
+  const removeSession = (sessionType, idx) => {
     if (!isEdit) return;
-    const updated = [...discounts];
-    updated[idx][field] = value;
-    setDiscounts(updated);
-  };
-  const addDiscountRow = () => {
-    if (!isEdit) return;
-    setDiscounts((prev) => [...prev, { min: "", max: "", pct: "" }]);
-  };
-
-  // Availability toggle
-  const toggleDay = (idx) => {
-    if (!isEdit) return;
-    setAvailability((prev) => {
-      const updated = [...prev];
-      updated[idx].active = !updated[idx].active;
-      return updated;
+    setSessions((prev) => {
+      const updated = [...prev[sessionType]];
+      updated.splice(idx, 1);
+      return { ...prev, [sessionType]: updated };
     });
   };
 
-  const openPicker = (idx, type) => {
+  // Update price
+  const updateDayPrice = (sessionType, idx, value) => {
     if (!isEdit) return;
-    setPicker({ show: true, idx, type });
+    setSessions((prev) => {
+      const updated = [...prev[sessionType]];
+      updated[idx].price = value;
+      return { ...prev, [sessionType]: updated };
+    });
   };
 
-  const onTimePicked = (event, date) => {
-    if (!picker.show) return;
-    const { idx, type } = picker;
-    setPicker({ show: false, idx: null, type: null });
-    if (event.type === "dismissed" || !date) return;
-    const time = date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
+  // Open picker
+  const openPicker = (sessionType, idx, type) => {
+    if (!isEdit) return;
+    setPicker({
+      show: true,
+      mode: type === "date" ? "date" : "time",
+      type,
+      session: sessionType,
+      idx,
     });
-    setAvailability((prev) => {
-      const updated = [...prev];
-      updated[idx][type] = time;
-      return updated;
+  };
+
+  const openDatePicker = (sessionType) => {
+    if (!isEdit) return;
+    setPicker({
+      show: true,
+      mode: "date",
+      type: "date",
+      session: sessionType,
+      idx: null,
+    });
+  };
+
+  const formatDate = (isoDate) => {
+    const d = new Date(isoDate);
+    return d.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Handle date/time pick safely
+  const onPicked = (event, selectedDate) => {
+    if (event.type === "dismissed") {
+      setPicker((prev) => ({ ...prev, show: false }));
+      return;
+    }
+
+    if (event.type === "set" && selectedDate) {
+      const { mode, type, session, idx } = picker;
+
+      if (mode === "date") {
+        const isoDate = selectedDate.toISOString().split("T")[0];
+        if (idx === null) {
+          addSession(session, selectedDate);
+        } else {
+          setSessions((prev) => {
+            const updated = [...prev[session]];
+            updated[idx].date = isoDate;
+            return { ...prev, [session]: updated };
+          });
+        }
+      }
+
+      if (mode === "time") {
+        const time = selectedDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        setSessions((prev) => {
+          const updated = [...prev[session]];
+          updated[idx][type] = time;
+
+          if (updated[idx].start && updated[idx].end) {
+            const [sh, sm] = updated[idx].start.split(":").map(Number);
+            const [eh, em] = updated[idx].end.split(":").map(Number);
+            if (eh * 60 + em <= sh * 60 + sm) {
+              Alert.alert("Invalid Time", "End time must be after Start time.");
+              updated[idx].end = null;
+            }
+          }
+          return { ...prev, [session]: updated };
+        });
+      }
+    }
+
+    // close picker
+    setPicker((prev) => ({ ...prev, show: false }));
+  };
+
+  // Discounts
+  const updateDiscount = (sessionType, idx, field, value) => {
+    if (!isEdit) return;
+    setDiscounts((prev) => {
+      const updated = [...prev[sessionType]];
+      updated[idx][field] = value;
+      return { ...prev, [sessionType]: updated };
+    });
+  };
+
+  const addDiscountRow = (sessionType) => {
+    if (!isEdit) return;
+    setDiscounts((prev) => ({
+      ...prev,
+      [sessionType]: [...prev[sessionType], { min: "", max: "", pct: "" }],
+    }));
+  };
+
+  const removeDiscountRow = (sessionType, idx) => {
+    if (!isEdit) return;
+    setDiscounts((prev) => {
+      const updated = [...prev[sessionType]];
+      updated.splice(idx, 1);
+      return { ...prev, [sessionType]: updated };
     });
   };
 
   const onSave = () => {
-    const payload = { selectedLevels, sessions, discounts, availability };
+    const payload = { selectedLevels, sessions, discounts };
+    console.log("Saving payload:", payload);
     navigation.navigate("CoachInPersonPricingDetails", { data: payload });
   };
 
@@ -128,14 +216,11 @@ export default function CoachVirtualPricingDetails({ navigation }) {
       />
 
       {/* Levels */}
-      <Text style={{ color: "#fff", fontSize: 16, marginBottom: 10 }}>
-        Client Accepted Levels
-      </Text>
+      <Text style={styles.sectionTitle}>Client Accepted Levels</Text>
       <View
         style={{
           flexDirection: "row",
           flexWrap: "wrap",
-          gap: 10,
           opacity: !isEdit ? 0.6 : 1,
         }}
       >
@@ -143,257 +228,146 @@ export default function CoachVirtualPricingDetails({ navigation }) {
           <TouchableOpacity
             key={lvl}
             disabled={!isEdit}
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              borderRadius: 20,
-              borderWidth: 1,
-              borderColor: "#ffffff40",
-              backgroundColor: selectedLevels.includes(lvl)
-                ? "rgba(255,255,255,0.2)"
-                : "transparent",
-            }}
+            style={[
+              styles.levelBtn,
+              selectedLevels.includes(lvl) && styles.levelBtnActive,
+            ]}
             onPress={() => toggleLevel(lvl)}
           >
-            <Text style={{ color: "#fff" }}>{lvl}</Text>
+            <Text style={styles.whiteText}>{lvl}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Sessions & Pricing */}
-      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
-        Sessions & Pricing
-      </Text>
+      {/* Private & Group Sections */}
       {["private", "group"].map((type) => (
-        <View
-          key={type}
-          style={{
-            backgroundColor: "rgba(255,255,255,0.05)",
-            padding: 12,
-            borderRadius: 12,
-            marginBottom: 15,
-            opacity: !isEdit ? 0.6 : 1,
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: 15, marginBottom: 10 }}>
+        <View key={type} style={styles.sectionCard}>
+          <Text style={styles.sectionTitle}>
             {type === "private" ? "Private Sessions" : "Group Sessions"}
           </Text>
+
           {sessions[type].map((s, idx) => (
             <View
               key={idx}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 8,
-              }}
+              style={[styles.sessionCard, { opacity: !isEdit ? 0.6 : 1 }]}
             >
-              <TextInput
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: 8,
-                  padding: 8,
-                  color: "#fff",
-                }}
-                editable={isEdit}
-                placeholder="Duration (e.g. 30 mins)"
-                placeholderTextColor="#aaa"
-                value={s.duration}
-                onChangeText={(val) =>
-                  updateTimeslot(type, idx, "duration", val)
-                }
-              />
-              <TextInput
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: 8,
-                  padding: 8,
-                  color: "#fff",
-                }}
-                editable={isEdit}
-                placeholder="Price (USD)"
-                placeholderTextColor="#aaa"
-                keyboardType="numeric"
-                value={s.price}
-                onChangeText={(val) => updateTimeslot(type, idx, "price", val)}
-              />
+              {/* Date & Remove */}
+              <View style={styles.sessionHeader}>
+                <TouchableOpacity
+                  disabled={!isEdit}
+                  onPress={() => openPicker(type, idx, "date")}
+                >
+                  <Text style={styles.whiteText}>{formatDate(s.date)}</Text>
+                </TouchableOpacity>
+                {isEdit && (
+                  <TouchableOpacity onPress={() => removeSession(type, idx)}>
+                    <Text style={styles.removeIcon}>✕</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* Start, End, Price inline */}
+              <View style={styles.sessionRow}>
+                <TouchableOpacity
+                  disabled={!isEdit}
+                  style={[styles.timeBtn, { flex: 1 }]}
+                  onPress={() => openPicker(type, idx, "start")}
+                >
+                  <Text style={styles.whiteText}>
+                    {s.start || "Start Time"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  disabled={!isEdit}
+                  style={[styles.timeBtn, { flex: 1 }]}
+                  onPress={() => openPicker(type, idx, "end")}
+                >
+                  <Text style={styles.whiteText}>{s.end || "End Time"}</Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  editable={isEdit}
+                  placeholder="Price"
+                  placeholderTextColor="#aaa"
+                  keyboardType="numeric"
+                  value={s.price}
+                  onChangeText={(val) => updateDayPrice(type, idx, val)}
+                />
+              </View>
             </View>
           ))}
+
           {isEdit && (
-            <TouchableOpacity onPress={() => addTimeslot(type)}>
-              <Text style={{ color: "#4da6ff" }}>+ Add Timeslot</Text>
+            <TouchableOpacity onPress={() => openDatePicker(type)}>
+              <Text style={{ color: "#4da6ff", marginTop: 6 }}>
+                + Add Session
+              </Text>
             </TouchableOpacity>
           )}
-        </View>
-      ))}
 
-      {/* Discounts */}
-      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
-        Bulk Booking Discounts
-      </Text>
-      <View
-        style={{
-          backgroundColor: "rgba(255,255,255,0.05)",
-          borderRadius: 12,
-          padding: 12,
-          opacity: !isEdit ? 0.6 : 1,
-        }}
-      >
-        {discounts.map((d, idx) => (
-          <View
-            key={idx}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 10,
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                borderRadius: 8,
-                padding: 8,
-                color: "#fff",
-              }}
-              editable={isEdit}
-              placeholder="Min"
-              placeholderTextColor="#aaa"
-              value={d.min}
-              keyboardType="numeric"
-              onChangeText={(val) => updateDiscount(idx, "min", val)}
-            />
-            <Text style={{ color: "#fff" }}>to</Text>
-            <TextInput
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                borderRadius: 8,
-                padding: 8,
-                color: "#fff",
-              }}
-              editable={isEdit}
-              placeholder="Max"
-              placeholderTextColor="#aaa"
-              value={d.max}
-              keyboardType="numeric"
-              onChangeText={(val) => updateDiscount(idx, "max", val)}
-            />
-            <TextInput
-              style={{
-                flex: 1,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                borderRadius: 8,
-                padding: 8,
-                color: "#fff",
-              }}
-              editable={isEdit}
-              placeholder="% Off"
-              placeholderTextColor="#aaa"
-              value={d.pct}
-              keyboardType="numeric"
-              onChangeText={(val) => updateDiscount(idx, "pct", val)}
-            />
-          </View>
-        ))}
-        {isEdit && (
-          <TouchableOpacity onPress={addDiscountRow}>
-            <Text style={{ color: "#4da6ff" }}>+ Add Discount</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Availability */}
-      <Text style={{ color: "#fff", fontSize: 16, marginVertical: 15 }}>
-        Weekly Availability
-      </Text>
-      {availability.map((d, idx) => (
-        <View
-          key={idx}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 10,
-            backgroundColor: "rgba(255,255,255,0.05)",
-            borderRadius: 8,
-            padding: 8,
-            opacity: !isEdit ? 0.6 : 1,
-          }}
-        >
-          {/* Radio Button */}
-          <TouchableOpacity
-            disabled={!isEdit}
-            style={{
-              height: 24,
-              width: 24,
-              borderRadius: 12,
-              borderWidth: 2,
-              borderColor: "#fff",
-              alignItems: "center",
-              justifyContent: "center",
-              marginRight: 10,
-            }}
-            onPress={() => toggleDay(idx)}
-          >
-            {d.active && (
-              <View
-                style={{
-                  height: 12,
-                  width: 12,
-                  borderRadius: 6,
-                  backgroundColor: "#4da6ff",
-                }}
-              />
+          {/* Discounts */}
+          <Text style={styles.discountTitle}>Bulk Booking Discounts</Text>
+          <View style={styles.discountCard}>
+            {discounts[type].map((d, idx) => (
+              <View key={idx} style={styles.discountRow}>
+                <TextInput
+                  style={styles.discountInput}
+                  editable={isEdit}
+                  placeholder="Min"
+                  placeholderTextColor="#aaa"
+                  value={d.min}
+                  keyboardType="numeric"
+                  onChangeText={(val) => updateDiscount(type, idx, "min", val)}
+                />
+                <Text style={styles.whiteText}>to</Text>
+                <TextInput
+                  style={styles.discountInput}
+                  editable={isEdit}
+                  placeholder="Max"
+                  placeholderTextColor="#aaa"
+                  value={d.max}
+                  keyboardType="numeric"
+                  onChangeText={(val) => updateDiscount(type, idx, "max", val)}
+                />
+                <TextInput
+                  style={styles.discountInput}
+                  editable={isEdit}
+                  placeholder="% Off"
+                  placeholderTextColor="#aaa"
+                  value={d.pct}
+                  keyboardType="numeric"
+                  onChangeText={(val) => updateDiscount(type, idx, "pct", val)}
+                />
+                {isEdit && (
+                  <TouchableOpacity
+                    onPress={() => removeDiscountRow(type, idx)}
+                  >
+                    <Text style={{ color: "red", marginLeft: 6 }}>🗑️</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+            {isEdit && (
+              <TouchableOpacity onPress={() => addDiscountRow(type)}>
+                <Text style={{ color: "#4da6ff" }}>+ Add Discount</Text>
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
-
-          {/* Day */}
-          <Text style={{ color: "#fff", flex: 1 }}>{d.day}</Text>
-
-          {/* Start & End Time */}
-          {d.active && (
-            <>
-              <TouchableOpacity
-                disabled={!isEdit}
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: 8,
-                  padding: 6,
-                  marginRight: 6,
-                }}
-                onPress={() => openPicker(idx, "start")}
-              >
-                <Text style={{ color: "#fff" }}>{d.start || "Start"}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                disabled={!isEdit}
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: 8,
-                  padding: 6,
-                }}
-                onPress={() => openPicker(idx, "end")}
-              >
-                <Text style={{ color: "#fff" }}>{d.end || "End"}</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          </View>
         </View>
       ))}
 
       {picker.show && (
         <DateTimePicker
           value={new Date()}
-          mode="time"
+          minimumDate={picker.mode === "date" ? new Date() : undefined}
+          mode={picker.mode}
           display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={onTimePicked}
+          onChange={onPicked}
         />
       )}
 
-      {/* ✅ Show Next button only in Preview mode */}
       {!isEdit && (
         <Button
           text={"Next"}
