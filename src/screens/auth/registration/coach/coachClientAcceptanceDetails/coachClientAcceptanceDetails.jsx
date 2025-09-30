@@ -79,17 +79,6 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     setSelectedActivities(user.my_activities || []);
     setAcceptedGenders(user.accepted_genders || []);
     setAcceptedLanguages(user.accepted_languages || []);
-
-    // If no values → start in edit, otherwise preview
-    setIsEdit(
-      !(
-        (user.my_activities?.length || route.params?.my_activities?.length) &&
-        (user.accepted_genders?.length ||
-          route.params?.accepted_genders?.length) &&
-        (user.accepted_languages?.length ||
-          route.params?.accepted_languages?.length)
-      )
-    );
   }, [data, route.params]);
 
   // 🔹 reusable validation function

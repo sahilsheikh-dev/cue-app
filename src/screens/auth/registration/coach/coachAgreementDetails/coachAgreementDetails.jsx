@@ -159,7 +159,7 @@ export default function CoachAgreementDetails({ navigation }) {
       : DEFAULT_TEMPLATE;
 
   const [agreementTerm, setAgreementTerm] = useState(initialAgreement);
-  const [isEdit, setIsEdit] = useState(!data?.user?.agreement_terms); // preview if data exists
+  const [isEdit, setIsEdit] = useState(false); // preview if data exists
 
   // --- helper to strip only color/background rules but keep other inline styles ---
   const sanitizeHtml = (html) => {

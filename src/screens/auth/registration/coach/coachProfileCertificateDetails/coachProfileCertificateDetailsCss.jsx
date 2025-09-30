@@ -32,11 +32,6 @@ const styles = StyleSheet.create({
     left: 0,
     opacity: 0.25,
   },
-  main_scroll_view: {
-    height: "100%",
-    width: "100%",
-    zIndex: 10,
-  },
   main_view: {
     height: screenHeight - 55 - 10,
     width: "100%",

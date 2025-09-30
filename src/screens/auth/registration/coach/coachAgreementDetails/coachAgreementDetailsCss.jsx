@@ -72,12 +72,6 @@ const styles = StyleSheet.create({
   },
 
   // ===== Scroll / Content wrapper =====
-  main_scroll_view: {
-    marginTop: "50px",
-    height: "100%",
-    width: "100%",
-    zIndex: 10,
-  },
   main_view: {
     height: screenHeight - 55 - 10,
     width: "100%",

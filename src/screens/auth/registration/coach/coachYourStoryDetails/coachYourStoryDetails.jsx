@@ -34,7 +34,7 @@ export default function CoachYourStoryDetails({ navigation }) {
     }
   }, [data]);
 
-  const maxChars = 2500;
+  const maxChars = 700;
   const plainText = stripHtml(story);
   const remainingChars = `${plainText.length}/${maxChars}`;
 

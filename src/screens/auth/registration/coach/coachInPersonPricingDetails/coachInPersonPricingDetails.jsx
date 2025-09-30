@@ -23,7 +23,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     idx: null,
   });
 
-  const [isEdit, setIsEdit] = useState(true);
+  const [isEdit, setIsEdit] = useState(false);
 
   // Structure for private and group (no duration anymore 🚫)
   const initialDays = [

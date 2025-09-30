@@ -37,6 +37,7 @@
     "react-native-calendars": "^1.1312.0",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-iap": "^13.0.1",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-markdown-display": "^7.0.2",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-pell-rich-editor": "^1.10.0",

@@ -31,14 +31,6 @@ const styles = StyleSheet.create({
     left: 0,
     opacity: 0.25,
   },
-  main_scroll_view: {
-    height: screenHeight - 220 - 10,
-    width: "100%",
-    zIndex: 10,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   top_portion1: {
     height: 10 + sb.currentHeight,
     width: "100%",

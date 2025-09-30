@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     minHeight: 300,
     // height: "fit-content",
     flex: 1,
-    width: "85%",
+    width: "95%",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.09)",
     borderRadius: 20,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   input_inner_section_btn: {
     height: "100%",
-    width: "85%",
+    width: "95%",
     borderRadius: 100,
     borderWidth: 1.2,
     borderColor: "#ffffff17",

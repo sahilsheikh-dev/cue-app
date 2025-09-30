@@ -41,7 +41,6 @@ export const CoachRegistrationScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
 
-  //   COACH - SEMI VERIFIED ACCESS
   <Stack.Screen
     name="CoachYourStoryDetails"
     component={CoachYourStoryDetails}
@@ -54,7 +53,6 @@ export const CoachRegistrationScreens = (Stack) => [
     options={{ headerShown: false }}
   />,
 
-  //   PENDING
   <Stack.Screen
     name="CoachVirtualPricingDetails"
     component={CoachVirtualPricingDetails}
@@ -65,7 +63,6 @@ export const CoachRegistrationScreens = (Stack) => [
     component={CoachInPersonPricingDetails}
     options={{ headerShown: false }}
   />,
-  //   PENDING
 
   <Stack.Screen
     name="CoachAgreementDetails"

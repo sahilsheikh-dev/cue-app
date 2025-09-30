@@ -114,20 +114,6 @@ export default function CoachPersonalProfileDetails({ navigation }) {
         data.user.agree_experience || false,
         data.user.agree_refund || false,
       ]);
-
-      // If data already present → start in preview mode
-      setIsEdit(
-        !(
-          data.user.email &&
-          data.user.dob &&
-          data.user.gender &&
-          data.user.country &&
-          data.user.city &&
-          data.user.address &&
-          data.user.pincode &&
-          data.user.experience_since_date
-        )
-      );
     }
   }, [data]);
 

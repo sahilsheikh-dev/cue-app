@@ -80,7 +80,7 @@ export default function AccountVerificationStatus({ navigation }) {
       <ScreenLayout scrollable withPadding>
         <Header title={"cue"} />
 
-        <View style={styles.main_scroll_view}>
+        <View>
           <View style={styles.img_section}>
             <Image source={currentStatus.icon} />
           </View>

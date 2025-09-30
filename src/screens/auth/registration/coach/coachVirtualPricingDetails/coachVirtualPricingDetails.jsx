@@ -26,7 +26,7 @@ export default function CoachVirtualPricingDetails({ navigation }) {
     idx: null,
   });
 
-  const [isEdit, setIsEdit] = useState(true);
+  const [isEdit, setIsEdit] = useState(false);
 
   // Sample sessions
   const [sessions, setSessions] = useState({
