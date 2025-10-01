@@ -14,7 +14,6 @@ import CoachCommissionStructure from "./coachCommissionStructure/coachCommission
 import CoachAgreementDetails from "./coachAgreementDetails/coachAgreementDetails";
 
 export const CoachRegistrationScreens = (Stack) => [
-  //   COACH - UNVERIFIED ACCESS
   <Stack.Screen
     name="CoachIntroduction"
     component={CoachIntroduction}

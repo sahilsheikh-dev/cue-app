@@ -136,8 +136,7 @@ export default function CoachProfileCertificateDetails({ navigation }) {
         Add Your Certificate
       </Text>
       <Text style={styles.upy_text}>
-        Upload your certificates (up to 10). Each slot can store one
-        image/video.
+        Upload your certificates (up to 10). Each slot can store one image.
       </Text>
 
       {certificates.map((item, index) => {

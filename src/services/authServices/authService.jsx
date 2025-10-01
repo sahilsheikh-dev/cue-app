@@ -3,11 +3,9 @@ import axios from "axios";
 import put from "../../secureStore/put";
 import get from "../../secureStore/get";
 import remove from "../../secureStore/remove";
-import { BASE_API_URL } from "../../config/app.config"; // adjust path if needed
+import { BASE_API_URL } from "../../config/app.config";
 
-/**
- * Save auth token and role to secure storage
- */
+/** Persist auth & role */
 export async function saveAuthTokenAndRole(authToken, role, user) {
   try {
     await Promise.all([
@@ -22,9 +20,7 @@ export async function saveAuthTokenAndRole(authToken, role, user) {
   }
 }
 
-/**
- * Initialize auth values from storage
- */
+/** Load persisted auth */
 export async function initializeAuth() {
   try {
     const [authTokenRaw, roleRaw, dfRaw, userRaw] = await Promise.all([
@@ -33,7 +29,6 @@ export async function initializeAuth() {
       get("data_filled"),
       get("user"),
     ]);
-
     return {
       authToken: authTokenRaw || null,
       role: roleRaw || null,
@@ -46,9 +41,6 @@ export async function initializeAuth() {
   }
 }
 
-/**
- * Mark checked today
- */
 export async function checkedToday() {
   try {
     await put("checked", new Date().toISOString());
@@ -59,9 +51,6 @@ export async function checkedToday() {
   }
 }
 
-/**
- * Mark onboarding/profile completed
- */
 export async function markDataFilled() {
   try {
     await put("data_filled", "true");
@@ -72,9 +61,6 @@ export async function markDataFilled() {
   }
 }
 
-/**
- * Logout (local only) - clears secure storage
- */
 export async function logout() {
   try {
     await Promise.all([
@@ -92,21 +78,40 @@ export async function logout() {
 
 /**
  * Server-backed login
- * @returns { ok: boolean, token?, coach?, status?, data? }
+ * - For coach: POST /coach/login => { ok, accessToken, coach }
+ * - (Other roles keep legacy shape for now)
  */
 export async function loginWithApi(mobile, password, role) {
   try {
-    const res = await axios.post(`${BASE_API_URL}/${role}/login`, {
-      mobile,
-      password,
-    });
-
-    const data = res.data;
-    const token = data.token;
-
-    await saveAuthTokenAndRole(token, role, data[role] || null);
-
-    return { ok: true, token, user: data[role] || null };
+    if (role === "coach") {
+      const res = await axios.post(`${BASE_API_URL}/coach/login`, {
+        mobile,
+        password,
+      });
+      const data = res.data || {};
+      if (!data.ok || !data.accessToken) {
+        return {
+          ok: false,
+          status: res.status,
+          data,
+          error: data.message || "Login failed",
+        };
+      }
+      const token = data.accessToken;
+      const user = data.coach || null;
+      await saveAuthTokenAndRole(token, role, user);
+      return { ok: true, token, user };
+    } else {
+      // fallback to old endpoints if you still have them
+      const res = await axios.post(`${BASE_API_URL}/${role}/login`, {
+        mobile,
+        password,
+      });
+      const data = res.data;
+      const token = data.token;
+      await saveAuthTokenAndRole(token, role, data[role] || null);
+      return { ok: true, token, user: data[role] || null };
+    }
   } catch (err) {
     console.error(
       "authService.loginWithApi error:",
@@ -122,28 +127,18 @@ export async function loginWithApi(mobile, password, role) {
 }
 
 /**
- * Call server logout endpoint (best-effort), then clear local storage.
- * Always clears local storage (so user is logged out locally even if server call fails).
+ * POST /coach/logout (protected)
+ * We best-effort call server to revoke the refresh session then
+ * clear local storage regardless. (Server expects Authorization header)
  */
 export async function serverLogout() {
   try {
     const token = await get("auth");
-    if (!token) {
-      await logout();
-      return true;
-    }
-
-    // POST to /coach/logout with Bearer token
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    // server: POST /coach/logout (verifyCoach protected) — revokes current cookie session if present
     await axios
-      .post(
-        `${BASE_API_URL}/coach/logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      .post(`${BASE_API_URL}/coach/logout`, {}, { headers })
       .catch((e) => {
-        // swallow and continue to clear local storage
         console.warn(
           "serverLogout axios error (ignored):",
           e.response?.data || e.message
@@ -160,18 +155,12 @@ export async function serverLogout() {
 export async function updatePassword(role, id, oldPassword, newPassword) {
   try {
     const token = await get("auth");
-    if (!token) {
-      return { ok: false, error: "No auth token found" };
-    }
-
+    if (!token) return { ok: false, error: "No auth token found" };
     const res = await axios.put(
       `${BASE_API_URL}/${role}/updatePassword/${id}`,
       { oldPassword, newPassword },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
-
     return { ok: true, data: res.data };
   } catch (err) {
     console.error("updatePassword error:", err.response?.data || err.message);
@@ -185,6 +174,7 @@ export async function updatePassword(role, id, oldPassword, newPassword) {
 
 export async function forgetPassword(role, mobile, newPassword) {
   try {
+    // coach backend: PUT /coach/forget-password
     const res = await axios.put(`${BASE_API_URL}/${role}/forget-password`, {
       mobile,
       newPassword,
@@ -200,9 +190,6 @@ export async function forgetPassword(role, mobile, newPassword) {
   }
 }
 
-/**
- * Default export (convenience)
- */
 const authService = {
   saveAuthTokenAndRole,
   initializeAuth,

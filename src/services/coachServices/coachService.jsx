@@ -1,17 +1,25 @@
+// src/services/coachServices/coachService.js
 import axios from "axios";
 import { BASE_API_URL } from "../../config/app.config";
-import get from "../../secureStore/get"; // to fetch token from storage
+import get from "../../secureStore/get"; // secure token
+
+// helper: get Bearer header from secure store
+async function authHeader() {
+  const token = await get("auth");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const coachService = {
+  /* -------------------- Auth-adjacent -------------------- */
+
   async signup(data) {
+    // POST /coach/signup   (name, mobile, password, agree_*, mobileVerified?)
     try {
       const res = await axios.post(`${BASE_API_URL}/coach/signup`, data);
-
-      // If server responds with success
       return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
+        success: !!res.data?.ok,
+        message: res.data?.message || "Signup successful",
+        data: res.data?.data,
       };
     } catch (err) {
       console.error("Signup API error:", err.response?.data || err.message);
@@ -24,13 +32,16 @@ const coachService = {
   },
 
   async checkMobileAvailability(mobile) {
+    // POST /coach/check-mobile
     try {
       const res = await axios.post(`${BASE_API_URL}/coach/check-mobile`, {
         mobile,
       });
-
-      // Response format: { available: true/false, message: "..." }
-      return res.data;
+      // { ok, available, message }
+      return {
+        available: !!res.data?.available,
+        message: res.data?.message,
+      };
     } catch (err) {
       console.error(
         "CheckMobile API error:",
@@ -43,17 +54,41 @@ const coachService = {
     }
   },
 
-  async coachProfileSetup(payload) {
+  /* -------------------- Coach profile/info -------------------- */
+
+  async getMyInfo() {
+    // GET /coach/me  (protected)
     try {
-      const token = await get("auth"); // read from secureStore
+      const headers = await authHeader();
+      const res = await axios.get(`${BASE_API_URL}/coach/me`, { headers });
+      return {
+        success: !!res.data?.ok,
+        data: res.data?.data || res.data?.coach, // controller returns {ok, data} for many; for /me it returns coach in data
+        message: res.data?.message || "Success",
+      };
+    } catch (err) {
+      console.error("getMyInfo API error:", err.response?.data || err.message);
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to fetch coach info",
+      };
+    }
+  },
+
+  async coachProfileSetup(payload) {
+    // PATCH /coach/profile-setup (protected)
+    try {
+      const headers = await authHeader();
       const res = await axios.patch(
-        `${BASE_API_URL}/coach/coachProfileSetup`,
+        `${BASE_API_URL}/coach/profile-setup`,
         payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers }
       );
-      return { success: true, message: res.data.message, data: res.data.data };
+      return {
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
+      };
     } catch (err) {
       console.error(
         "coachProfileSetup API error:",
@@ -68,20 +103,18 @@ const coachService = {
   },
 
   async saveStory({ id, story }) {
+    // PATCH /coach/story (protected)
     try {
-      const token = await get("auth");
+      const headers = await authHeader();
       const res = await axios.patch(
-        `${BASE_API_URL}/coach/saveStory`,
+        `${BASE_API_URL}/coach/story`,
         { id, story },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers }
       );
-
       return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
       };
     } catch (err) {
       console.error("saveStory API error:", err.response?.data || err.message);
@@ -94,20 +127,18 @@ const coachService = {
   },
 
   async coachAgreementTerms({ id, agreement_terms }) {
+    // PATCH /coach/agreement-terms (protected)
     try {
-      const token = await get("auth");
+      const headers = await authHeader();
       const res = await axios.patch(
-        `${BASE_API_URL}/coach/coachAgreementTerms`,
+        `${BASE_API_URL}/coach/agreement-terms`,
         { id, agreement_terms },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers }
       );
-
       return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
       };
     } catch (err) {
       console.error(
@@ -123,34 +154,19 @@ const coachService = {
     }
   },
 
-  async getMyInfo() {
-    try {
-      const token = await get("auth");
-      const res = await axios.get(`${BASE_API_URL}/coach/getMyInfo`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return { success: true, data: res.data.data, message: res.data.message };
-    } catch (err) {
-      console.error("getMyInfo API error:", err.response?.data || err.message);
-      return {
-        success: false,
-        message: err.response?.data?.message || "Failed to fetch coach info",
-      };
-    }
-  },
-
   async deleteCoachAccount(coachId) {
+    // DELETE /coach/delete/:id (protected)
     try {
-      const token = await get("auth"); // get auth token from secure store
-
+      const headers = await authHeader();
       const res = await axios.delete(
-        `${BASE_API_URL}/coach/deleteCoach/${coachId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `${BASE_API_URL}/coach/delete/${coachId}`,
+        { headers }
       );
-
-      return { success: true, message: res.data.message, data: res.data.data };
+      return {
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
+      };
     } catch (err) {
       console.error(
         "deleteCoachAccount API error:",
@@ -165,13 +181,17 @@ const coachService = {
     }
   },
 
+  /* -------------------- Uploads -------------------- */
+
   async uploadCertificate({ id, index, file }) {
+    // POST /coach/upload/certificates  (protected)
+    // field name: "certificates" (array), body.index can be single or array
     try {
-      const token = await get("auth");
+      const headers = await authHeader();
 
       const formData = new FormData();
       formData.append("id", id);
-      formData.append("index", index); // single slot index
+      formData.append("index", index);
 
       if (file) {
         formData.append("certificates", {
@@ -182,20 +202,20 @@ const coachService = {
       }
 
       const res = await axios.post(
-        `${BASE_API_URL}/coach/upload-certificates`,
+        `${BASE_API_URL}/coach/upload/certificates`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...headers,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
       return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
       };
     } catch (err) {
       console.error(
@@ -212,12 +232,13 @@ const coachService = {
   },
 
   async uploadWorkAsset({ id, index, file }) {
+    // PATCH /coach/upload/work-assets (protected)
     try {
-      const token = await get("auth");
+      const headers = await authHeader();
+
       const formData = new FormData();
       formData.append("id", id);
       formData.append("index", index);
-
       if (file) {
         formData.append("workAsset", {
           uri: file.content,
@@ -231,20 +252,20 @@ const coachService = {
       }
 
       const res = await axios.patch(
-        `${BASE_API_URL}/coach/upload-work-asset`,
+        `${BASE_API_URL}/coach/upload/work-assets`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...headers,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
       return {
-        success: true,
-        message: res.data.message,
-        data: res.data.data,
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
       };
     } catch (err) {
       console.error(
@@ -252,22 +273,17 @@ const coachService = {
         err.response?.data || err.message
       );
 
-      // Grab more detail from backend response if available
       const status = err.response?.status;
       const backendMessage = err.response?.data?.message;
       const backendError = err.response?.data?.error;
 
       let userMessage = "Failed to upload/delete work asset";
-      if (status === 400 && backendMessage) {
-        userMessage = backendMessage; // e.g. "Indexes required"
-      } else if (status === 404) {
-        userMessage = "Coach not found";
-      } else if (status === 415) {
+      if (status === 400 && backendMessage) userMessage = backendMessage;
+      else if (status === 404) userMessage = "Coach not found";
+      else if (status === 415)
         userMessage =
           backendMessage || "Invalid file type. Only images and videos allowed";
-      } else if (backendMessage) {
-        userMessage = backendMessage;
-      }
+      else if (backendMessage) userMessage = backendMessage;
 
       return {
         success: false,
@@ -278,7 +294,30 @@ const coachService = {
     }
   },
 
-  // ✅ Placeholder for future APIs
+  // add inside coachService (optional)
+  async uploadProfilePicture(fileUri) {
+    try {
+      const headers = await authHeader();
+      const form = new FormData();
+      form.append("profilePicture", {
+        uri: fileUri,
+        type: "image/jpeg",
+        name: "profile.jpg",
+      });
+      const res = await axios.post(
+        `${BASE_API_URL}/coach/upload/profile-picture`,
+        form,
+        { headers: { ...headers, "Content-Type": "multipart/form-data" } }
+      );
+      return {
+        success: !!res.data?.ok,
+        message: res.data?.message,
+        data: res.data?.data,
+      };
+    } catch (e) {
+      return { success: false, message: "Failed to upload" };
+    }
+  },
 };
 
 export default coachService;
