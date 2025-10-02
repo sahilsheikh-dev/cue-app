@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -12,78 +12,152 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import styles from "./treeSelectDropdownCss";
 import Button from "../button/button";
 
+/**
+ * Props:
+ * - label: string
+ * - selectedTitle: string
+ * - selected: string[] (ids)
+ * - onChange: (ids: string[]) => void
+ * - disabled?: boolean
+ * - fetchRoot: () => Promise<{id,title,contains_subtopic,parent_id}[]>
+ * - fetchChildren: (parentId: string) => Promise<same[]>
+ */
 const TreeSelectDropdown = ({
   label,
   selectedTitle,
-  data,
   selected = [],
   onChange,
   disabled = false,
+  fetchRoot,
+  fetchChildren,
 }) => {
   const sheetRef = useRef();
-  const [currentOptions, setCurrentOptions] = useState(data);
-  const [path, setPath] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const toggleSelect = (title) => {
-    if (selected.includes(title)) {
-      onChange(selected.filter((x) => x !== title));
+  const [items, setItems] = useState([]); // items currently visible
+  const [stack, setStack] = useState([]); // breadcrumb navigation
+  const [titleCache, setTitleCache] = useState({}); // {id: title}
+
+  const openSheet = async () => {
+    if (disabled) return;
+    sheetRef.current.open();
+    if (items.length === 0) {
+      await loadRoot();
+    }
+  };
+
+  const loadRoot = async () => {
+    try {
+      setLoading(true);
+      const arr = (await fetchRoot()) || [];
+      setItems(arr);
+      const tc = {};
+      arr.forEach((it) => (tc[it.id] = it.title));
+      setTitleCache((prev) => ({ ...prev, ...tc }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goDeeper = async (node) => {
+    try {
+      setLoading(true);
+      const children = (await fetchChildren(node.id)) || [];
+      setStack((prev) => [
+        ...prev,
+        { parentId: node.id, parentTitle: node.title, snapshotItems: items },
+      ]);
+      setItems(children);
+      const tc = {};
+      children.forEach((it) => (tc[it.id] = it.title));
+      setTitleCache((prev) => ({ ...prev, ...tc }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goBack = () => {
+    if (stack.length === 0) return;
+    const nextStack = [...stack];
+    const last = nextStack.pop();
+    setStack(nextStack);
+    setItems(last.snapshotItems || []);
+  };
+
+  const toggleSelect = (id) => {
+    if (selected.includes(id)) {
+      onChange(selected.filter((x) => x !== id));
     } else {
-      onChange([...selected, title]);
+      onChange([...selected, id]);
     }
   };
 
-  const handleGoDeeper = (key, option) => {
-    setPath((prev) => [...prev, key]);
-    setCurrentOptions(option.sub);
-  };
+  // 🔹 Preload titles for already selected IDs
+  useEffect(() => {
+    if (selected.length === 0) return;
+    const preloadTitles = async () => {
+      // If some IDs not in cache, fetch their parent sets
+      const missingIds = selected.filter((id) => !titleCache[id]);
+      if (missingIds.length > 0) {
+        try {
+          // Try to get root first
+          const roots = await fetchRoot();
+          const tc = {};
+          roots.forEach((it) => (tc[it.id] = it.title));
+          setTitleCache((prev) => ({ ...prev, ...tc }));
+          // Try children of each root
+          for (const root of roots) {
+            if (root.contains_subtopic) {
+              const children = await fetchChildren(root.id);
+              const childMap = {};
+              children.forEach((it) => (childMap[it.id] = it.title));
+              setTitleCache((prev) => ({ ...prev, ...childMap }));
+            }
+          }
+        } catch (err) {
+          console.error("Preload activity titles error:", err);
+        }
+      }
+    };
+    preloadTitles();
+  }, [selected]);
 
-  const handleBack = () => {
-    const newPath = [...path];
-    newPath.pop();
-
-    let newOptions = data;
-    for (const key of newPath) {
-      newOptions = newOptions[key].sub;
-    }
-
-    setPath(newPath);
-    setCurrentOptions(newOptions);
-  };
+  const selectedText =
+    selected.length > 0
+      ? selected.map((id) => titleCache[id] || id).join(", ")
+      : label;
 
   return (
     <>
       {/* Trigger */}
       <TouchableOpacity
         style={[styles.triggerWrapper, disabled && { opacity: 0.6 }]}
-        onPress={() => !disabled && sheetRef.current.open()}
+        onPress={openSheet}
         disabled={disabled}
       >
         <LinearGradient
           colors={["rgba(255,255,255,0.1)", "rgba(30,53,126,0.1)"]}
           style={styles.triggerInner}
         >
-          <Text style={styles.selectedText}>
-            {selected.length > 0 ? selected.join(", ") : label}
-          </Text>
+          <Text style={styles.selectedText}>{selectedText}</Text>
           <Ionicons name="chevron-down" size={20} color="#fff" />
         </LinearGradient>
       </TouchableOpacity>
 
       {/* Bottom Sheet */}
-      <RBSheet ref={sheetRef} height={500}>
+      <RBSheet ref={sheetRef} height={520}>
         <LinearGradient
           style={{ flex: 1, padding: 16 }}
           colors={["rgb(40, 57, 109)", "rgb(27, 44, 98)"]}
         >
-          {/* Back button */}
-          {path.length > 0 && (
+          {stack.length > 0 && (
             <TouchableOpacity
               style={{
                 marginBottom: 12,
                 flexDirection: "row",
                 alignItems: "center",
               }}
-              onPress={handleBack}
+              onPress={goBack}
               disabled={disabled}
             >
               <Ionicons name="arrow-back" size={20} color="orange" />
@@ -91,74 +165,84 @@ const TreeSelectDropdown = ({
             </TouchableOpacity>
           )}
 
-          <ScrollView>
-            {Object.entries(currentOptions).map(([key, option]) => {
-              const isSelected = selected.includes(option.title);
-
-              return (
-                <View
-                  key={option.id}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginVertical: 8,
-                    padding: 10,
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    borderRadius: 8,
-                  }}
-                >
-                  <TouchableOpacity
+          {loading ? (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ActivityIndicator color="#fff" />
+            </View>
+          ) : (
+            <ScrollView>
+              {items.map((option) => {
+                const isSelected = selected.includes(option.id);
+                return (
+                  <View
+                    key={option.id}
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      flex: 1,
-                      opacity: disabled ? 0.6 : 1,
+                      justifyContent: "space-between",
+                      marginVertical: 8,
+                      padding: 10,
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      borderRadius: 8,
                     }}
-                    onPress={() => !disabled && toggleSelect(option.title)}
-                    disabled={disabled}
                   >
-                    <Ionicons
-                      name={isSelected ? "radio-button-on" : "radio-button-off"}
-                      size={20}
-                      color={isSelected ? "lightgreen" : "#fff"}
-                      style={{ marginRight: 10 }}
-                    />
-                    <Text style={{ color: "#fff", fontSize: 16 }}>
-                      {option.title}
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* Go Deeper */}
-                  {option.sub && Object.keys(option.sub).length > 0 && (
                     <TouchableOpacity
-                      onPress={() => !disabled && handleGoDeeper(key, option)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        flex: 1,
+                        opacity: disabled ? 0.6 : 1,
+                      }}
+                      onPress={() => !disabled && toggleSelect(option.id)}
                       disabled={disabled}
                     >
                       <Ionicons
-                        name="chevron-forward"
+                        name={isSelected ? "checkbox" : "square-outline"}
                         size={20}
-                        color="skyblue"
+                        color={isSelected ? "lightgreen" : "#fff"}
+                        style={{ marginRight: 10 }}
                       />
+                      <Text style={{ color: "#fff", fontSize: 16 }}>
+                        {option.title}
+                      </Text>
                     </TouchableOpacity>
-                  )}
-                </View>
-              );
-            })}
-          </ScrollView>
 
-          {/* ✅ Close / Done Button */}
+                    {option.contains_subtopic && (
+                      <TouchableOpacity
+                        onPress={() => !disabled && goDeeper(option)}
+                        disabled={disabled}
+                      >
+                        <Ionicons
+                          name="chevron-forward"
+                          size={20}
+                          color="skyblue"
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                );
+              })}
+            </ScrollView>
+          )}
+
           <Button text={"Done"} onPress={() => sheetRef.current.close()} />
         </LinearGradient>
       </RBSheet>
 
-      {/* Selected preview */}
       {selected.length > 0 && (
         <View style={{ marginTop: 16 }}>
           <Text style={{ color: "#fff", fontSize: 14, marginBottom: 6 }}>
             {selectedTitle} :
           </Text>
-          <Text style={{ color: "lightgreen" }}>{selected.join(", ")}</Text>
+          <Text style={{ color: "lightgreen" }}>
+            {selected.map((id) => titleCache[id] || id).join(", ")}
+          </Text>
         </View>
       )}
     </>

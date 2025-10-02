@@ -97,14 +97,12 @@ export default function CoachPersonalProfileDetails({ navigation }) {
       setEmail(data.user.email || "");
       setDob(data.user.dob || "");
 
-      // setGender(genders.find((g) => g.id === data.user.gender) || "");
       const matchedGender = genders.find(
         (g) => g.id.toLowerCase() === data.user.gender?.toLowerCase()
       );
       setGender(matchedGender || null);
 
       setCountry(countries.find((c) => c.name === data.user.country) || "");
-
       setCity(data.user.city || "");
       setAddress(data.user.address || "");
       setPincode(data.user.pincode ? String(data.user.pincode) : "");
@@ -134,28 +132,23 @@ export default function CoachPersonalProfileDetails({ navigation }) {
     return age;
   };
 
-  // 🔹 reusable validation function
+  // Validation
   const validateFields = () => {
     if (!email.trim())
       return Alert.alert("Validation Error", "Email is required") || false;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email))
-      return (
-        Alert.alert("Validation Error", "Please enter a valid email address") ||
-        false
-      );
+      return Alert.alert("Validation Error", "Enter valid email") || false;
 
     if (!dob)
       return (
         Alert.alert("Validation Error", "Date of Birth is required") || false
       );
-
     const age = calculateAge(dob);
     if (age < 18)
       return (
-        Alert.alert("Validation Error", "You must be at least 18 years old") ||
-        false
+        Alert.alert("Validation Error", "You must be at least 18") || false
       );
 
     if (!gender)
@@ -164,10 +157,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
       );
     if (!experienceDate)
       return (
-        Alert.alert(
-          "Validation Error",
-          "Please select experience start date"
-        ) || false
+        Alert.alert("Validation Error", "Select experience start date") || false
       );
     if (!country)
       return (
@@ -182,17 +172,13 @@ export default function CoachPersonalProfileDetails({ navigation }) {
       return Alert.alert("Validation Error", "Pincode is required") || false;
     if (!/^\d+$/.test(pincode))
       return (
-        Alert.alert("Validation Error", "Pincode must contain only numbers") ||
-        false
+        Alert.alert("Validation Error", "Pincode must be numbers") || false
       );
 
     const [agree_certification, agree_experience, agree_refund] = checked;
     if (!agree_certification || !agree_experience || !agree_refund)
       return (
-        Alert.alert(
-          "Validation Error",
-          "Please agree to all terms to continue"
-        ) || false
+        Alert.alert("Validation Error", "Please agree to all terms") || false
       );
 
     return true;
@@ -219,7 +205,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
   };
 
   const validateAndContinue = () => {
-    if (isEdit && !validateFields()) return; // only validate when editing
+    if (isEdit && !validateFields()) return;
     const payload = buildPayload();
     navigation.navigate("CoachClientAcceptanceDetails", payload);
   };
@@ -228,16 +214,8 @@ export default function CoachPersonalProfileDetails({ navigation }) {
     <ScreenLayout scrollable withPadding>
       <Header
         title="cue"
-        showBack={!isEdit} // 🔹 hide back in edit mode
+        showBack={!isEdit}
         onBackPress={() => navigation.goBack()}
-        rightIcon={isEdit ? "eye-outline" : "create-outline"}
-        onRightPress={() => {
-          if (isEdit) {
-            if (validateFields()) setIsEdit(false);
-          } else {
-            setIsEdit(true);
-          }
-        }}
       />
 
       <View style={styles.welcome_view}>
@@ -353,6 +331,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
         icon="pin"
         disabled={!isEdit}
       />
+
       {agreements.map((item, idx) => (
         <TouchableOpacity
           key={idx}
@@ -370,11 +349,30 @@ export default function CoachPersonalProfileDetails({ navigation }) {
         </TouchableOpacity>
       ))}
 
-      {/* ✅ Show Next only in preview mode */}
-      {!isEdit && (
+      {/* Buttons */}
+      {!isEdit ? (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 20,
+          }}
+        >
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <Button text="Edit" onPress={() => setIsEdit(true)} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Button
+              text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+              onPress={validateAndContinue}
+            />
+          </View>
+        </View>
+      ) : (
         <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+          text="Next"
           onPress={validateAndContinue}
+          style={{ marginTop: 20 }}
         />
       )}
     </ScreenLayout>
