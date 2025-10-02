@@ -1,29 +1,34 @@
-import { StyleSheet, Dimensions } from "react-native";
-
-const { width, height } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  // ==== Containers ====
   sectionCard: {
     backgroundColor: "rgba(255,255,255,0.05)",
     borderRadius: 12,
     padding: 12,
     marginVertical: 15,
   },
+  sessionCard: {
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+  },
+  sessionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   sessionRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 8,
-    padding: 8,
+    gap: 8,
   },
-
-  // ==== Header & Titles ====
   sectionTitle: {
     color: "#fff",
     fontSize: 16,
     marginBottom: 10,
+    textAlign: "center", // center align titles
   },
   discountTitle: {
     color: "#fff",
@@ -31,23 +36,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
   },
-
-  // ==== Buttons / Radio ====
-  radioOuter: {
-    height: 24,
-    width: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 6,
+  whiteText: {
+    color: "#fff",
   },
-  radioInner: {
-    height: 12,
-    width: 12,
-    borderRadius: 6,
-    backgroundColor: "#4da6ff",
+  discountRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    gap: 8,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    marginBottom: 12,
   },
   levelBtn: {
     paddingHorizontal: 16,
@@ -61,51 +62,13 @@ const styles = StyleSheet.create({
   levelBtnActive: {
     backgroundColor: "rgba(255,255,255,0.2)",
   },
-
-  // ==== Text ====
-  whiteText: {
-    color: "#fff",
-  },
-  durationText: {
-    color: "#4da6ff",
-  },
-
-  // ==== Inputs ====
-  input: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 6,
-    color: "#fff",
-    textAlign: "center",
-  },
-  discountInput: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 8,
-    color: "#fff",
-  },
-  timeBtn: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 6,
-    marginRight: 6,
-    alignItems: "center",
-  },
-
-  // ==== Discount Section ====
-  discountCard: {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 8,
-    padding: 10,
-  },
-  discountRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 10,
+  hiddenInput: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0,
   },
 });
 

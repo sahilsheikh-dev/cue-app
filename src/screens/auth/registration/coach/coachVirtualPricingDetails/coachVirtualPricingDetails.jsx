@@ -108,16 +108,11 @@ export default function CoachVirtualPricingDetails({ navigation }) {
     if (!isoDate) return "Pick Date";
     const d = new Date(isoDate);
     return d.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
+      weekday: "long",
       day: "numeric",
+      month: "long",
+      year: "numeric",
     });
-  };
-
-  const validateTimes = (start, end) => {
-    if (!start || !end) return true;
-    const [sH, sM] = start.split(":")[0].split(" ");
-    return end >= start;
   };
 
   const onPicked = (event, selectedDate) => {
@@ -144,34 +139,8 @@ export default function CoachVirtualPricingDetails({ navigation }) {
           hour: "2-digit",
           minute: "2-digit",
         });
-
         setSessions((prev) => {
           const updated = [...prev[session]];
-          if (
-            type === "end" &&
-            updated[idx].start &&
-            time < updated[idx].start
-          ) {
-            Alert.alert(
-              "Validation Error",
-              "End time cannot be before start time"
-            );
-            return prev;
-          }
-          if (type === "start") {
-            const now = new Date();
-            const current = now.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            if (time < current) {
-              Alert.alert(
-                "Validation Error",
-                "Start time cannot be before current time"
-              );
-              return prev;
-            }
-          }
           updated[idx][type] = time;
           return { ...prev, [session]: updated };
         });
@@ -180,18 +149,26 @@ export default function CoachVirtualPricingDetails({ navigation }) {
     setPicker((p) => ({ ...p, show: false }));
   };
 
+  const addDiscountRow = (sessionType) => {
+    setDiscounts((prev) => ({
+      ...prev,
+      [sessionType]: [...prev[sessionType], { min: "", max: "", pct: "" }],
+    }));
+  };
+
+  const removeDiscountRow = (sessionType, idx) => {
+    setDiscounts((prev) => {
+      const updated = [...prev[sessionType]];
+      updated.splice(idx, 1);
+      return { ...prev, [sessionType]: updated };
+    });
+  };
+
   const updateDiscount = (sessionType, idx, field, value) => {
     if (!isEdit) return;
     setDiscounts((prev) => {
       const updated = [...prev[sessionType]];
       updated[idx][field] = value;
-      if (
-        field === "max" &&
-        Number(updated[idx].max) < Number(updated[idx].min)
-      ) {
-        Alert.alert("Validation Error", "Max cannot be less than Min");
-        updated[idx].max = "";
-      }
       return { ...prev, [sessionType]: updated };
     });
   };
@@ -208,6 +185,28 @@ export default function CoachVirtualPricingDetails({ navigation }) {
         "Validation Error",
         "Please add at least one session."
       );
+    }
+    for (const type of ["private", "group"]) {
+      for (const d of discounts[type]) {
+        if (!d.min || !d.max || !d.pct) {
+          return Alert.alert(
+            "Validation Error",
+            "Please fill all fields in bulk discounts."
+          );
+        }
+        if (Number(d.max) < Number(d.min)) {
+          return Alert.alert(
+            "Validation Error",
+            "Max booking cannot be less than Min booking in discounts."
+          );
+        }
+        if (Number(d.pct) <= 0) {
+          return Alert.alert(
+            "Validation Error",
+            "% Off must be greater than 0."
+          );
+        }
+      }
     }
     const bookingDetails = {
       acceptedClientLevels: selectedLevels,
@@ -244,6 +243,7 @@ export default function CoachVirtualPricingDetails({ navigation }) {
         style={{
           flexDirection: "row",
           flexWrap: "wrap",
+          justifyContent: "center",
           opacity: !isEdit ? 0.6 : 1,
         }}
       >
@@ -275,7 +275,7 @@ export default function CoachVirtualPricingDetails({ navigation }) {
                 <Text style={styles.whiteText}>{formatDate(s.date)}</Text>
                 {isEdit && (
                   <TouchableOpacity onPress={() => removeSession(type, idx)}>
-                    <Ionicons name="trash-outline" size={20} color="red" />
+                    <Ionicons name="trash-outline" size={20} color="blue" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -299,10 +299,14 @@ export default function CoachVirtualPricingDetails({ navigation }) {
                   <Text style={styles.whiteText}>{s.end || "End Time"}</Text>
                 </TouchableOpacity>
 
-                <View style={styles.levelBtn}>
-                  <Text style={styles.whiteText}>
-                    {s.price ? `₹${s.price}` : "Price"}
-                  </Text>
+                <View
+                  style={[
+                    styles.levelBtn,
+                    { flexDirection: "row", alignItems: "center" },
+                  ]}
+                >
+                  <Text style={[styles.whiteText, { marginRight: 4 }]}>$</Text>
+                  <Text style={styles.whiteText}>{s.price || "Price"}</Text>
                   {isEdit && (
                     <TextInput
                       style={styles.hiddenInput}
@@ -327,31 +331,61 @@ export default function CoachVirtualPricingDetails({ navigation }) {
           {/* Discounts */}
           <Text style={styles.discountTitle}>Bulk Booking Discounts</Text>
           {discounts[type].map((d, idx) => (
-            <View key={idx} style={styles.discountRow}>
-              {["min", "max", "pct"].map((field, i) => (
-                <View key={i} style={styles.levelBtn}>
-                  <Text style={styles.whiteText}>
-                    {d[field]
-                      ? `${field === "pct" ? d[field] + "% Off" : d[field]}`
-                      : field.toUpperCase()}
-                  </Text>
-                  {isEdit && (
-                    <TextInput
-                      style={styles.hiddenInput}
-                      keyboardType="numeric"
-                      value={d[field]?.toString()}
-                      onChangeText={(val) =>
-                        updateDiscount(type, idx, field, val)
-                      }
-                    />
-                  )}
+            <View key={idx} style={styles.discountCard}>
+              <View style={styles.discountRow}>
+                {/* Min */}
+                <TextInput
+                  style={styles.discountInput}
+                  placeholder="Min"
+                  placeholderTextColor="#aaa"
+                  keyboardType="numeric"
+                  value={d.min?.toString()}
+                  onChangeText={(val) => updateDiscount(type, idx, "min", val)}
+                  editable={isEdit}
+                />
+
+                <Text style={{ color: "#fff", marginHorizontal: 6 }}>to</Text>
+
+                {/* Max */}
+                <TextInput
+                  style={styles.discountInput}
+                  placeholder="Max"
+                  placeholderTextColor="#aaa"
+                  keyboardType="numeric"
+                  value={d.max?.toString()}
+                  onChangeText={(val) => updateDiscount(type, idx, "max", val)}
+                  editable={isEdit}
+                />
+
+                {/* % Off */}
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <TextInput
+                    style={[
+                      styles.discountInput,
+                      { width: 60, marginRight: 4 },
+                    ]}
+                    placeholder="%"
+                    placeholderTextColor="#aaa"
+                    keyboardType="numeric"
+                    value={d.pct?.toString()}
+                    onChangeText={(val) =>
+                      updateDiscount(type, idx, "pct", val)
+                    }
+                    editable={isEdit}
+                  />
+                  <Text style={{ color: "#fff" }}>% Off</Text>
                 </View>
-              ))}
-              {isEdit && (
-                <TouchableOpacity onPress={() => removeDiscountRow(type, idx)}>
-                  <Ionicons name="trash-outline" size={20} color="red" />
-                </TouchableOpacity>
-              )}
+
+                {/* Delete */}
+                {isEdit && (
+                  <TouchableOpacity
+                    onPress={() => removeDiscountRow(type, idx)}
+                    style={styles.trashBtn}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="blue" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           ))}
           {isEdit && (
@@ -371,11 +405,20 @@ export default function CoachVirtualPricingDetails({ navigation }) {
         />
       )}
       {isEdit && (
-        <Button
-          text="Save Virtual Pricing"
-          onPress={onSave}
-          style={{ marginTop: 20 }}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 20,
+          }}
+        >
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <Button text="Cancel" onPress={() => setIsEdit(false)} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Button text="Save" onPress={onSave} style={{ marginTop: 20 }} />
+          </View>
+        </View>
       )}
 
       {picker.show && (

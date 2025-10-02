@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     marginBottom: 10,
+    textAlign: "center", // center align titles
   },
   discountTitle: {
     color: "#fff",
@@ -38,37 +39,16 @@ const styles = StyleSheet.create({
   whiteText: {
     color: "#fff",
   },
-  timeBtn: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 8,
-    alignItems: "center",
-    marginRight: 6,
-  },
-  input: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 8,
-    color: "#fff",
-    textAlign: "center",
-  },
-  discountCard: {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 8,
-    padding: 10,
-  },
   discountRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
     gap: 8,
-  },
-  discountInput: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    padding: 8,
-    color: "#fff",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 10,
+    marginBottom: 12,
   },
   levelBtn: {
     paddingHorizontal: 16,
@@ -82,10 +62,13 @@ const styles = StyleSheet.create({
   levelBtnActive: {
     backgroundColor: "rgba(255,255,255,0.2)",
   },
-  removeIcon: {
-    color: "red",
-    fontSize: 18,
-    fontWeight: "bold",
+  hiddenInput: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0,
   },
 });
 

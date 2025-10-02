@@ -29,15 +29,14 @@ export default function CoachInPersonPricingDetails({ navigation }) {
   const [picker, setPicker] = useState({
     show: false,
     mode: "date",
-    type: null, // "start" | "end" | "date"
-    session: null, // private | group
+    type: null,
+    session: null,
     idx: null,
   });
 
   const [sessions, setSessions] = useState({ private: [], group: [] });
   const [discounts, setDiscounts] = useState({ private: [], group: [] });
 
-  // hydrate from DataContext
   useEffect(() => {
     if (data?.user?.bookingDetails?.inPerson) {
       const bd = data.user.bookingDetails;
@@ -53,7 +52,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     }
   }, [data?.user?.bookingDetails]);
 
-  // toggle client levels
   const toggleLevel = (lvl) => {
     if (!isEdit) return;
     setSelectedLevels((prev) =>
@@ -61,7 +59,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     );
   };
 
-  // add session
   const addSession = (sessionType, date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -79,7 +76,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     }));
   };
 
-  // remove session
   const removeSession = (sessionType, idx) => {
     if (!isEdit) return;
     setSessions((prev) => {
@@ -89,7 +85,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  // update price
   const updateDayPrice = (sessionType, idx, value) => {
     if (!isEdit) return;
     setSessions((prev) => {
@@ -99,7 +94,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  // open picker
   const openPicker = (sessionType, idx, type) => {
     if (!isEdit) return;
     setPicker({
@@ -115,9 +109,10 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     if (!isoDate) return "Pick Date";
     const d = new Date(isoDate);
     return d.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
+      weekday: "long",
       day: "numeric",
+      month: "long",
+      year: "numeric",
     });
   };
 
@@ -145,34 +140,8 @@ export default function CoachInPersonPricingDetails({ navigation }) {
           hour: "2-digit",
           minute: "2-digit",
         });
-
         setSessions((prev) => {
           const updated = [...prev[session]];
-          if (
-            type === "end" &&
-            updated[idx].start &&
-            time < updated[idx].start
-          ) {
-            Alert.alert(
-              "Validation Error",
-              "End time cannot be before start time"
-            );
-            return prev;
-          }
-          if (type === "start") {
-            const now = new Date();
-            const current = now.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            if (time < current) {
-              Alert.alert(
-                "Validation Error",
-                "Start time cannot be before current time"
-              );
-              return prev;
-            }
-          }
           updated[idx][type] = time;
           return { ...prev, [session]: updated };
         });
@@ -181,19 +150,11 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     setPicker((p) => ({ ...p, show: false }));
   };
 
-  // discounts
   const updateDiscount = (sessionType, idx, field, value) => {
     if (!isEdit) return;
     setDiscounts((prev) => {
       const updated = [...prev[sessionType]];
       updated[idx][field] = value;
-      if (
-        field === "max" &&
-        Number(updated[idx].max) < Number(updated[idx].min)
-      ) {
-        Alert.alert("Validation Error", "Max cannot be less than Min");
-        updated[idx].max = "";
-      }
       return { ...prev, [sessionType]: updated };
     });
   };
@@ -215,7 +176,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  // save
   const onSave = () => {
     if (!selectedLevels.length) {
       return Alert.alert(
@@ -229,7 +189,28 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         "Please add at least one session."
       );
     }
-
+    for (const type of ["private", "group"]) {
+      for (const d of discounts[type]) {
+        if (!d.min || !d.max || !d.pct) {
+          return Alert.alert(
+            "Validation Error",
+            "Please fill all fields in bulk discounts."
+          );
+        }
+        if (Number(d.max) < Number(d.min)) {
+          return Alert.alert(
+            "Validation Error",
+            "Max booking cannot be less than Min booking in discounts."
+          );
+        }
+        if (Number(d.pct) <= 0) {
+          return Alert.alert(
+            "Validation Error",
+            "% Off must be greater than 0."
+          );
+        }
+      }
+    }
     const bookingDetails = {
       acceptedClientLevels: selectedLevels,
       inPerson: {
@@ -266,6 +247,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         style={{
           flexDirection: "row",
           flexWrap: "wrap",
+          justifyContent: "center",
           opacity: !isEdit ? 0.6 : 1,
         }}
       >
@@ -297,7 +279,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
                 <Text style={styles.whiteText}>{formatDate(s.date)}</Text>
                 {isEdit && (
                   <TouchableOpacity onPress={() => removeSession(type, idx)}>
-                    <Ionicons name="trash-outline" size={20} color="red" />
+                    <Ionicons name="trash-outline" size={20} color="blue" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -321,10 +303,14 @@ export default function CoachInPersonPricingDetails({ navigation }) {
                   <Text style={styles.whiteText}>{s.end || "End Time"}</Text>
                 </TouchableOpacity>
 
-                <View style={styles.levelBtn}>
-                  <Text style={styles.whiteText}>
-                    {s.price ? `₹${s.price}` : "Price"}
-                  </Text>
+                <View
+                  style={[
+                    styles.levelBtn,
+                    { flexDirection: "row", alignItems: "center" },
+                  ]}
+                >
+                  <Text style={[styles.whiteText, { marginRight: 4 }]}>$</Text>
+                  <Text style={styles.whiteText}>{s.price || "Price"}</Text>
                   {isEdit && (
                     <TextInput
                       style={styles.hiddenInput}
@@ -349,31 +335,71 @@ export default function CoachInPersonPricingDetails({ navigation }) {
           {/* Discounts */}
           <Text style={styles.discountTitle}>Bulk Booking Discounts</Text>
           {discounts[type].map((d, idx) => (
-            <View key={idx} style={styles.discountRow}>
-              {["min", "max", "pct"].map((field, i) => (
-                <View key={i} style={styles.levelBtn}>
+            <View key={idx} style={styles.discountCard}>
+              <View style={styles.discountRow}>
+                {/* Min */}
+                <View style={styles.discountBox}>
+                  <Text style={styles.whiteText}>{d.min || "Min"}</Text>
+                  {isEdit && (
+                    <TextInput
+                      style={styles.hiddenInput}
+                      keyboardType="numeric"
+                      value={d.min?.toString()}
+                      onChangeText={(val) =>
+                        updateDiscount(type, idx, "min", val)
+                      }
+                    />
+                  )}
+                </View>
+
+                <Text style={{ color: "#fff" }}>to</Text>
+
+                {/* Max */}
+                <View style={styles.discountBox}>
+                  <Text style={styles.whiteText}>{d.max || "Max"}</Text>
+                  {isEdit && (
+                    <TextInput
+                      style={styles.hiddenInput}
+                      keyboardType="numeric"
+                      value={d.max?.toString()}
+                      onChangeText={(val) =>
+                        updateDiscount(type, idx, "max", val)
+                      }
+                    />
+                  )}
+                </View>
+
+                {/* % Off */}
+                <View
+                  style={[
+                    styles.discountBox,
+                    { flexDirection: "row", alignItems: "center" },
+                  ]}
+                >
                   <Text style={styles.whiteText}>
-                    {d[field]
-                      ? `${field === "pct" ? d[field] + "% Off" : d[field]}`
-                      : field.toUpperCase()}
+                    {d.pct ? `${d.pct}% Off` : "% Off"}
                   </Text>
                   {isEdit && (
                     <TextInput
                       style={styles.hiddenInput}
                       keyboardType="numeric"
-                      value={d[field]?.toString()}
+                      value={d.pct?.toString()}
                       onChangeText={(val) =>
-                        updateDiscount(type, idx, field, val)
+                        updateDiscount(type, idx, "pct", val)
                       }
                     />
                   )}
                 </View>
-              ))}
-              {isEdit && (
-                <TouchableOpacity onPress={() => removeDiscountRow(type, idx)}>
-                  <Ionicons name="trash-outline" size={20} color="red" />
-                </TouchableOpacity>
-              )}
+
+                {isEdit && (
+                  <TouchableOpacity
+                    onPress={() => removeDiscountRow(type, idx)}
+                    style={styles.trashBtn}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="blue" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           ))}
           {isEdit && (
@@ -393,11 +419,20 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         />
       )}
       {isEdit && (
-        <Button
-          text="Save In-Person Pricing"
-          onPress={onSave}
-          style={{ marginTop: 20 }}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 20,
+          }}
+        >
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <Button text="Cancel" onPress={() => setIsEdit(false)} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Button text="Save" onPress={onSave} style={{ marginTop: 20 }} />
+          </View>
+        </View>
       )}
 
       {picker.show && (
