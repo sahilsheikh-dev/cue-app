@@ -35,7 +35,9 @@ export default function CoachPersonalInformation({ navigation }) {
           <View style={styles.profile_section}>
             <Image
               source={
-                data?.user?.profilePicture
+                data?.user?.workAssets && data.user.workAssets.length > 0
+                  ? { uri: data.user.workAssets[0].path }
+                  : data?.user?.profilePicture
                   ? { uri: data.user.profilePicture }
                   : require("../../../../../assets/images/profile.png")
               }
