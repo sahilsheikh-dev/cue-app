@@ -1,13 +1,6 @@
-// src/services/coachServices/coachService.js
-import axios from "axios";
+import api from "../../config/axiosConfig";
 import { BASE_API_URL } from "../../config/app.config";
 import get from "../../secureStore/get"; // secure token
-
-// helper: get Bearer header from secure store
-async function authHeader() {
-  const token = await get("auth");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 /** RN-safe file part builder */
 function buildFilePartFromAsset(file, defaultName = "upload.jpg") {
@@ -40,7 +33,7 @@ const coachService = {
 
   async signup(data) {
     try {
-      const res = await axios.post(`${BASE_API_URL}/coach/signup`, data);
+      const res = await api.post(`${BASE_API_URL}/coach/signup`, data);
       return {
         success: !!res.data?.ok,
         message: res.data?.message || "Signup successful",
@@ -58,7 +51,7 @@ const coachService = {
 
   async checkMobileAvailability(mobile) {
     try {
-      const res = await axios.post(`${BASE_API_URL}/coach/check-mobile`, {
+      const res = await api.post(`${BASE_API_URL}/coach/check-mobile`, {
         mobile,
       });
       return {
@@ -81,8 +74,7 @@ const coachService = {
 
   async getMyInfo() {
     try {
-      const headers = await authHeader();
-      const res = await axios.get(`${BASE_API_URL}/coach/me`, { headers });
+      const res = await api.get(`${BASE_API_URL}/coach/me`);
       return {
         success: !!res.data?.ok,
         data: res.data?.data || res.data?.coach,
@@ -99,11 +91,9 @@ const coachService = {
 
   async coachProfileSetup(payload) {
     try {
-      const headers = await authHeader();
-      const res = await axios.patch(
+      const res = await api.patch(
         `${BASE_API_URL}/coach/profile-setup`,
-        payload,
-        { headers }
+        payload
       );
       return {
         success: !!res.data?.ok,
@@ -125,12 +115,7 @@ const coachService = {
 
   async saveStory({ id, story }) {
     try {
-      const headers = await authHeader();
-      const res = await axios.patch(
-        `${BASE_API_URL}/coach/story`,
-        { id, story },
-        { headers }
-      );
+      const res = await api.patch(`${BASE_API_URL}/coach/story`, { id, story });
       return {
         success: !!res.data?.ok,
         message: res.data?.message,
@@ -148,12 +133,10 @@ const coachService = {
 
   async coachAgreementTerms({ id, agreement_terms }) {
     try {
-      const headers = await authHeader();
-      const res = await axios.patch(
-        `${BASE_API_URL}/coach/agreement-terms`,
-        { id, agreement_terms },
-        { headers }
-      );
+      const res = await api.patch(`${BASE_API_URL}/coach/agreement-terms`, {
+        id,
+        agreement_terms,
+      });
       return {
         success: !!res.data?.ok,
         message: res.data?.message,
@@ -175,11 +158,7 @@ const coachService = {
 
   async deleteCoachAccount(coachId) {
     try {
-      const headers = await authHeader();
-      const res = await axios.delete(
-        `${BASE_API_URL}/coach/delete/${coachId}`,
-        { headers }
-      );
+      const res = await api.delete(`${BASE_API_URL}/coach/delete/${coachId}`);
       return {
         success: !!res.data?.ok,
         message: res.data?.message,
@@ -214,7 +193,7 @@ const coachService = {
         formData.append("file", part);
       }
 
-      const res = await axios.post(
+      const res = await api.post(
         `${BASE_API_URL}/coach/upload/certificates`,
         formData,
         {
@@ -261,7 +240,7 @@ const coachService = {
         formData.append("file", part);
       }
 
-      const res = await axios.patch(
+      const res = await api.patch(
         `${BASE_API_URL}/coach/upload/work-assets`,
         formData,
         {
@@ -290,14 +269,7 @@ const coachService = {
   // Save Pricing Slots API
   async savePricingSlots(payload) {
     try {
-      const headers = await authHeader();
-      const res = await axios.post(
-        `${BASE_API_URL}/coach/pricing/save`,
-        payload,
-        {
-          headers,
-        }
-      );
+      const res = await api.post(`${BASE_API_URL}/coach/pricing/save`, payload);
       return {
         success: !!res.data?.ok,
         message: res.data?.message || "Pricing saved successfully",
@@ -326,7 +298,7 @@ const coachService = {
   async listActivities(parentId = null) {
     try {
       const url = `${BASE_API_URL}/activities`;
-      const res = await axios.get(url, {
+      const res = await api.get(url, {
         params: parentId ? { parentId } : undefined,
       });
       const items = Array.isArray(res.data?.data) ? res.data.data : [];

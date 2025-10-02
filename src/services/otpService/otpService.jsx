@@ -1,5 +1,4 @@
-// src/services/otpService/otpService.js
-import axios from "axios";
+import api from "../../config/axiosConfig";
 import { BASE_API_URL } from "../../config/app.config";
 
 /**
@@ -9,7 +8,7 @@ import { BASE_API_URL } from "../../config/app.config";
  */
 async function sendOtp(phone, userType = "client") {
   try {
-    const res = await axios.post(`${BASE_API_URL}/otp/send`, {
+    const res = await api.post(`${BASE_API_URL}/otp/send`, {
       phone,
       userType,
     });
@@ -32,7 +31,7 @@ async function sendOtp(phone, userType = "client") {
  */
 async function verifyOtp(otpId, otp) {
   try {
-    const res = await axios.post(`${BASE_API_URL}/otp/verify`, { otpId, otp });
+    const res = await api.post(`${BASE_API_URL}/otp/verify`, { otpId, otp });
     if (res.data?.ok) {
       return { ok: true, ...res.data };
     }
@@ -53,7 +52,7 @@ async function verifyOtp(otpId, otp) {
  */
 async function resendOtp(otpId) {
   try {
-    const res = await axios.post(`${BASE_API_URL}/otp/resend`, { otpId });
+    const res = await api.post(`${BASE_API_URL}/otp/resend`, { otpId });
     if (res.data?.ok) {
       return { ok: true, ...res.data };
     }

@@ -10,7 +10,7 @@ import Splash from "./src/screens/common/splash/splash";
 import RootNavigator from "./src/screens/rootNavigator";
 
 import { BASE_API_URL, STRIPE_PUBLISHABLE_KEY } from "./src/config/app.config";
-import {
+import authService, {
   saveAuthTokenAndRole,
   initializeAuth,
   logout as clearLocalAuth,
@@ -135,18 +135,64 @@ export default function App() {
     (async () => {
       const { authToken, role, data_filled, user } = await initializeAuth();
       if (!mounted) return;
-      setData({
-        auth: !!authToken,
-        authToken: authToken || undefined,
-        role,
-        user,
-        url: BASE_API_URL,
-        data_filled,
-      });
+
+      if (authToken && role) {
+        // ✅ Validate token with server
+        const { ok, user: refreshedUser } = await authService.validateToken(
+          role
+        );
+        if (ok) {
+          setData({
+            auth: true,
+            authToken,
+            role,
+            user: refreshedUser || user,
+            url: BASE_API_URL,
+            data_filled,
+          });
+        } else {
+          // Token invalid → force logout
+          await clearLocalAuth();
+          setData({
+            auth: false,
+            authToken: undefined,
+            role: undefined,
+            user: null,
+            url: BASE_API_URL,
+            data_filled: false,
+          });
+        }
+      } else {
+        // No token at all
+        setData({
+          auth: false,
+          authToken: undefined,
+          role: undefined,
+          user: null,
+          url: BASE_API_URL,
+          data_filled: false,
+        });
+      }
+
       setLoading(false);
     })();
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    global.onUnauthorized = async () => {
+      console.log("🔄 Redirecting to Signup due to invalid JWT...");
+      await clearLocalAuth(); // from authService
+      setData({
+        auth: false,
+        authToken: undefined,
+        role: undefined,
+        user: null,
+        url: BASE_API_URL,
+        data_filled: false,
+      });
     };
   }, []);
 

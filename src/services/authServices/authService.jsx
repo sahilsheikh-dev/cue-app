@@ -1,5 +1,4 @@
-// src/services/authServices/authService.js
-import axios from "axios";
+import api from "../../config/axiosConfig";
 import put from "../../secureStore/put";
 import get from "../../secureStore/get";
 import remove from "../../secureStore/remove";
@@ -84,7 +83,7 @@ export async function logout() {
 export async function loginWithApi(mobile, password, role) {
   try {
     if (role === "coach") {
-      const res = await axios.post(`${BASE_API_URL}/coach/login`, {
+      const res = await api.post(`${BASE_API_URL}/coach/login`, {
         mobile,
         password,
       });
@@ -103,7 +102,7 @@ export async function loginWithApi(mobile, password, role) {
       return { ok: true, token, user };
     } else {
       // fallback to old endpoints if you still have them
-      const res = await axios.post(`${BASE_API_URL}/${role}/login`, {
+      const res = await api.post(`${BASE_API_URL}/${role}/login`, {
         mobile,
         password,
       });
@@ -136,7 +135,7 @@ export async function serverLogout() {
     const token = await get("auth");
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     // server: POST /coach/logout (verifyCoach protected) — revokes current cookie session if present
-    await axios
+    await api
       .post(`${BASE_API_URL}/coach/logout`, {}, { headers })
       .catch((e) => {
         console.warn(
@@ -156,7 +155,7 @@ export async function updatePassword(role, id, oldPassword, newPassword) {
   try {
     const token = await get("auth");
     if (!token) return { ok: false, error: "No auth token found" };
-    const res = await axios.put(
+    const res = await api.put(
       `${BASE_API_URL}/${role}/updatePassword/${id}`,
       { oldPassword, newPassword },
       { headers: { Authorization: `Bearer ${token}` } }
@@ -175,7 +174,7 @@ export async function updatePassword(role, id, oldPassword, newPassword) {
 export async function forgetPassword(role, mobile, newPassword) {
   try {
     // coach backend: PUT /coach/forget-password
-    const res = await axios.put(`${BASE_API_URL}/${role}/forget-password`, {
+    const res = await api.put(`${BASE_API_URL}/${role}/forget-password`, {
       mobile,
       newPassword,
     });
@@ -190,6 +189,31 @@ export async function forgetPassword(role, mobile, newPassword) {
   }
 }
 
+export async function validateToken(role) {
+  try {
+    const token = await get("auth");
+    if (!token) return { ok: false };
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    let endpoint;
+    if (role === "coach") endpoint = "/coach/me";
+    else if (role === "client") endpoint = "/client/me";
+    else if (role === "eventOrganizer") endpoint = "/eventOrganizer/me";
+    else if (role === "productCompany") endpoint = "/productCompany/me";
+
+    const res = await api.get(`${BASE_API_URL}${endpoint}`, { headers });
+
+    if (res.data?.ok || res.data?.success) {
+      return { ok: true, user: res.data.data || res.data[role] };
+    }
+    return { ok: false };
+  } catch (err) {
+    console.warn("validateToken failed:", err.response?.data || err.message);
+    return { ok: false };
+  }
+}
+
 const authService = {
   saveAuthTokenAndRole,
   initializeAuth,
@@ -200,6 +224,7 @@ const authService = {
   serverLogout,
   updatePassword,
   forgetPassword,
+  validateToken,
 };
 
 export default authService;
