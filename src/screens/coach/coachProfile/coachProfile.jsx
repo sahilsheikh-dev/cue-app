@@ -147,10 +147,10 @@ export default function CoachProfile({ navigation }) {
           <View style={styles.profile_section}>
             <Image
               source={
-                data?.user?.workAssets && data.user.workAssets.length > 0
-                  ? { uri: data.user.workAssets[0].path }
-                  : data?.user?.profilePicture
+                data?.user?.profilePicture
                   ? { uri: data.user.profilePicture }
+                  : data?.user?.workAssets && data.user.workAssets.length > 0
+                  ? { uri: data.user.workAssets[0].path }
                   : require("../../../../assets/images/profile.png")
               }
               style={styles.profile_img}

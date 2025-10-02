@@ -18,6 +18,8 @@ import Dropdown from "../../../../../components/common/dropdown/dropdown";
 import DatePickerField from "../../../../../components/common/datePickerField/datePickerField";
 import { DataContext } from "../../../../../context/dataContext";
 
+import countries from "../../../../../constants/countries";
+
 export default function CoachPersonalProfileDetails({ navigation }) {
   const { data } = useContext(DataContext);
 
@@ -31,51 +33,6 @@ export default function CoachPersonalProfileDetails({ navigation }) {
     { id: "male", name: "Male", icon: "male" },
     { id: "female", name: "Female", icon: "female" },
     { id: "other", name: "Other", icon: "male-female" },
-  ];
-
-  const countries = [
-    {
-      id: "in",
-      name: "India",
-      code: "+91",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/in.png",
-    },
-    {
-      id: "us",
-      name: "United States",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/us.png",
-    },
-    {
-      id: "gb",
-      name: "United Kingdom",
-      code: "+44",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/gb.png",
-    },
-    {
-      id: "ca",
-      name: "Canada",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/ca.png",
-    },
-    {
-      id: "au",
-      name: "Australia",
-      code: "+61",
-      number_of_digit: "9",
-      img: "https://flagcdn.com/w20/au.png",
-    },
-    {
-      id: "ae",
-      name: "United Arab Emirates",
-      code: "+971",
-      number_of_digit: "9",
-      img: "https://flagcdn.com/w20/ae.png",
-    },
   ];
 
   // State
@@ -214,7 +171,7 @@ export default function CoachPersonalProfileDetails({ navigation }) {
     <ScreenLayout scrollable withPadding>
       <Header
         title="cue"
-        showBack={!isEdit}
+        showBack={true}
         onBackPress={() => navigation.goBack()}
       />
 
@@ -350,31 +307,27 @@ export default function CoachPersonalProfileDetails({ navigation }) {
       ))}
 
       {/* Buttons */}
-      {!isEdit ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
-          }}
-        >
-          <View style={{ flex: 1, marginRight: 10 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+        }}
+      >
+        <View style={{ flex: 1, marginRight: 10 }}>
+          {!isEdit ? (
             <Button text="Edit" onPress={() => setIsEdit(true)} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Button
-              text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
-              onPress={validateAndContinue}
-            />
-          </View>
+          ) : (
+            <Button text="Cancel" onPress={() => setIsEdit(false)} />
+          )}
         </View>
-      ) : (
-        <Button
-          text="Next"
-          onPress={validateAndContinue}
-          style={{ marginTop: 20 }}
-        />
-      )}
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Button
+            text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
+            onPress={validateAndContinue}
+          />
+        </View>
+      </View>
     </ScreenLayout>
   );
 }

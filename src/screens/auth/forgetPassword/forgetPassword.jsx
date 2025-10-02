@@ -18,54 +18,10 @@ import Header from "../../../components/common/header/header";
 import otpService from "../../../services/otpService/otpService";
 import authService from "../../../services/authServices/authService";
 
-const background = require("../../../../assets/images/background.png");
+import countries from "../../../constants/countries";
 
 export default function ForgetPassword({ navigation }) {
   const roles = ["client", "coach", "eventOrganizer", "productCompany"];
-  const countries = [
-    {
-      id: "in",
-      name: "India",
-      code: "+91",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/in.png",
-    },
-    {
-      id: "us",
-      name: "United States",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/us.png",
-    },
-    {
-      id: "gb",
-      name: "United Kingdom",
-      code: "+44",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/gb.png",
-    },
-    {
-      id: "ca",
-      name: "Canada",
-      code: "+1",
-      number_of_digit: "10",
-      img: "https://flagcdn.com/w20/ca.png",
-    },
-    {
-      id: "au",
-      name: "Australia",
-      code: "+61",
-      number_of_digit: "9",
-      img: "https://flagcdn.com/w20/au.png",
-    },
-    {
-      id: "ae",
-      name: "United Arab Emirates",
-      code: "+971",
-      number_of_digit: "9",
-      img: "https://flagcdn.com/w20/ae.png",
-    },
-  ];
 
   const [role, setRole] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);

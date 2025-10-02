@@ -30,7 +30,7 @@ export default function CoachIntroduction({ navigation }) {
 
         <Button
           text={"Next"}
-          onPress={() => navigation.navigate("CoachPersonalProfileDetails")}
+          onPress={() => navigation.navigate("CueGuideline")}
           // onPress={() => {
           //   navigation.reset({
           //     index: 0,

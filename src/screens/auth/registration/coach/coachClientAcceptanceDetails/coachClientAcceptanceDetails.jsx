@@ -1,4 +1,3 @@
-// src/screens/auth/registration/coach/coachClientAcceptanceDetails/coachClientAcceptanceDetails.js
 import { Text, View, Alert, ActivityIndicator } from "react-native";
 import styles from "./coachClientAcceptanceDetailsCss";
 import { useState, useEffect, useContext, useMemo } from "react";
@@ -9,6 +8,8 @@ import MultiSelectDropdown from "../../../../../components/common/multiSelectDro
 import TreeSelectDropdown from "../../../../../components/common/treeSelectDropdown/treeSelectDropdown";
 import { DataContext } from "../../../../../context/dataContext";
 import coachService from "../../../../../services/coachServices/coachService";
+
+import languages from "../../../../../constants/languages";
 
 export default function CoachClientAcceptanceDetails({ navigation, route }) {
   const { data } = useContext(DataContext);
@@ -38,7 +39,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
 
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [acceptedGenders, setAcceptedGenders] = useState([]);
-  const [acceptedLanguages, setAcceptedLanguages] = useState([]);
+  const [acceptedLanguages, setAcceptedLanguages] = useState([]); // store ids (["en","hi"])
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -83,7 +84,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     agree_refund,
     my_activities: selectedActivities,
     accepted_genders: acceptedGenders,
-    accepted_languages: acceptedLanguages,
+    accepted_languages: acceptedLanguages, // always IDs
   });
 
   const handleNext = () => {
@@ -106,7 +107,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     <ScreenLayout scrollable withPadding>
       <Header
         title="cue"
-        showBack={!isEdit}
+        showBack={true}
         onBackPress={() => navigation.goBack()}
       />
 
@@ -115,6 +116,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
       </View>
 
       <View style={!isEdit && { opacity: 0.6 }}>
+        {/* Genders */}
         <MultiSelectDropdown
           label="Select Genders"
           data={genderOptions}
@@ -134,15 +136,29 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
           )}
         />
 
+        {/* Languages */}
         <MultiSelectDropdown
           label="Select Languages Spoken"
-          data={["English", "Hindi", "Marathi", "Gujarati"]}
-          selected={acceptedLanguages}
-          onChange={setAcceptedLanguages}
+          data={languages}
+          selected={acceptedLanguages.map(
+            (id) => languages.find((l) => l.id === id) || { id, name: id }
+          )}
+          onChange={(vals) => setAcceptedLanguages(vals.map((v) => v.id))}
           searchable
           disabled={!isEdit}
+          renderOption={(item) => (
+            <Text style={{ color: "#fff" }}>
+              {item.name} {item.native ? `(${item.native})` : ""}
+            </Text>
+          )}
+          renderTrigger={(items) => (
+            <Text style={{ color: "#fff" }}>
+              {items.map((i) => i.name).join(", ")}
+            </Text>
+          )}
         />
 
+        {/* Activities */}
         <TreeSelectDropdown
           label="Choose Activities"
           selectedTitle="Selected Activities"
@@ -155,27 +171,24 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
       </View>
 
       {/* Bottom Buttons */}
-      {!isEdit ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
-          }}
-        >
-          <View style={{ flex: 1, marginRight: 10 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+        }}
+      >
+        <View style={{ flex: 1, marginRight: 10 }}>
+          {!isEdit ? (
             <Button text="Edit" onPress={() => setIsEdit(true)} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Button
-              text={loading ? <ActivityIndicator color="#fff" /> : "Next"}
-              onPress={handleNext}
-            />
-          </View>
+          ) : (
+            <Button text="Cancel" onPress={() => setIsEdit(false)} />
+          )}
         </View>
-      ) : (
-        <Button text="Next" onPress={handleNext} style={{ marginTop: 20 }} />
-      )}
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Button text="Next" onPress={handleNext} style={{ marginTop: 20 }} />
+        </View>
+      </View>
     </ScreenLayout>
   );
 }
