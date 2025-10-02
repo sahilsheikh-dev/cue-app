@@ -9,11 +9,36 @@ async function authHeader() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+/** RN-safe file part builder */
+function buildFilePartFromAsset(file, defaultName = "upload.jpg") {
+  let uri = file?.content || "";
+  if (!uri) return null;
+
+  const ensuredName =
+    file?.fileName ||
+    (uri.includes("/") ? uri.substring(uri.lastIndexOf("/") + 1) : defaultName);
+  const hasExt = /\.[a-z0-9]+$/i.test(ensuredName);
+  const name = hasExt ? ensuredName : defaultName;
+
+  // detect mime
+  let type = "application/octet-stream";
+  if (file?.mimeType) {
+    type = file.mimeType;
+  } else if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
+    type = "image/jpeg";
+  } else if (name.endsWith(".png")) {
+    type = "image/png";
+  } else if (name.endsWith(".mp4")) {
+    type = "video/mp4";
+  }
+
+  return { uri, name, type };
+}
+
 const coachService = {
-  /* -------------------- Auth-adjacent -------------------- */
+  /* -------------------- Auth-adjacent (unchanged) -------------------- */
 
   async signup(data) {
-    // POST /coach/signup   (name, mobile, password, agree_*, mobileVerified?)
     try {
       const res = await axios.post(`${BASE_API_URL}/coach/signup`, data);
       return {
@@ -32,12 +57,10 @@ const coachService = {
   },
 
   async checkMobileAvailability(mobile) {
-    // POST /coach/check-mobile
     try {
       const res = await axios.post(`${BASE_API_URL}/coach/check-mobile`, {
         mobile,
       });
-      // { ok, available, message }
       return {
         available: !!res.data?.available,
         message: res.data?.message,
@@ -57,13 +80,12 @@ const coachService = {
   /* -------------------- Coach profile/info -------------------- */
 
   async getMyInfo() {
-    // GET /coach/me  (protected)
     try {
       const headers = await authHeader();
       const res = await axios.get(`${BASE_API_URL}/coach/me`, { headers });
       return {
         success: !!res.data?.ok,
-        data: res.data?.data || res.data?.coach, // controller returns {ok, data} for many; for /me it returns coach in data
+        data: res.data?.data || res.data?.coach,
         message: res.data?.message || "Success",
       };
     } catch (err) {
@@ -76,7 +98,6 @@ const coachService = {
   },
 
   async coachProfileSetup(payload) {
-    // PATCH /coach/profile-setup (protected)
     try {
       const headers = await authHeader();
       const res = await axios.patch(
@@ -103,7 +124,6 @@ const coachService = {
   },
 
   async saveStory({ id, story }) {
-    // PATCH /coach/story (protected)
     try {
       const headers = await authHeader();
       const res = await axios.patch(
@@ -127,7 +147,6 @@ const coachService = {
   },
 
   async coachAgreementTerms({ id, agreement_terms }) {
-    // PATCH /coach/agreement-terms (protected)
     try {
       const headers = await authHeader();
       const res = await axios.patch(
@@ -155,7 +174,6 @@ const coachService = {
   },
 
   async deleteCoachAccount(coachId) {
-    // DELETE /coach/delete/:id (protected)
     try {
       const headers = await authHeader();
       const res = await axios.delete(
@@ -181,24 +199,19 @@ const coachService = {
     }
   },
 
-  /* -------------------- Uploads -------------------- */
-
-  async uploadCertificate({ id, index, file }) {
-    // POST /coach/upload/certificates  (protected)
-    // field name: "certificates" (array), body.index can be single or array
+  /* -------------------- Certificates -------------------- */
+  async uploadCertificate({ coachId, certificateId, file }) {
     try {
-      const headers = await authHeader();
-
+      const token = await get("auth");
       const formData = new FormData();
-      formData.append("id", id);
-      formData.append("index", index);
+      formData.append("coachId", coachId);
 
+      if (certificateId) {
+        formData.append("certificateId", certificateId);
+      }
       if (file) {
-        formData.append("certificates", {
-          uri: file.content,
-          type: "image/jpeg",
-          name: `certificate_${index}.jpg`,
-        });
+        const part = buildFilePartFromAsset(file, "certificate.jpg");
+        formData.append("file", part);
       }
 
       const res = await axios.post(
@@ -206,17 +219,13 @@ const coachService = {
         formData,
         {
           headers: {
-            ...headers,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      return {
-        success: !!res.data?.ok,
-        message: res.data?.message,
-        data: res.data?.data,
-      };
+      return { success: true, message: res.data.message, data: res.data.data };
     } catch (err) {
       console.error(
         "uploadCertificate API error:",
@@ -231,24 +240,25 @@ const coachService = {
     }
   },
 
-  async uploadWorkAsset({ id, index, file }) {
-    // PATCH /coach/upload/work-assets (protected)
-    try {
-      const headers = await authHeader();
+  /* -------------------- Work Assets -------------------- */
 
+  async uploadWorkAsset({ coachId, assetId, file }) {
+    try {
+      const token = await get("auth");
       const formData = new FormData();
-      formData.append("id", id);
-      formData.append("index", index);
+      formData.append("coachId", coachId);
+
+      if (assetId) {
+        formData.append("assetId", assetId);
+      }
       if (file) {
-        formData.append("workAsset", {
-          uri: file.content,
-          type:
-            file.mimeType ||
-            (file.type === "video" ? "video/mp4" : "image/jpeg"),
-          name:
-            file.fileName ||
-            `asset_${index}.${file.type === "video" ? "mp4" : "jpg"}`,
-        });
+        const part = buildFilePartFromAsset(
+          file,
+          file.mimeType?.startsWith("video")
+            ? "work-asset.mp4"
+            : "work-asset.jpg"
+        );
+        formData.append("file", part);
       }
 
       const res = await axios.patch(
@@ -256,66 +266,87 @@ const coachService = {
         formData,
         {
           headers: {
-            ...headers,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      return {
-        success: !!res.data?.ok,
-        message: res.data?.message,
-        data: res.data?.data,
-      };
+      return { success: true, message: res.data.message, data: res.data.data };
     } catch (err) {
       console.error(
-        "uploadWorkAsset error:",
+        "uploadWorkAsset API error:",
         err.response?.data || err.message
       );
-
-      const status = err.response?.status;
-      const backendMessage = err.response?.data?.message;
-      const backendError = err.response?.data?.error;
-
-      let userMessage = "Failed to upload/delete work asset";
-      if (status === 400 && backendMessage) userMessage = backendMessage;
-      else if (status === 404) userMessage = "Coach not found";
-      else if (status === 415)
-        userMessage =
-          backendMessage || "Invalid file type. Only images and videos allowed";
-      else if (backendMessage) userMessage = backendMessage;
-
       return {
         success: false,
-        message: userMessage,
-        error: backendError || err.message,
-        status,
+        message:
+          err.response?.data?.message || "Failed to upload/delete work asset",
+        error: err.response?.data?.error || err.message,
       };
     }
   },
 
-  // add inside coachService (optional)
-  async uploadProfilePicture(fileUri) {
+  // Save Pricing Slots API
+  async savePricingSlots(payload) {
     try {
       const headers = await authHeader();
-      const form = new FormData();
-      form.append("profilePicture", {
-        uri: fileUri,
-        type: "image/jpeg",
-        name: "profile.jpg",
-      });
       const res = await axios.post(
-        `${BASE_API_URL}/coach/upload/profile-picture`,
-        form,
-        { headers: { ...headers, "Content-Type": "multipart/form-data" } }
+        `${BASE_API_URL}/coach/pricing/save`,
+        payload,
+        {
+          headers,
+        }
       );
       return {
         success: !!res.data?.ok,
-        message: res.data?.message,
+        message: res.data?.message || "Pricing saved successfully",
         data: res.data?.data,
       };
-    } catch (e) {
-      return { success: false, message: "Failed to upload" };
+    } catch (err) {
+      console.error(
+        "savePricingSlots API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to save pricing",
+        error: err.response?.data?.error || err.message,
+      };
+    }
+  },
+
+  /* -------------------- Activities (NEW) -------------------- */
+  /**
+   * Public route: GET /activities
+   * - Without parentId: returns layer 1 (roots)
+   * - With parentId: returns children for that parent
+   * Returns normalized items: { id, title, parent_id, contains_subtopic }
+   */
+  async listActivities(parentId = null) {
+    try {
+      const url = `${BASE_API_URL}/activities`;
+      const res = await axios.get(url, {
+        params: parentId ? { parentId } : undefined,
+      });
+      const items = Array.isArray(res.data?.data) ? res.data.data : [];
+      const normalized = items.map((a) => ({
+        id: a._id || a.id,
+        title: a.title,
+        parent_id: a.parent_id || null,
+        contains_subtopic: !!a.contains_subtopic,
+      }));
+      return { success: true, data: normalized };
+    } catch (err) {
+      console.error(
+        "listActivities API error:",
+        err.response?.data || err.message
+      );
+      return {
+        success: false,
+        message: err.response?.data?.message || "Failed to load activities",
+        data: [],
+      };
     }
   },
 };
