@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -8,42 +8,52 @@ import {
   Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 import ScreenLayout from "../../../../../components/common/screenLayout/screenLayout";
 import Header from "../../../../../components/common/header/header";
 import Button from "../../../../../components/common/button/button";
 
 import styles from "./coachInPersonPricingDetailsCss";
+import { DataContext } from "../../../../../context/dataContext";
+import { useSaveAndRedirect } from "../../../../../hooks/useSaveAndRedirect";
+import coachService from "../../../../../services/coachServices/coachService";
 
 export default function CoachInPersonPricingDetails({ navigation }) {
+  const { data } = useContext(DataContext);
+  const { saveAndRedirect } = useSaveAndRedirect(navigation);
+
   const client_accepted_levels = ["Beginner", "Intermediate", "Advanced"];
   const [selectedLevels, setSelectedLevels] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
 
   const [picker, setPicker] = useState({
     show: false,
-    mode: "date", // "date" or "time"
-    type: null, // start | end | date
+    mode: "date",
+    type: null, // "start" | "end" | "date"
     session: null, // private | group
     idx: null,
   });
 
-  const [isEdit, setIsEdit] = useState(false);
+  const [sessions, setSessions] = useState({ private: [], group: [] });
+  const [discounts, setDiscounts] = useState({ private: [], group: [] });
 
-  // Sample sessions
-  const [sessions, setSessions] = useState({
-    private: [
-      { date: "2025-10-05", start: "10:00 AM", end: "11:00 AM", price: "50" },
-    ],
-    group: [
-      { date: "2025-10-06", start: "02:00 PM", end: "03:00 PM", price: "30" },
-    ],
-  });
+  // hydrate from DataContext
+  useEffect(() => {
+    if (data?.user?.bookingDetails?.inPerson) {
+      const bd = data.user.bookingDetails;
+      setSelectedLevels(bd.acceptedClientLevels || []);
+      setSessions({
+        private: bd.inPerson?.private?.sessions || [],
+        group: bd.inPerson?.group?.sessions || [],
+      });
+      setDiscounts({
+        private: bd.inPerson?.private?.bulkDiscounts || [],
+        group: bd.inPerson?.group?.bulkDiscounts || [],
+      });
+    }
+  }, [data?.user?.bookingDetails]);
 
-  const [discounts, setDiscounts] = useState({
-    private: [{ min: "3", max: "5", pct: "20" }],
-    group: [{ min: "3", max: "5", pct: "15" }],
-  });
-
-  // Toggle client levels
+  // toggle client levels
   const toggleLevel = (lvl) => {
     if (!isEdit) return;
     setSelectedLevels((prev) =>
@@ -51,7 +61,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     );
   };
 
-  // Add a new session
+  // add session
   const addSession = (sessionType, date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -69,7 +79,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     }));
   };
 
-  // Remove session
+  // remove session
   const removeSession = (sessionType, idx) => {
     if (!isEdit) return;
     setSessions((prev) => {
@@ -79,7 +89,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  // Update price
+  // update price
   const updateDayPrice = (sessionType, idx, value) => {
     if (!isEdit) return;
     setSessions((prev) => {
@@ -89,7 +99,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  // Open picker
+  // open picker
   const openPicker = (sessionType, idx, type) => {
     if (!isEdit) return;
     setPicker({
@@ -101,42 +111,27 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
-  const openDatePicker = (sessionType) => {
-    if (!isEdit) return;
-    setPicker({
-      show: true,
-      mode: "date",
-      type: "date",
-      session: sessionType,
-      idx: null,
-    });
-  };
-
   const formatDate = (isoDate) => {
+    if (!isoDate) return "Pick Date";
     const d = new Date(isoDate);
     return d.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
+      weekday: "short",
+      month: "short",
       day: "numeric",
     });
   };
 
-  // Handle date/time pick safely
   const onPicked = (event, selectedDate) => {
-    if (event.type === "dismissed") {
-      setPicker((prev) => ({ ...prev, show: false }));
-      return;
-    }
+    if (event.type === "dismissed")
+      return setPicker((p) => ({ ...p, show: false }));
 
     if (event.type === "set" && selectedDate) {
       const { mode, type, session, idx } = picker;
 
       if (mode === "date") {
         const isoDate = selectedDate.toISOString().split("T")[0];
-        if (idx === null) {
-          addSession(session, selectedDate);
-        } else {
+        if (idx === null) addSession(session, selectedDate);
+        else {
           setSessions((prev) => {
             const updated = [...prev[session]];
             updated[idx].date = isoDate;
@@ -145,7 +140,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         }
       }
 
-      if (mode === "time") {
+      if (mode === "time" && idx !== null) {
         const time = selectedDate.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -153,31 +148,52 @@ export default function CoachInPersonPricingDetails({ navigation }) {
 
         setSessions((prev) => {
           const updated = [...prev[session]];
-          updated[idx][type] = time;
-
-          if (updated[idx].start && updated[idx].end) {
-            const [sh, sm] = updated[idx].start.split(":").map(Number);
-            const [eh, em] = updated[idx].end.split(":").map(Number);
-            if (eh * 60 + em <= sh * 60 + sm) {
-              Alert.alert("Invalid Time", "End time must be after Start time.");
-              updated[idx].end = null;
+          if (
+            type === "end" &&
+            updated[idx].start &&
+            time < updated[idx].start
+          ) {
+            Alert.alert(
+              "Validation Error",
+              "End time cannot be before start time"
+            );
+            return prev;
+          }
+          if (type === "start") {
+            const now = new Date();
+            const current = now.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            if (time < current) {
+              Alert.alert(
+                "Validation Error",
+                "Start time cannot be before current time"
+              );
+              return prev;
             }
           }
+          updated[idx][type] = time;
           return { ...prev, [session]: updated };
         });
       }
     }
-
-    // close picker
-    setPicker((prev) => ({ ...prev, show: false }));
+    setPicker((p) => ({ ...p, show: false }));
   };
 
-  // Discounts
+  // discounts
   const updateDiscount = (sessionType, idx, field, value) => {
     if (!isEdit) return;
     setDiscounts((prev) => {
       const updated = [...prev[sessionType]];
       updated[idx][field] = value;
+      if (
+        field === "max" &&
+        Number(updated[idx].max) < Number(updated[idx].min)
+      ) {
+        Alert.alert("Validation Error", "Max cannot be less than Min");
+        updated[idx].max = "";
+      }
       return { ...prev, [sessionType]: updated };
     });
   };
@@ -199,10 +215,41 @@ export default function CoachInPersonPricingDetails({ navigation }) {
     });
   };
 
+  // save
   const onSave = () => {
-    const payload = { selectedLevels, sessions, discounts };
-    console.log("Saving payload:", payload);
-    navigation.navigate("CoachInPersonPricingDetails", { data: payload });
+    if (!selectedLevels.length) {
+      return Alert.alert(
+        "Validation Error",
+        "Please select at least one level."
+      );
+    }
+    if (!sessions.private.length && !sessions.group.length) {
+      return Alert.alert(
+        "Validation Error",
+        "Please add at least one session."
+      );
+    }
+
+    const bookingDetails = {
+      acceptedClientLevels: selectedLevels,
+      inPerson: {
+        private: {
+          sessions: sessions.private,
+          bulkDiscounts: discounts.private,
+        },
+        group: { sessions: sessions.group, bulkDiscounts: discounts.group },
+      },
+      virtual: data?.user?.bookingDetails?.virtual || {
+        private: { sessions: [], bulkDiscounts: [] },
+        group: { sessions: [], bulkDiscounts: [] },
+      },
+    };
+
+    saveAndRedirect(
+      coachService.savePricingSlots,
+      { coachId: data.user._id, bookingDetails },
+      "In-Person pricing saved!"
+    );
   };
 
   return (
@@ -211,8 +258,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         title="In-Person Pricing"
         showBack={!isEdit}
         onBackPress={() => navigation.goBack()}
-        rightIcon={isEdit ? "eye-outline" : "create-outline"}
-        onRightPress={() => setIsEdit((prev) => !prev)}
       />
 
       {/* Levels */}
@@ -239,7 +284,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         ))}
       </View>
 
-      {/* Private & Group Sections */}
+      {/* Private & Group */}
       {["private", "group"].map((type) => (
         <View key={type} style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>
@@ -247,30 +292,20 @@ export default function CoachInPersonPricingDetails({ navigation }) {
           </Text>
 
           {sessions[type].map((s, idx) => (
-            <View
-              key={idx}
-              style={[styles.sessionCard, { opacity: !isEdit ? 0.6 : 1 }]}
-            >
-              {/* Date & Remove */}
+            <View key={idx} style={styles.sessionCard}>
               <View style={styles.sessionHeader}>
-                <TouchableOpacity
-                  disabled={!isEdit}
-                  onPress={() => openPicker(type, idx, "date")}
-                >
-                  <Text style={styles.whiteText}>{formatDate(s.date)}</Text>
-                </TouchableOpacity>
+                <Text style={styles.whiteText}>{formatDate(s.date)}</Text>
                 {isEdit && (
                   <TouchableOpacity onPress={() => removeSession(type, idx)}>
-                    <Text style={styles.removeIcon}>✕</Text>
+                    <Ionicons name="trash-outline" size={20} color="red" />
                   </TouchableOpacity>
                 )}
               </View>
 
-              {/* Start, End, Price inline */}
               <View style={styles.sessionRow}>
                 <TouchableOpacity
                   disabled={!isEdit}
-                  style={[styles.timeBtn, { flex: 1 }]}
+                  style={styles.levelBtn}
                   onPress={() => openPicker(type, idx, "start")}
                 >
                   <Text style={styles.whiteText}>
@@ -280,27 +315,31 @@ export default function CoachInPersonPricingDetails({ navigation }) {
 
                 <TouchableOpacity
                   disabled={!isEdit}
-                  style={[styles.timeBtn, { flex: 1 }]}
+                  style={styles.levelBtn}
                   onPress={() => openPicker(type, idx, "end")}
                 >
                   <Text style={styles.whiteText}>{s.end || "End Time"}</Text>
                 </TouchableOpacity>
 
-                <TextInput
-                  style={[styles.input, { flex: 1 }]}
-                  editable={isEdit}
-                  placeholder="Price"
-                  placeholderTextColor="#aaa"
-                  keyboardType="numeric"
-                  value={s.price}
-                  onChangeText={(val) => updateDayPrice(type, idx, val)}
-                />
+                <View style={styles.levelBtn}>
+                  <Text style={styles.whiteText}>
+                    {s.price ? `₹${s.price}` : "Price"}
+                  </Text>
+                  {isEdit && (
+                    <TextInput
+                      style={styles.hiddenInput}
+                      keyboardType="numeric"
+                      value={s.price}
+                      onChangeText={(val) => updateDayPrice(type, idx, val)}
+                    />
+                  )}
+                </View>
               </View>
             </View>
           ))}
 
           {isEdit && (
-            <TouchableOpacity onPress={() => openDatePicker(type)}>
+            <TouchableOpacity onPress={() => openPicker(type, null, "date")}>
               <Text style={{ color: "#4da6ff", marginTop: 6 }}>
                 + Add Session
               </Text>
@@ -309,54 +348,57 @@ export default function CoachInPersonPricingDetails({ navigation }) {
 
           {/* Discounts */}
           <Text style={styles.discountTitle}>Bulk Booking Discounts</Text>
-          <View style={styles.discountCard}>
-            {discounts[type].map((d, idx) => (
-              <View key={idx} style={styles.discountRow}>
-                <TextInput
-                  style={styles.discountInput}
-                  editable={isEdit}
-                  placeholder="Min"
-                  placeholderTextColor="#aaa"
-                  value={d.min}
-                  keyboardType="numeric"
-                  onChangeText={(val) => updateDiscount(type, idx, "min", val)}
-                />
-                <Text style={styles.whiteText}>to</Text>
-                <TextInput
-                  style={styles.discountInput}
-                  editable={isEdit}
-                  placeholder="Max"
-                  placeholderTextColor="#aaa"
-                  value={d.max}
-                  keyboardType="numeric"
-                  onChangeText={(val) => updateDiscount(type, idx, "max", val)}
-                />
-                <TextInput
-                  style={styles.discountInput}
-                  editable={isEdit}
-                  placeholder="% Off"
-                  placeholderTextColor="#aaa"
-                  value={d.pct}
-                  keyboardType="numeric"
-                  onChangeText={(val) => updateDiscount(type, idx, "pct", val)}
-                />
-                {isEdit && (
-                  <TouchableOpacity
-                    onPress={() => removeDiscountRow(type, idx)}
-                  >
-                    <Text style={{ color: "red", marginLeft: 6 }}>🗑️</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-            {isEdit && (
-              <TouchableOpacity onPress={() => addDiscountRow(type)}>
-                <Text style={{ color: "#4da6ff" }}>+ Add Discount</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          {discounts[type].map((d, idx) => (
+            <View key={idx} style={styles.discountRow}>
+              {["min", "max", "pct"].map((field, i) => (
+                <View key={i} style={styles.levelBtn}>
+                  <Text style={styles.whiteText}>
+                    {d[field]
+                      ? `${field === "pct" ? d[field] + "% Off" : d[field]}`
+                      : field.toUpperCase()}
+                  </Text>
+                  {isEdit && (
+                    <TextInput
+                      style={styles.hiddenInput}
+                      keyboardType="numeric"
+                      value={d[field]?.toString()}
+                      onChangeText={(val) =>
+                        updateDiscount(type, idx, field, val)
+                      }
+                    />
+                  )}
+                </View>
+              ))}
+              {isEdit && (
+                <TouchableOpacity onPress={() => removeDiscountRow(type, idx)}>
+                  <Ionicons name="trash-outline" size={20} color="red" />
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
+          {isEdit && (
+            <TouchableOpacity onPress={() => addDiscountRow(type)}>
+              <Text style={{ color: "#4da6ff" }}>+ Add Discount</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ))}
+
+      {/* Action Buttons */}
+      {!isEdit && (
+        <Button
+          text="Edit"
+          onPress={() => setIsEdit(true)}
+          style={{ marginTop: 20 }}
+        />
+      )}
+      {isEdit && (
+        <Button
+          text="Save In-Person Pricing"
+          onPress={onSave}
+          style={{ marginTop: 20 }}
+        />
+      )}
 
       {picker.show && (
         <DateTimePicker
@@ -365,16 +407,6 @@ export default function CoachInPersonPricingDetails({ navigation }) {
           mode={picker.mode}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={onPicked}
-        />
-      )}
-
-      {!isEdit && (
-        <Button
-          text={"Next"}
-          onPress={() => {
-            navigation.navigate("CoachCommissionStructure");
-          }}
-          style={{ marginTop: 20 }}
         />
       )}
     </ScreenLayout>

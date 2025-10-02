@@ -65,10 +65,16 @@ export default function CoachDashboard({ navigation }) {
       screen: "CoachServicePictures",
     },
     {
-      id: "bookingSystem",
-      title: "Booking System",
+      id: "virtualBookingSystem",
+      title: "Virtual Booking",
       icon: "laptop-outline",
       screen: "CoachVirtualPricingDetails",
+    },
+    {
+      id: "bookingSystem",
+      title: "In-Person Booking",
+      icon: "people",
+      screen: "CoachInPersonPricingDetails",
     },
   ];
 
