@@ -1,3 +1,4 @@
+// src/screens/coach/coachProfile/coachProfileCertificateDetails/coachProfileCertificateDetails.js
 import {
   Text,
   View,
@@ -23,95 +24,140 @@ export default function CoachProfileCertificateDetails({ navigation }) {
   const { data } = useContext(DataContext);
   const { saveAndRedirect } = useSaveAndRedirect(navigation);
 
-  // Normalize certificates safely
+  // Convert server certificate to slot item with id + path
   const normalizeCert = (cert) => {
-    if (!cert) return { type: "", content: "" };
-    if (typeof cert === "object" && cert.path) {
-      return { type: "image", content: cert.path }; // already absolute
-    }
-    return { type: "", content: "" };
+    if (!cert) return { id: null, type: "", content: "" };
+    return {
+      id: cert._id || cert.id || null,
+      type: "image",
+      content: cert.path || "",
+    };
   };
 
-  const initialState = Array(10)
-    .fill()
-    .map((_, i) => normalizeCert(data?.user?.certificates?.[i]));
+  // We keep up to 10 visible slots; map existing in order, then empty
+  const existing = (data?.user?.certificates || []).map(normalizeCert);
+  const initialState = Array.from(
+    { length: 10 },
+    (_, i) => existing[i] || { id: null, type: "", content: "" }
+  );
 
   const [certificates, setCertificates] = useState(initialState);
   const [saveEnabled, setSaveEnabled] = useState(Array(10).fill(false));
   const [loadingIndex, setLoadingIndex] = useState(null); // track which slot is uploading
 
-  // Pick image
+  // Pick image (images only)
   const pickImage = async (slotIndex) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // ✅ restrict to images only
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
 
-    if (!result.canceled) {
-      let asset = result.assets[0];
+    if (result.canceled) return;
 
-      // ✅ extra safeguard: block anything that's not an image
-      if (asset.type !== "image") {
-        Alert.alert(
-          "Invalid File",
-          "Only images are allowed for certificates."
-        );
-        return;
-      }
-
-      let updated = [...certificates];
-      updated[slotIndex] = { type: "image", content: asset.uri };
-      setCertificates(updated);
-
-      let updatedSave = [...saveEnabled];
-      updatedSave[slotIndex] = true;
-      setSaveEnabled(updatedSave);
+    const asset = result.assets?.[0];
+    const mime = asset?.mimeType || "";
+    if (!asset || (asset.type && asset.type !== "image")) {
+      return Alert.alert("Invalid File", "Only images are allowed.");
     }
+    // Extra safety: ensure mime is image/*
+    if (mime && !/^image\//i.test(mime)) {
+      return Alert.alert("Invalid File", "Only images are allowed.");
+    }
+
+    const updated = [...certificates];
+    updated[slotIndex] = {
+      id: updated[slotIndex]?.id || null, // keep id if existed; if new -> null
+      type: "image",
+      content: asset.uri,
+      mimeType: asset.mimeType,
+      fileName: asset.fileName,
+    };
+    setCertificates(updated);
+
+    const se = [...saveEnabled];
+    se[slotIndex] = true;
+    setSaveEnabled(se);
   };
 
-  // Remove → mark slot empty + call API
+  // Remove (delete if on server; otherwise just clear local)
   const removeImage = async (slotIndex) => {
+    const slot = certificates[slotIndex];
+    if (!slot?.id && !slot?.content) {
+      return; // nothing to do
+    }
+
+    // If it's only local (new but unsaved), just clear the slot
+    if (!slot.id && slot.content) {
+      const updated = [...certificates];
+      updated[slotIndex] = { id: null, type: "", content: "" };
+      setCertificates(updated);
+      const se = [...saveEnabled];
+      se[slotIndex] = false;
+      setSaveEnabled(se);
+      return;
+    }
+
+    // Else delete on server
     setLoadingIndex(slotIndex);
     try {
-      let updated = [...certificates];
-      updated[slotIndex] = { type: "", content: "" };
-      setCertificates(updated);
-
       await saveAndRedirect(
         coachService.uploadCertificate,
-        { id: data.user._id, index: slotIndex, file: null },
-        `Certificate ${slotIndex + 1} removed`,
-        null // ✅ stay on same screen, refresh context only
+        { coachId: data.user._id, certificateId: slot.id, file: null },
+        "Certificate removed",
+        null
       );
+
+      // Clear slot locally
+      const updated = [...certificates];
+      updated[slotIndex] = { id: null, type: "", content: "" };
+      setCertificates(updated);
+
+      const se = [...saveEnabled];
+      se[slotIndex] = false;
+      setSaveEnabled(se);
     } catch (err) {
-      Alert.alert("Error", "Failed to remove certificate");
+      Alert.alert("Error", err.message || "Failed to remove certificate");
     } finally {
       setLoadingIndex(null);
     }
   };
 
-  // Save → call API
+  // Save (create or update)
   const saveImage = async (slotIndex) => {
-    const cert = certificates[slotIndex];
-    if (!cert.content) return;
+    const slot = certificates[slotIndex];
+    if (!slot?.content) {
+      return Alert.alert("Nothing to save", "Please pick an image first.");
+    }
 
     setLoadingIndex(slotIndex);
     try {
-      const file = { type: cert.type, content: cert.content };
+      const payload = {
+        coachId: data.user._id,
+        certificateId: slot.id || null,
+        file: slot.content
+          ? {
+              content: slot.content,
+              mimeType: slot.mimeType || "image/jpeg",
+              fileName: slot.fileName || `certificate_${slotIndex + 1}.jpg`,
+            }
+          : null,
+      };
 
-      await saveAndRedirect(
+      const ok = await saveAndRedirect(
         coachService.uploadCertificate,
-        { id: data.user._id, index: slotIndex, file },
-        `Certificate ${slotIndex + 1} saved`,
-        null // ✅ stay on same screen, refresh context only
+        payload,
+        slot.id ? "Certificate updated" : "Certificate added",
+        null
       );
 
-      let updatedSave = [...saveEnabled];
-      updatedSave[slotIndex] = false; // disable after save
-      setSaveEnabled(updatedSave);
+      if (ok) {
+        const se = [...saveEnabled];
+        se[slotIndex] = false;
+        setSaveEnabled(se);
+      }
     } catch (err) {
-      Alert.alert("Error", "Upload failed, please try again.");
+      Alert.alert("Error", err.message || "Upload failed, please try again.");
     } finally {
       setLoadingIndex(null);
     }
@@ -136,11 +182,10 @@ export default function CoachProfileCertificateDetails({ navigation }) {
         Add Your Certificate
       </Text>
       <Text style={styles.upy_text}>
-        Upload your certificates (up to 10). Each slot can store one image.
+        Upload your certificates (up to 10). Each slot stores one image.
       </Text>
 
       {certificates.map((item, index) => {
-        const hasDbCertificate = Boolean(data?.user?.certificates?.[index]);
         const isLoading = loadingIndex === index;
 
         return (
@@ -189,13 +234,13 @@ export default function CoachProfileCertificateDetails({ navigation }) {
                 text={"Remove"}
                 onPress={() => removeImage(index)}
                 style={{ flex: 1, marginRight: 5 }}
-                disabled={!hasDbCertificate || isLoading}
+                disabled={isLoading || (!item.id && !item.content)}
               />
               <Button
                 text={"Save"}
                 onPress={() => saveImage(index)}
                 style={{ flex: 1, marginLeft: 5 }}
-                disabled={!saveEnabled[index] || isLoading}
+                disabled={isLoading || !saveEnabled[index] || !item.content}
               />
             </View>
           </View>

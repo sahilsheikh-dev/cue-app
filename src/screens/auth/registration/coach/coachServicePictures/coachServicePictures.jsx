@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import styles from "./coachServicePicturesCss";
 import { LinearGradient } from "expo-linear-gradient";
-import { Video } from "expo-av";
+// import { Video } from "expo-av"; // no videos now
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -26,9 +26,6 @@ export default function CoachServicePictures({ navigation }) {
   const { data } = useContext(DataContext);
   const { saveAndRedirect } = useSaveAndRedirect(navigation);
 
-  // ----------------------
-  // Helpers
-  // ----------------------
   function toPublicUrl(filePath) {
     if (!filePath) return "";
     if (typeof filePath !== "string") return "";
@@ -46,42 +43,40 @@ export default function CoachServicePictures({ navigation }) {
     return `${BASE_API_URL}/uploads/${filename}`;
   }
 
-  const buildInitialState = (user) =>
-    Array(3)
-      .fill()
-      .map((_, i) => {
-        const asset =
-          user?.workAssets?.find((a) => Number(a.index) === i) ||
-          user?.workImages?.[i];
-        if (asset) {
-          const path = asset.path || asset;
-          return {
-            type:
-              asset.type ||
-              (typeof path === "string" && path.endsWith(".mp4")
-                ? "video"
-                : "image"),
-            content: toPublicUrl(path),
-            rawPath: path,
-            hasServerAsset: true,
-          };
+  // Convert server workAssets to a flat list preserving order
+  const normalizeAsset = (a) =>
+    a
+      ? {
+          id: a._id || a.id || null,
+          type: a.type || "image",
+          content: toPublicUrl(a.path || ""),
+          hasServerAsset: true,
         }
-        return { type: "", content: "", rawPath: null, hasServerAsset: false };
-      });
+      : { id: null, type: "", content: "", hasServerAsset: false };
 
-  // ----------------------
-  // Local State
-  // ----------------------
+  const buildInitialState = (user) => {
+    const fromServer = (user?.workAssets || []).map(normalizeAsset);
+    const three = Array.from(
+      { length: 3 },
+      (_, i) =>
+        fromServer[i] || {
+          id: null,
+          type: "",
+          content: "",
+          hasServerAsset: false,
+        }
+    );
+    return three;
+  };
+
   const [workAssets, setWorkAssets] = useState(buildInitialState(data.user));
   const [localChanged, setLocalChanged] = useState(Array(3).fill(false));
   const [hasServerAsset, setHasServerAsset] = useState(
     buildInitialState(data.user).map((s) => !!s.hasServerAsset)
   );
-  const [isPlaying, setIsPlaying] = useState(Array(3).fill(false));
-  const [loadingIndex, setLoadingIndex] = useState(null); // slot-specific loader
-  const videoRefs = useRef([]);
+  const [loadingIndex, setLoadingIndex] = useState(null);
 
-  // Sync with refreshed context
+  // Sync when user refreshed
   useEffect(() => {
     const init = buildInitialState(data.user);
     setWorkAssets(init);
@@ -89,32 +84,36 @@ export default function CoachServicePictures({ navigation }) {
     setHasServerAsset(init.map((s) => !!s.hasServerAsset));
   }, [data.user]);
 
-  // ----------------------
-  // Media picker
-  // ----------------------
+  // Pick image (STRICTLY images)
   const pickMedia = async (slotIndex) => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // ✅ only images
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // images only
         allowsEditing: true,
         quality: 1,
       });
 
       if (result.canceled) return;
 
-      const asset = result.assets[0];
+      const asset = result.assets?.[0];
+      const mime = asset?.mimeType || "";
 
-      // ✅ enforce image validation
-      if (asset.type !== "image") {
-        Alert.alert("Invalid Selection", "Only images are allowed.");
-        return;
+      // Hard validation
+      if (!asset || (asset.type && asset.type !== "image")) {
+        return Alert.alert("Invalid Selection", "Only images are allowed.");
+      }
+      if (mime && !/^image\//i.test(mime)) {
+        return Alert.alert("Invalid Selection", "Only images are allowed.");
       }
 
       const updated = [...workAssets];
       updated[slotIndex] = {
-        type: "image", // ✅ always image
+        id: updated[slotIndex]?.id || null, // keep id if replacing; null if creating
+        type: "image",
         content: asset.uri,
-        rawPath: null,
+        hasServerAsset: !!updated[slotIndex]?.id,
+        mimeType: asset.mimeType,
+        fileName: asset.fileName,
       };
       setWorkAssets(updated);
 
@@ -127,30 +126,30 @@ export default function CoachServicePictures({ navigation }) {
     }
   };
 
-  // ----------------------
   // Remove
-  // ----------------------
   const removeMedia = async (slotIndex) => {
+    const slot = workAssets[slotIndex];
+
+    // If locally changed (unsaved), revert to previous server item or empty
     if (localChanged[slotIndex]) {
       const reverted = [...workAssets];
       if (hasServerAsset[slotIndex]) {
-        const serverAsset =
-          data.user?.workAssets?.find((a) => Number(a.index) === slotIndex) ||
-          null;
-        const path = serverAsset?.path || null;
-        reverted[slotIndex] = {
-          type:
-            serverAsset?.type ||
-            (path && path.endsWith(".mp4") ? "video" : "image"),
-          content: toPublicUrl(path),
-          rawPath: path,
-          hasServerAsset: !!path,
-        };
-      } else {
-        reverted[slotIndex] = {
+        // restore from server snapshot in data.user (first three)
+        const serverList = (data.user?.workAssets || []).map((a) =>
+          normalizeAsset(a)
+        );
+        const original = serverList[slotIndex] || {
+          id: null,
           type: "",
           content: "",
-          rawPath: null,
+          hasServerAsset: false,
+        };
+        reverted[slotIndex] = original;
+      } else {
+        reverted[slotIndex] = {
+          id: null,
+          type: "",
+          content: "",
           hasServerAsset: false,
         };
       }
@@ -160,9 +159,11 @@ export default function CoachServicePictures({ navigation }) {
       setLocalChanged(changed);
       return;
     }
-    if (!hasServerAsset[slotIndex]) return;
 
-    Alert.alert("Remove", "Are you sure you want to remove this asset?", [
+    // If no server asset, nothing to delete
+    if (!slot?.id) return;
+
+    Alert.alert("Remove", "Are you sure you want to remove this image?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Remove",
@@ -172,9 +173,9 @@ export default function CoachServicePictures({ navigation }) {
             setLoadingIndex(slotIndex);
             await saveAndRedirect(
               coachService.uploadWorkAsset,
-              { id: data.user._id, index: slotIndex, file: null },
+              { coachId: data.user._id, assetId: slot.id, file: null },
               "Asset removed successfully",
-              null // ✅ stay on same screen, refresh context only
+              null
             );
           } catch (err) {
             console.error("removeMedia API error:", err);
@@ -187,28 +188,34 @@ export default function CoachServicePictures({ navigation }) {
     ]);
   };
 
-  // ----------------------
   // Save
-  // ----------------------
   const saveMedia = async (slotIndex) => {
     if (!localChanged[slotIndex] || !workAssets[slotIndex].content) {
-      // Alert.alert("Nothing to save", "Please pick an image or video first.");
-      Alert.alert("Nothing to save", "Please pick an image first.");
-      return;
+      return Alert.alert("Nothing to save", "Please pick an image first.");
     }
+
+    const slot = workAssets[slotIndex];
     const file = {
-      content: workAssets[slotIndex].content,
-      type: workAssets[slotIndex].type,
+      content: slot.content,
+      type: "image",
+      mimeType: slot.mimeType || "image/jpeg",
+      fileName: slot.fileName || `work-asset-${slotIndex + 1}.jpg`,
     };
+
     try {
       setLoadingIndex(slotIndex);
       await saveAndRedirect(
         coachService.uploadWorkAsset,
-        { id: data.user._id, index: slotIndex, file },
-        "Asset saved successfully",
-        null // stay on same screen
+        {
+          coachId: data.user._id,
+          assetId: slot.id || null,
+          file,
+        },
+        slot.id ? "Asset updated successfully" : "Asset added successfully",
+        null
       );
-      // reset changed state after save
+
+      // reset changed state after successful save
       const changed = [...localChanged];
       changed[slotIndex] = false;
       setLocalChanged(changed);
@@ -220,25 +227,6 @@ export default function CoachServicePictures({ navigation }) {
     }
   };
 
-  // ----------------------
-  // Video Play/Pause
-  // ----------------------
-  const togglePlayPause = async (index) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
-    if (isPlaying[index]) {
-      await video.pauseAsync();
-    } else {
-      await video.playAsync();
-    }
-    const updated = [...isPlaying];
-    updated[index] = !isPlaying[index];
-    setIsPlaying(updated);
-  };
-
-  // ----------------------
-  // Render
-  // ----------------------
   return (
     <ScreenLayout scrollable withPadding>
       <Header
@@ -255,18 +243,11 @@ export default function CoachServicePictures({ navigation }) {
           marginTop: 30,
         }}
       >
-        {/* Add Your Pictures & Videos */}
         Add Your Pictures
       </Text>
-      {/* <Text style={styles.up_text}>
-        The first slot must be your profile picture (image only). The next two
-        can be images or videos (max 90 seconds).
-      </Text> */}
 
       {workAssets.map((item, index) => {
         const isEmpty = !item.content;
-        const removeDisabled = !hasServerAsset[index] && !localChanged[index];
-        const saveDisabled = !localChanged[index] || !item.content;
         const isLoading = loadingIndex === index;
 
         return (
@@ -294,53 +275,20 @@ export default function CoachServicePictures({ navigation }) {
                         {index === 0
                           ? "Upload Profile Picture (Image only)"
                           : "Upload Work Image"}
-                        {/* : "Upload Work Image/Video"} */}
                       </Text>
                       <Text style={styles.mpp_text}>Slot {index + 1} of 3</Text>
                     </>
-                  ) : item.type === "image" ? (
+                  ) : (
                     <Image
                       source={{ uri: item.content }}
                       style={styles.profile_img}
-                    />
-                  ) : (
-                    <Video
-                      ref={(ref) => (videoRefs.current[index] = ref)}
-                      source={{ uri: item.content }}
-                      resizeMode="cover"
-                      style={{ width: "100%", height: 200, borderRadius: 10 }}
-                      shouldPlay={false}
-                      isLooping
                     />
                   )}
                 </View>
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Play/Pause button for videos */}
-            {item.type === "video" && !isEmpty && !isLoading && (
-              <TouchableOpacity
-                onPress={() => togglePlayPause(index)}
-                style={{
-                  backgroundColor: "rgba(0,0,0,0.6)",
-                  padding: 10,
-                  borderRadius: 8,
-                  alignItems: "center",
-                  marginTop: 10,
-                }}
-              >
-                <MaterialIcons
-                  name={isPlaying[index] ? "pause" : "play-arrow"}
-                  size={28}
-                  color="white"
-                />
-                <Text style={{ color: "white" }}>
-                  {isPlaying[index] ? "Pause Video" : "Play Video"}
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {/* Remove + Save buttons */}
+            {/* Remove + Save */}
             <View
               style={{
                 flexDirection: "row",
@@ -353,13 +301,17 @@ export default function CoachServicePictures({ navigation }) {
                 text={"Remove"}
                 onPress={() => removeMedia(index)}
                 style={{ flex: 1, marginRight: 5 }}
-                disabled={removeDisabled || isLoading}
+                disabled={isLoading || (!item.id && !localChanged[index])}
               />
               <Button
                 text={"Save"}
                 onPress={() => saveMedia(index)}
                 style={{ flex: 1, marginLeft: 5 }}
-                disabled={saveDisabled || isLoading}
+                disabled={
+                  isLoading ||
+                  !localChanged[index] ||
+                  !workAssets[index].content
+                }
               />
             </View>
           </View>
