@@ -183,12 +183,33 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         "Please select at least one level."
       );
     }
+
     if (!sessions.private.length && !sessions.group.length) {
       return Alert.alert(
         "Validation Error",
         "Please add at least one session."
       );
     }
+
+    // ✅ Validate all sessions (date, start, end, price)
+    for (const type of ["private", "group"]) {
+      for (const s of sessions[type]) {
+        if (!s.date || !s.start || !s.end || !s.price) {
+          return Alert.alert(
+            "Validation Error",
+            `Please fill all fields (date, start time, end time, price) for ${type} sessions.`
+          );
+        }
+        if (Number(s.price) <= 0) {
+          return Alert.alert(
+            "Validation Error",
+            `Price for ${type} sessions must be greater than 0.`
+          );
+        }
+      }
+    }
+
+    // ✅ Validate discounts
     for (const type of ["private", "group"]) {
       for (const d of discounts[type]) {
         if (!d.min || !d.max || !d.pct) {
@@ -211,6 +232,8 @@ export default function CoachInPersonPricingDetails({ navigation }) {
         }
       }
     }
+
+    // ✅ If all good → Save
     const bookingDetails = {
       acceptedClientLevels: selectedLevels,
       inPerson: {
