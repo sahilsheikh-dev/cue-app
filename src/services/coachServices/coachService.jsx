@@ -181,7 +181,6 @@ const coachService = {
   /* -------------------- Certificates -------------------- */
   async uploadCertificate({ coachId, certificateId, file }) {
     try {
-      const token = await get("auth");
       const formData = new FormData();
       formData.append("coachId", coachId);
 
@@ -198,8 +197,7 @@ const coachService = {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", // ✅ only content type
           },
         }
       );
@@ -220,10 +218,8 @@ const coachService = {
   },
 
   /* -------------------- Work Assets -------------------- */
-
   async uploadWorkAsset({ coachId, assetId, file }) {
     try {
-      const token = await get("auth");
       const formData = new FormData();
       formData.append("coachId", coachId);
 
@@ -245,8 +241,7 @@ const coachService = {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", // ✅ only content type
           },
         }
       );
