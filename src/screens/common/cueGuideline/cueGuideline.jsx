@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import Header from "../../../components/common/header/header";
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
+import Button from "../../../components/common/button/button";
 
 const background = require("../../../../assets/images/background.png");
 
@@ -77,6 +78,15 @@ export default function CueGuideline({ route, navigation }) {
             align="center"
           />
         )}
+      />
+      <Button
+        text={"Continue"}
+        onPress={() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "CoachDashboard" }],
+          });
+        }}
       />
     </ScreenLayout>
   );

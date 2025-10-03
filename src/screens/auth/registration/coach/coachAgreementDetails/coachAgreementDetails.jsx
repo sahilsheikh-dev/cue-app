@@ -208,7 +208,7 @@ export default function CoachAgreementDetails({ navigation }) {
       <ScreenLayout scrollable withPadding>
         <Header
           title="Coach Agreement Terms"
-          showBack={!isEdit}
+          showBack={true}
           onBackPress={() => navigation.goBack()}
         />
 
@@ -331,18 +331,25 @@ export default function CoachAgreementDetails({ navigation }) {
 
       {/* Action Button at bottom */}
       {isEdit ? (
-        <Button
-          text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
-          onPress={handleSave}
-          disabled={loading}
-          style={{ margin: 20 }}
-        />
+        <View
+          style={{ width: "100%", alignItems: "center", marginVertical: 20 }}
+        >
+          <Button
+            text={loading ? <ActivityIndicator color="#fff" /> : "Save"}
+            onPress={handleSave}
+            disabled={loading}
+          />
+        </View>
       ) : (
-        <Button
-          text="Edit"
-          onPress={() => setIsEdit(true)}
-          style={{ margin: 20 }}
-        />
+        <View
+          style={{ width: "100%", alignItems: "center", marginVertical: 20 }}
+        >
+          <Button
+            text={loading ? <ActivityIndicator color="#fff" /> : "Edit"}
+            onPress={() => setIsEdit(true)}
+            disabled={loading}
+          />
+        </View>
       )}
     </LinearGradient>
   );
