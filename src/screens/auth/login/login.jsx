@@ -18,7 +18,11 @@ import { useContext, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { Alert } from "react-native";
 
-import { loginWithApi } from "../../../services/authServices/authService";
+import {
+  loginWithApi,
+  getCoachFirstLogin,
+  setCoachFirstLogin,
+} from "../../../services/authServices/authService";
 import { DataContext } from "../../../context/dataContext";
 
 import ButtonLink from "../../../components/common/buttonLink/buttonLink";
@@ -86,7 +90,23 @@ export default function Login({ navigation }) {
         const saved = await login(res.token, role, res.user);
 
         if (saved) {
-          // ✅ Reset navigation to role-specific dashboard
+          if (role === "coach") {
+            const firstLoginFlag = await getCoachFirstLogin();
+
+            if (firstLoginFlag === null) {
+              // First time: mark as visited
+              await setCoachFirstLogin(true);
+
+              // Redirect to CoachIntroduction
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "CoachIntroduction" }],
+              });
+              return;
+            }
+          }
+
+          // Normal navigation (non-first login)
           navigation.reset({
             index: 0,
             routes: [
@@ -128,8 +148,11 @@ export default function Login({ navigation }) {
         <Dropdown
           label="Login As"
           data={["client", "coach", "eventOrganizer", "productCompany"]}
-          selected={role}
-          onSelect={(val) => setRole(val)}
+          // selected={role}
+          // onSelect={(val) => setRole(val)}
+          selected={"coach"}    // temp added to make coach default, remove it later
+          onSelect={() => {}}    // temp added to make coach default, remove it later
+          disabled={true}    // temp added to make coach default, remove it later
           dotSelect
           renderSelected={(item) =>
             item === "client"

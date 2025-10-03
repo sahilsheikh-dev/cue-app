@@ -137,8 +137,11 @@ export default function Signup({ navigation }) {
         <Dropdown
           label="Login As"
           data={["client", "coach", "eventOrganizer", "productCompany"]}
-          selected={role}
-          onSelect={(val) => setRole(val)}
+          // selected={role}
+          // onSelect={(val) => setRole(val)}
+          selected={"coach"} // temp added to make coach default, remove it later
+          onSelect={() => {}} // temp added to make coach default, remove it later
+          disabled={true} // temp added to make coach default, remove it later
           dotSelect
           renderSelected={(item) =>
             item === "client"

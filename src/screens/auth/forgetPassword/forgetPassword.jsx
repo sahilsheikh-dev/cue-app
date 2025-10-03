@@ -133,10 +133,13 @@ export default function ForgetPassword({ navigation }) {
       <Dropdown
         label="Select Role"
         data={roles}
-        selected={role}
-        onSelect={setRole}
+        // selected={role}
+        // onSelect={setRole}
+        // disabled={step !== "start"} // disable after step 1
+        disabled={true} // temp added to make coach default, remove it later
+        selected={"coach"} // temp added to make coach default, remove it later
+        onSelect={() => {}} // temp added to make coach default, remove it later
         dotSelect
-        disabled={step !== "start"} // disable after step 1
         containerStyle={{ width: "85%", alignSelf: "center" }}
       />
 
