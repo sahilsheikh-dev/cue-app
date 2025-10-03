@@ -25,7 +25,7 @@ import coachService from "../../../services/coachServices/coachService";
 export default function Signup({ navigation }) {
   const role_ref = useRef();
 
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("coach");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");

@@ -23,7 +23,7 @@ import countries from "../../../constants/countries";
 export default function ForgetPassword({ navigation }) {
   const roles = ["client", "coach", "eventOrganizer", "productCompany"];
 
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("coach");
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [mobileNumber, setMobileNumber] = useState("");
   const [otpId, setOtpId] = useState(null);

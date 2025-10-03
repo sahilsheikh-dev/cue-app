@@ -37,7 +37,7 @@ export default function Login({ navigation }) {
   // get login function from context
   const { login } = useContext(DataContext);
 
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("coach");
   const [mobileNumber, setMobileNumber] = useState();
   const [password, setPassword] = useState();
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
