@@ -214,6 +214,26 @@ export async function validateToken(role) {
   }
 }
 
+// Mark coach first login
+export async function setCoachFirstLogin(flag) {
+  try {
+    await put("coach_first_login", flag ? "true" : "false");
+  } catch (err) {
+    console.error("setCoachFirstLogin error:", err);
+  }
+}
+
+export async function getCoachFirstLogin() {
+  try {
+    const val = await get("coach_first_login");
+    if (val === null || val === undefined) return null; // first ever login
+    return val === "true"; // true = already did intro
+  } catch (err) {
+    console.error("getCoachFirstLogin error:", err);
+    return null;
+  }
+}
+
 const authService = {
   saveAuthTokenAndRole,
   initializeAuth,
@@ -225,6 +245,8 @@ const authService = {
   updatePassword,
   forgetPassword,
   validateToken,
+  setCoachFirstLogin,
+  getCoachFirstLogin,
 };
 
 export default authService;

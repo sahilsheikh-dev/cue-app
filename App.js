@@ -3,7 +3,12 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  CommonActions,
+  createNavigationContainerRef,
+  NavigationContainer,
+} from "@react-navigation/native";
+import { AppState } from "react-native";
 
 import { DataContext } from "./src/context/dataContext";
 import Splash from "./src/screens/common/splash/splash";
@@ -24,6 +29,13 @@ import clientService from "./src/services/clientServices/clientService";
 import eventOrganizerService from "./src/services/eventOrganizerServices/eventOrganizerService";
 import productCompanyService from "./src/services/productCompanyServices/productCompanyService";
 
+// ---------- Global navigation ref (used by axios 401 handler) ----------
+export const navigationRef = createNavigationContainerRef();
+global.navigationRef = navigationRef;
+
+// single-flight guard so multiple sources (axios/appstate/interval) don't trigger logout twice
+let isHandlingUnauthorized = false;
+
 export default function App() {
   // ---------- Load fonts ----------
   const [fontsLoaded] = useFonts({
@@ -43,6 +55,7 @@ export default function App() {
     authToken: undefined,
     role: undefined,
     data_filled: false,
+    user: null,
   });
 
   // ---------- Context helpers ----------
@@ -57,13 +70,12 @@ export default function App() {
         user,
       }));
       setLoading(false);
-      return true; // 👈 return success
+      return true;
     }
-    return false; // 👈 return failure
+    return false;
   }, []);
 
   const logout = useCallback(async () => {
-    // call server logout (best-effort) and clear local storage inside serverLogout
     const ok = await serverLogout();
     if (ok) {
       setData((prev) => ({
@@ -81,22 +93,16 @@ export default function App() {
     async (partialData = null) => {
       try {
         let refreshed;
-
-        if (data.role === "coach") {
-          refreshed = await coachService.getMyInfo();
-        } else if (data.role === "client") {
+        if (data.role === "coach") refreshed = await coachService.getMyInfo();
+        else if (data.role === "client")
           refreshed = await clientService.getMyInfo();
-        } else if (data.role === "eventOrganizer") {
+        else if (data.role === "eventOrganizer")
           refreshed = await eventOrganizerService.getMyInfo();
-        } else if (data.role === "productCompany") {
+        else if (data.role === "productCompany")
           refreshed = await productCompanyService.getMyInfo();
-        }
 
         if (refreshed?.success) {
-          setData((prev) => ({
-            ...prev,
-            user: refreshed.data,
-          }));
+          setData((prev) => ({ ...prev, user: refreshed.data }));
           return refreshed.data;
         }
       } catch (err) {
@@ -112,7 +118,6 @@ export default function App() {
         });
         return merged;
       }
-
       return null;
     },
     [data.role]
@@ -120,13 +125,11 @@ export default function App() {
 
   const markFilled = useCallback(async () => {
     const ok = await markDataFilled();
-    if (ok) {
-      setData((prev) => ({ ...prev, data_filled: true }));
-    }
+    if (ok) setData((prev) => ({ ...prev, data_filled: true }));
   }, []);
 
   const markCheckedToday = useCallback(async () => {
-    await checkedToday(); // no state update needed
+    await checkedToday();
   }, []);
 
   // ---------- Initial auth load ----------
@@ -137,7 +140,6 @@ export default function App() {
       if (!mounted) return;
 
       if (authToken && role) {
-        // ✅ Validate token with server
         const { ok, user: refreshedUser } = await authService.validateToken(
           role
         );
@@ -151,7 +153,6 @@ export default function App() {
             data_filled,
           });
         } else {
-          // Token invalid → force logout
           await clearLocalAuth();
           setData({
             auth: false,
@@ -163,7 +164,6 @@ export default function App() {
           });
         }
       } else {
-        // No token at all
         setData({
           auth: false,
           authToken: undefined,
@@ -181,10 +181,14 @@ export default function App() {
     };
   }, []);
 
+  // ---------- Global unauthorized handler (called by axios 401, etc.) ----------
   useEffect(() => {
     global.onUnauthorized = async () => {
-      console.log("🔄 Redirecting to Signup due to invalid JWT...");
-      await clearLocalAuth(); // from authService
+      if (isHandlingUnauthorized) return; // prevent duplicate handling
+      isHandlingUnauthorized = true;
+
+      console.log("🔄 Redirecting to Login due to invalid JWT...");
+      await clearLocalAuth();
       setData({
         auth: false,
         authToken: undefined,
@@ -193,8 +197,55 @@ export default function App() {
         url: BASE_API_URL,
         data_filled: false,
       });
+
+      // dispatch only once, when nav is ready
+      if (global.navigationRef?.isReady()) {
+        global.navigationRef.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
+      }
+
+      // allow future 401s to be handled again (after a tick)
+      setTimeout(() => {
+        isHandlingUnauthorized = false;
+      }, 0);
     };
   }, []);
+
+  // ---------- Background token pinger (every 5 mins) ----------
+  useEffect(() => {
+    if (!data.auth || !data.role) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const { ok } = await authService.validateToken(data.role);
+        if (!ok && global.onUnauthorized) {
+          console.warn("Token expired during background check, auto-logout...");
+          global.onUnauthorized();
+        }
+      } catch (err) {
+        console.warn("Background token check failed:", err.message);
+      }
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [data.auth, data.role]);
+
+  // ---------- When app returns to foreground, re-validate ----------
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", async (state) => {
+      if (state === "active" && data.auth && data.role) {
+        const { ok } = await authService.validateToken(data.role);
+        if (!ok && global.onUnauthorized) {
+          global.onUnauthorized();
+        }
+      }
+    });
+    return () => sub.remove();
+  }, [data.auth, data.role]);
 
   // ---------- Render ----------
   return (
@@ -211,13 +262,11 @@ export default function App() {
             refreshUser,
           }}
         >
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             {!fontsLoaded || (loading && !data.auth) ? (
               <Splash />
             ) : (
-              <RootNavigator
-                key={data.role || "auth"} // 👈 force re-mount when role changes after login
-              />
+              <RootNavigator key={data.role || "auth"} />
             )}
           </NavigationContainer>
         </DataContext.Provider>
