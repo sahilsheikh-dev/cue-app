@@ -14,7 +14,7 @@ import styles from "./loginCss";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { Alert } from "react-native";
 
@@ -43,6 +43,12 @@ export default function Login({ navigation }) {
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
   // const [agreeTc, setAgreeTc] = useState(false);
+
+  useEffect(() => {
+    if (!countries || countries.length === 0) {
+      Alert.alert("Error", "Countries data not available");
+    }
+  }, []);
 
   const handleLogin = async () => {
     // Role check
@@ -150,9 +156,9 @@ export default function Login({ navigation }) {
           data={["client", "coach", "eventOrganizer", "productCompany"]}
           // selected={role}
           // onSelect={(val) => setRole(val)}
-          selected={"coach"}    // temp added to make coach default, remove it later
-          onSelect={() => {}}    // temp added to make coach default, remove it later
-          disabled={true}    // temp added to make coach default, remove it later
+          selected={"coach"} // temp added to make coach default, remove it later
+          onSelect={() => {}} // temp added to make coach default, remove it later
+          disabled={true} // temp added to make coach default, remove it later
           dotSelect
           renderSelected={(item) =>
             item === "client"

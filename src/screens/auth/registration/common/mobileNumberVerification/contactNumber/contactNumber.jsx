@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import styles from "./contactNumberCss";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScreenLayout from "../../../../../../components/common/screenLayout/screenLayout";
 import Button from "../../../../../../components/common/button/button";
 import Header from "../../../../../../components/common/header/header";
@@ -32,6 +32,12 @@ export default function ContactNumber({ route, navigation }) {
   const [mobileNumber, setMobileNumber] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!countries || countries.length === 0) {
+      Alert.alert("Error", "Countries data not available");
+    }
+  }, []);
 
   const handleContinue = async () => {
     // 1️⃣ Role check

@@ -43,6 +43,12 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
+  useEffect(() => {
+    if (!languages || languages.length === 0) {
+      Alert.alert("Error", "Countries data not available");
+    }
+  }, []);
+
   // Prefill from context or route params
   useEffect(() => {
     const user = data?.user || {};

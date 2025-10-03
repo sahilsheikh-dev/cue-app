@@ -48,6 +48,12 @@ export default function CoachPersonalProfileDetails({ navigation }) {
   const [experienceDate, setExperienceDate] = useState("");
   const [isEdit, setIsEdit] = useState(false);
 
+  useEffect(() => {
+    if (!countries || countries.length === 0) {
+      Alert.alert("Error", "Countries data not available");
+    }
+  }, []);
+
   // Prefill data if present
   useEffect(() => {
     if (data?.user) {

@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import ScreenLayout from "../../../components/common/screenLayout/screenLayout";
 import Dropdown from "../../../components/common/dropdown/dropdown";
@@ -41,6 +41,12 @@ export default function ForgetPassword({ navigation }) {
   // "verified" → password input enabled
 
   const fullPhone = `${selectedCountry.code}${mobileNumber}`;
+
+  useEffect(() => {
+    if (!countries || countries.length === 0) {
+      Alert.alert("Error", "Countries data not available");
+    }
+  }, []);
 
   const handleSendOtp = async () => {
     if (!role || !mobileNumber) {
