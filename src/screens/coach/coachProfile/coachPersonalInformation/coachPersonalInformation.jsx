@@ -58,7 +58,7 @@ export default function CoachPersonalInformation({ navigation }) {
           </View>
           <View style={styles.io_name_section_lo}>
             <Text style={styles.io_name}>
-              {data?.user?.email ? data.user.email : "coach@cuewellness.net"}
+              {data?.user?.email ? data.user.email : "NA"}
             </Text>
           </View>
         </TouchableOpacity>
@@ -70,7 +70,7 @@ export default function CoachPersonalInformation({ navigation }) {
           </View>
           <View style={styles.io_name_section_lo}>
             <Text style={styles.io_name}>
-              {data?.user?.mobile ? data.user.mobile : "9876543210"}
+              {data?.user?.mobile ? data.user.mobile : "NA"}
             </Text>
           </View>
         </TouchableOpacity>
@@ -98,7 +98,7 @@ export default function CoachPersonalInformation({ navigation }) {
             </View>
             <View style={styles.io_name_section_lo_to}>
               <Text style={styles.io_name}>
-                {data?.user?.country ? data.user.country : "UAE"}
+                {data?.user?.country ? data.user.country : "NA"}
               </Text>
             </View>
           </TouchableOpacity>
