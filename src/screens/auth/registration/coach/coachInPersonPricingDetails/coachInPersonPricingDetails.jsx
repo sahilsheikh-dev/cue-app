@@ -338,59 +338,49 @@ export default function CoachInPersonPricingDetails({ navigation }) {
             <View key={idx} style={styles.discountCard}>
               <View style={styles.discountRow}>
                 {/* Min */}
-                <View style={styles.discountBox}>
-                  <Text style={styles.whiteText}>{d.min || "Min"}</Text>
-                  {isEdit && (
-                    <TextInput
-                      style={styles.hiddenInput}
-                      keyboardType="numeric"
-                      value={d.min?.toString()}
-                      onChangeText={(val) =>
-                        updateDiscount(type, idx, "min", val)
-                      }
-                    />
-                  )}
-                </View>
+                <TextInput
+                  style={styles.discountInput}
+                  placeholder="Min"
+                  placeholderTextColor="#aaa"
+                  keyboardType="numeric"
+                  value={d.min?.toString()}
+                  onChangeText={(val) => updateDiscount(type, idx, "min", val)}
+                  editable={isEdit}
+                />
 
-                <Text style={{ color: "#fff" }}>to</Text>
+                <Text style={{ color: "#fff", marginHorizontal: 6 }}>to</Text>
 
                 {/* Max */}
-                <View style={styles.discountBox}>
-                  <Text style={styles.whiteText}>{d.max || "Max"}</Text>
-                  {isEdit && (
-                    <TextInput
-                      style={styles.hiddenInput}
-                      keyboardType="numeric"
-                      value={d.max?.toString()}
-                      onChangeText={(val) =>
-                        updateDiscount(type, idx, "max", val)
-                      }
-                    />
-                  )}
-                </View>
+                <TextInput
+                  style={styles.discountInput}
+                  placeholder="Max"
+                  placeholderTextColor="#aaa"
+                  keyboardType="numeric"
+                  value={d.max?.toString()}
+                  onChangeText={(val) => updateDiscount(type, idx, "max", val)}
+                  editable={isEdit}
+                />
 
                 {/* % Off */}
-                <View
-                  style={[
-                    styles.discountBox,
-                    { flexDirection: "row", alignItems: "center" },
-                  ]}
-                >
-                  <Text style={styles.whiteText}>
-                    {d.pct ? `${d.pct}% Off` : "% Off"}
-                  </Text>
-                  {isEdit && (
-                    <TextInput
-                      style={styles.hiddenInput}
-                      keyboardType="numeric"
-                      value={d.pct?.toString()}
-                      onChangeText={(val) =>
-                        updateDiscount(type, idx, "pct", val)
-                      }
-                    />
-                  )}
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <TextInput
+                    style={[
+                      styles.discountInput,
+                      { width: 60, marginRight: 4 },
+                    ]}
+                    placeholder="%"
+                    placeholderTextColor="#aaa"
+                    keyboardType="numeric"
+                    value={d.pct?.toString()}
+                    onChangeText={(val) =>
+                      updateDiscount(type, idx, "pct", val)
+                    }
+                    editable={isEdit}
+                  />
+                  <Text style={{ color: "#fff" }}>% Off</Text>
                 </View>
 
+                {/* Delete */}
                 {isEdit && (
                   <TouchableOpacity
                     onPress={() => removeDiscountRow(type, idx)}

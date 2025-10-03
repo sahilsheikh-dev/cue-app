@@ -50,6 +50,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 12,
   },
+  discountInput: {
+    color: "#fff",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 20,
+    borderColor: "#ffffff40",
+    padding: 12,
+    marginTop: 10,
+    marginBottom: 12,
+  },
   levelBtn: {
     paddingHorizontal: 16,
     paddingVertical: 8,
