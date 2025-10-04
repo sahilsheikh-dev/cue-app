@@ -31,12 +31,13 @@ export default function CoachProfileReviewConfirmDetails({
     agree_experience,
     agree_refund,
     my_activities = [],
+    my_activities_display = [],
     accepted_genders,
     accepted_languages,
   } = route.params;
 
   // 🔹 Local state for resolved activity titles
-  const [activityTitles, setActivityTitles] = useState([]);
+  const activityTitles = my_activities_display.map((a) => a.title);
 
   // 🔹 Fetch titles for activities
   useEffect(() => {

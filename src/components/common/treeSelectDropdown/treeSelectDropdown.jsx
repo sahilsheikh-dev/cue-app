@@ -30,6 +30,7 @@ const TreeSelectDropdown = ({
   disabled = false,
   fetchRoot,
   fetchChildren,
+  onTitleCacheUpdate,
 }) => {
   const sheetRef = useRef();
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,10 @@ const TreeSelectDropdown = ({
   const [items, setItems] = useState([]); // items currently visible
   const [stack, setStack] = useState([]); // breadcrumb navigation
   const [titleCache, setTitleCache] = useState({}); // {id: title}
+
+  useEffect(() => {
+    onTitleCacheUpdate?.(titleCache);
+  }, [titleCache]);
 
   const openSheet = async () => {
     if (disabled) return;
@@ -95,37 +100,43 @@ const TreeSelectDropdown = ({
   // 🔹 Preload titles for already selected IDs
   useEffect(() => {
     if (selected.length === 0) return;
+
     const preloadTitles = async () => {
-      // If some IDs not in cache, fetch their parent sets
       const missingIds = selected.filter((id) => !titleCache[id]);
-      if (missingIds.length > 0) {
-        try {
-          // Try to get root first
-          const roots = await fetchRoot();
-          const tc = {};
-          roots.forEach((it) => (tc[it.id] = it.title));
-          setTitleCache((prev) => ({ ...prev, ...tc }));
-          // Try children of each root
-          for (const root of roots) {
-            if (root.contains_subtopic) {
-              const children = await fetchChildren(root.id);
-              const childMap = {};
-              children.forEach((it) => (childMap[it.id] = it.title));
-              setTitleCache((prev) => ({ ...prev, ...childMap }));
+      if (missingIds.length === 0) return;
+
+      try {
+        const tc = {};
+
+        // Recursive function to explore children until no deeper layers exist
+        const loadLayer = async (parentId = null) => {
+          const nodes = parentId
+            ? await fetchChildren(parentId)
+            : await fetchRoot();
+          nodes.forEach((n) => (tc[n.id] = n.title));
+
+          for (const node of nodes) {
+            if (node.contains_subtopic) {
+              await loadLayer(node.id);
             }
           }
-        } catch (err) {
-          console.error("Preload activity titles error:", err);
-        }
+        };
+
+        // Start from root layer
+        await loadLayer();
+
+        setTitleCache((prev) => ({ ...prev, ...tc }));
+      } catch (err) {
+        console.error("Preload activity titles error:", err);
       }
     };
+
     preloadTitles();
   }, [selected]);
 
-  const selectedText =
-    selected.length > 0
-      ? selected.map((id) => titleCache[id] || id).join(", ")
-      : label;
+  // const selectedText = selected.length > 0 ? selected.map((id) => titleCache[id] || id).join(", ") : label;    // uncomment this if need to show selected on dropdown
+
+  const selectedText = "Select Activities";
 
   return (
     <>
