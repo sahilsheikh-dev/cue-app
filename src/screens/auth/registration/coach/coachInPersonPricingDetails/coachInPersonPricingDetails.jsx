@@ -333,7 +333,7 @@ export default function CoachInPersonPricingDetails({ navigation }) {
                   ]}
                 >
                   <Text style={[styles.whiteText, { marginRight: 4 }]}>$</Text>
-                  <Text style={styles.whiteText}>{s.price || "Price"}</Text>
+                  <Text style={styles.whiteText}>{s.price}</Text>
                   {isEdit && (
                     <TextInput
                       style={styles.hiddenInput}
