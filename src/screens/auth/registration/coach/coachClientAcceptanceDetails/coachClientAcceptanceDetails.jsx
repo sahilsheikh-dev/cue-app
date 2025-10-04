@@ -42,6 +42,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
   const [acceptedLanguages, setAcceptedLanguages] = useState([]); // store ids (["en","hi"])
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [titleCache, setTitleCache] = useState({});
 
   useEffect(() => {
     if (!languages || languages.length === 0) {
@@ -76,26 +77,33 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
     return true;
   };
 
-  const buildPayload = () => ({
-    email,
-    dob,
-    gender,
-    country,
-    city,
-    address,
-    pincode,
-    experience_since_date,
-    agree_certification,
-    agree_experience,
-    agree_refund,
-    my_activities: selectedActivities,
-    accepted_genders: acceptedGenders,
-    accepted_languages: acceptedLanguages, // always IDs
-  });
-
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isEdit && !validateFields()) return;
-    navigation.navigate("CoachProfileReviewConfirmDetails", buildPayload());
+
+    // 1️⃣ Build title map (resolve titles from TreeSelectDropdown’s cache)
+    const activityTitleMap = selectedActivities.map((id) => ({
+      id,
+      title: titleCache[id] || id,
+    }));
+
+    // 2️⃣ Pass IDs and title map to next screen
+    navigation.navigate("CoachProfileReviewConfirmDetails", {
+      email,
+      dob,
+      gender,
+      country,
+      city,
+      address,
+      pincode,
+      experience_since_date,
+      agree_certification,
+      agree_experience,
+      agree_refund,
+      my_activities: selectedActivities, // IDs only for DB
+      my_activities_display: activityTitleMap, // Human-readable names
+      accepted_genders: acceptedGenders,
+      accepted_languages: acceptedLanguages,
+    });
   };
 
   // --- API connectors for TreeSelectDropdown ---
@@ -173,6 +181,7 @@ export default function CoachClientAcceptanceDetails({ navigation, route }) {
           disabled={!isEdit}
           fetchRoot={fetchRoot}
           fetchChildren={fetchChildren}
+          onTitleCacheUpdate={setTitleCache}
         />
       </View>
 
